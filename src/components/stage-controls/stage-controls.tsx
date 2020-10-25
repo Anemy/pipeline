@@ -6,15 +6,11 @@ import {
   UpdateStoreAction
 } from '../../store/actions';
 import {
-  AppState,
-  NO_ACTIVE_STAGE
+  AppState
 } from '../../store/store';
 import Stage from '../models/stage';
 
-import './stage-editor.css';
-
-import SampleDocuments from '../sample-documents/sample-documents';
-import StageControls from '../stage-controls/stage-controls';
+import './stage-controls.css';
 
 type StateProps = {
   activeStage: number;
@@ -26,26 +22,18 @@ type DispatchProps = {
 };
 
 
-class StageEditor extends React.Component<StateProps & DispatchProps> {
-  renderNoActiveStage() {
-    return (
-      <div className="stage-editor-empty-state">
-        No active stage, please choose one from above
-      </div>
-    );
-  }
-  
+class StageControls extends React.Component<StateProps & DispatchProps> {  
   render() {
     const { activeStage, stages } = this.props;
 
-    const hasValidStageSelected = activeStage !== NO_ACTIVE_STAGE && !!stages[activeStage];
-
     return (
       <div className="stage-editor-container">
-        Stage Editor
-        {!hasValidStageSelected && this.renderNoActiveStage()}
-        {hasValidStageSelected && <SampleDocuments />}
-        {hasValidStageSelected && <StageControls />}
+        <div>
+          Stage Controls
+        </div>
+        <div>
+          Stage: {stages[activeStage].type}
+        </div>
       </div>
     );
   }
@@ -66,4 +54,4 @@ const mapDispatchToProps: DispatchProps = {
   })
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(StageEditor);
+export default connect(mapStateToProps, mapDispatchToProps)(StageControls);

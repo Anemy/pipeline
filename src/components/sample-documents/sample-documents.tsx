@@ -9,7 +9,7 @@ import {
 import { AppState } from '../../store/store';
 import Stage from '../models/stage';
 
-import './stage-bar.css';
+import './sample-documents.css';
 
 type StateProps = {
   stages: Stage[];
@@ -19,41 +19,11 @@ type DispatchProps = {
   updateStore: (update: any) => void;
 };
 
-class StagesBar extends React.Component<StateProps & DispatchProps> {
-  addNewStage = (): void => {
-    alert('new stage');
-  }
-
-  onStageClicked = (): void => {
-    alert('stage clicked');
-  }
-
-  renderStages = (): React.ReactNode => {
-    const { stages } = this.props;
-
-    return (
-      <React.Fragment>
-        {stages.map(stage => (
-          <div
-            className="stages-bar-stage"
-            onClick={this.onStageClicked}
-          >
-            Stage: {stage.type}
-          </div>
-        ))}
-      </React.Fragment>
-    );
-  }
-
+class SampleDocuments extends React.Component<StateProps & DispatchProps> {
   render() {
     return (
       <div className="stages-bar-container">
-        Stages Bar
-        <button
-          onClick={this.addNewStage}
-        >
-          +
-        </button>
+        Sample Documents
       </div>
     );
   }
@@ -73,4 +43,4 @@ const mapDispatchToProps: DispatchProps = {
   })
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(StagesBar);
+export default connect(mapStateToProps, mapDispatchToProps)(SampleDocuments);
