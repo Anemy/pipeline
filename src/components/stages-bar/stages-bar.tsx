@@ -7,7 +7,7 @@ import {
   UpdateStoreAction
 } from '../../store/actions';
 import { AppState } from '../../store/store';
-import Stage from '../models/stage';
+import Stage, { STAGES } from '../models/stage';
 
 import './stage-bar.css';
 
@@ -22,6 +22,12 @@ type DispatchProps = {
 class StagesBar extends React.Component<StateProps & DispatchProps> {
   addNewStage = (): void => {
     alert('new stage');
+    this.props.updateStore({
+      stages: [
+        ...this.props.stages,
+        new Stage(STAGES.FILTER)
+      ]
+    })
   }
 
   onStageClicked = (): void => {
@@ -49,10 +55,28 @@ class StagesBar extends React.Component<StateProps & DispatchProps> {
     return (
       <div className="stages-bar-container">
         Stages Bar
+        <div>
+          {this.renderStages()}
+          <button
+            onClick={this.addNewStage}
+          >
+            +
+          </button>
+          <button
+            onClick={this.addNewStage}
+          >
+            Expand
+          </button>
+        </div>
         <button
           onClick={this.addNewStage}
         >
-          +
+          Run
+        </button>
+        <button
+          onClick={this.addNewStage}
+        >
+          Export
         </button>
       </div>
     );
