@@ -142,7 +142,6 @@ class CoordinatesMinichart extends Component<props> {
 
     const values = this.props.type.values.filter(isValidLatLng);
 
-    console.log('This might break: changed aaa');
     let bounds = leaflet.getBounds();// @RHYS - USED TO BE: // L.latLngBounds();
 
     if (values.length === 1) {

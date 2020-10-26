@@ -56,7 +56,7 @@ const minicharts_d3fns_geo = (localAppRegistry: any) => {
     let update: any = null;
 
     function dispatchQueryActions() {
-      const QueryAction = localAppRegistry.getAction('Query.Actions');
+      // const QueryAction = localAppRegistry.getAction('Query.Actions');
 
       if (circleCenter && circleOuter) {
         mileDistance = turfDistance(
@@ -64,15 +64,17 @@ const minicharts_d3fns_geo = (localAppRegistry: any) => {
           turfPoint([circleOuter.lng, circleOuter.lat]),
           'miles'
         );
-        QueryAction.setGeoWithinValue({
-          field: options.fieldName,
-          center: [circleCenter.lng, circleCenter.lat],
-          radius: mileDistance / 3963.2
-        });
+        alert('TODO: Use this action to build project');
+        // QueryAction.setGeoWithinValue({
+        //   field: options.fieldName,
+        //   center: [circleCenter.lng, circleCenter.lat],
+        //   radius: mileDistance / 3963.2
+        // });
       } else {
-        QueryAction.clearValue({
-          field: options.fieldName
-        });
+        alert('TODO: Use this action to clear something from the project - maybe this won\'t be a thing.');
+        // QueryAction.clearValue({
+        //   field: options.fieldName
+        // });
       }
     }
 

@@ -13,7 +13,7 @@ import {
   map
 } from 'lodash';
 
-// import $ from 'jquery';
+import $ from 'jquery';
 import moment from 'moment';
 import shared from './shared';
 import many from './many';
@@ -36,8 +36,7 @@ function extractTimestamp(d: any) {
   // date object from string.
   // TODO: this could be cleaner.
   try {
-    const objectId = bson.ObjectId.createFromHexString(d);
-    return objectId.getTimestamp();
+    return d.getTimestamp();
   } catch (e) {
     // error does not matter here, since we know objectid creation failed and
     // this is then a date string.
@@ -92,7 +91,7 @@ const minicharts_d3fns_date = (appRegistry: any) => {
   // }
 
   function handleDrag() {
-    const QueryAction = appRegistry.getAction('Query.Actions');
+    // const QueryAction = appRegistry.getAction('Query.Actions');
     const lines = el.selectAll('line.selectable');
     const numSelected = el.selectAll('line.selectable.selected').length;
     const s = brush.extent();
@@ -114,9 +113,10 @@ const minicharts_d3fns_date = (appRegistry: any) => {
       // number of selected items has changed, trigger querybuilder event
       if (selected[0].length === 0) {
         // clear value
-        QueryAction.clearValue({
-          field: options.fieldName
-        });
+        alert('TODO: Use this action to clear an item from the project'); // mmmm
+        // QueryAction.clearValue({
+        //   field: options.fieldName
+        // });
         return;
       }
     }
@@ -131,19 +131,21 @@ const minicharts_d3fns_date = (appRegistry: any) => {
 
     if (isEqual(minValue.ts, maxValue.ts)) {
       // if values are the same, single equality query
-      QueryAction.setValue({
-        field: options.fieldName,
-        value: minValue.value
-      }, true);
+      alert('TODO: Use this action to build project'); // mmmmm
+      // QueryAction.setValue({
+      //   field: options.fieldName,
+      //   value: minValue.value
+      // }, true);
       return;
     }
     // binned values, build range query with $gte and $lte
-    QueryAction.setRangeValues({
-      field: options.fieldName,
-      min: minValue.value,
-      max: maxValue.value,
-      maxInclusive: true
-    });
+    alert('TODO: Use this action to build project'); // mmmmm
+    // QueryAction.setRangeValues({
+    //   field: options.fieldName,
+    //   min: minValue.value,
+    //   max: maxValue.value,
+    //   maxInclusive: true
+    // });
   }
 
   function brushed() {
@@ -156,29 +158,31 @@ const minicharts_d3fns_date = (appRegistry: any) => {
 
 
   function handleMouseDown(d: any) {
-    const QueryAction = appRegistry.getAction('Query.Actions');
+    // const QueryAction = appRegistry.getAction('Query.Actions');
     if (d3.event.shiftKey && lastNonShiftRangeValue) {
       const minVal = d.ts < lastNonShiftRangeValue.ts ? d.value : lastNonShiftRangeValue.value;
       const maxVal = d.ts > lastNonShiftRangeValue.ts ? d.value : lastNonShiftRangeValue.value;
-      QueryAction.setRangeValues({
-        field: options.fieldName,
-        min: minVal,
-        max: maxVal,
-        maxInclusive: true
-      });
+      alert('TODO: Use this action to build project'); // mmmmm
+      // QueryAction.setRangeValues({
+      //   field: options.fieldName,
+      //   min: minVal,
+      //   max: maxVal,
+      //   maxInclusive: true
+      // });
     } else {
       // remember non-shift value so that range can be extended with shift
       lastNonShiftRangeValue = d;
-      QueryAction.setValue({
-        field: options.fieldName,
-        value: d.value,
-        unsetIfSet: true
-      });
+      alert('TODO: Use this action to build project'); // mmmmm
+      // QueryAction.setValue({
+      //   field: options.fieldName,
+      //   value: d.value,
+      //   unsetIfSet: true
+      // });
     }
 
-    console.log('Here! Avoid jquery - this may break...');
-    const parent = document.querySelector(this).closest('.minichart');
-    // const parent = $(this).closest('.minichart');
+    // console.log('Here! Avoid jquery - this may break...');
+    // const parent = document.querySelector(this).closest('.minichart');
+    const parent = $(this).closest('.minichart');
     const background = parent.find('g.brush > rect.background')[0];
     const brushNode = parent.find('g.brush')[0];
     const start = barcodeX.invert(d3.mouse(background)[0]);
@@ -396,6 +400,10 @@ const minicharts_d3fns_date = (appRegistry: any) => {
           labels: {
             'text-anchor': 'middle',
             text: function (d: any) {
+              // TODO @Rhys: addedV
+              if (!d.label) {
+                return 'no label to be found';
+              }
               return d.label[0];
             }
           }

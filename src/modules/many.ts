@@ -1,6 +1,6 @@
 /* eslint no-use-before-define: 0, camelcase: 0 */
 import d3 from 'd3';
-// import $ from 'jquery';
+import $ from 'jquery';
 import {
   assign,
   defaults,
@@ -16,7 +16,7 @@ import { hasDistinctValue, inValueRange } from 'mongodb-query-util';
 require('./d3-tip')(d3);
 
 const minicharts_d3fns_many = (appRegistry: any) => {
-  const QueryAction = appRegistry.getAction('Query.Actions');
+  // const QueryAction = appRegistry.getAction('Query.Actions');
 
   // --- beginning chart setup ---
   let width = 400; // default width
@@ -71,18 +71,21 @@ const minicharts_d3fns_many = (appRegistry: any) => {
     if (numSelected !== selected[0].length) {
       if (selected[0].length === 0) {
         // clear value
-        QueryAction.clearValue({
-          field: options.fieldName
-        });
+        // QueryAction.clearValue({
+        //   field: options.fieldName
+        // });
+        alert('TODO: Use this action to clear a value from the project - maybe gone away'); // mmmmm
         return;
       }
       // distinct values (strings)
       if (options.selectionType === 'distinct') {
         const values = map(selected.data(), 'value');
-        QueryAction.setDistinctValues({
-          field: options.fieldName,
-          value: values.map((v) => options.promoter(v))
-        });
+        alert('TODO: Use this action to add to the projection'); // mmmmm
+
+        // QueryAction.setDistinctValues({
+        //   field: options.fieldName,
+        //   value: values.map((v) => options.promoter(v))
+        // });
         return;
       }
       // numeric types
@@ -95,20 +98,22 @@ const minicharts_d3fns_many = (appRegistry: any) => {
 
       if (minValue.value === maxValue.value + maxValue.dx) {
         // if not binned and values are the same, single equality query
-        QueryAction.setValue({
-          field: options.fieldName,
-          value: options.promoter(minValue.bson)
-        });
+        alert('TODO: Use this action to build project'); // mmmmm
+        // QueryAction.setValue({
+        //   field: options.fieldName,
+        //   value: options.promoter(minValue.bson)
+        // });
         return;
       }
       // binned values, build range query with $gte and $lt (if binned)
       // or $gte and $lte (if not binned)
-      QueryAction.setRangeValues({
-        field: options.fieldName,
-        min: options.promoter(minValue.value),
-        max: options.promoter(maxValue.value + maxValue.dx),
-        maxInclusive: maxValue.dx === 0
-      });
+      alert('TODO: Use this action to build project'); // mmmmm
+      // QueryAction.setRangeValues({
+      //   field: options.fieldName,
+      //   min: options.promoter(minValue.value),
+      //   max: options.promoter(maxValue.value + maxValue.dx),
+      //   maxInclusive: maxValue.dx === 0
+      // });
     }
   }
 
@@ -146,44 +151,48 @@ const minicharts_d3fns_many = (appRegistry: any) => {
 
     if (options.selectionType === 'distinct') {
       // distinct values, behavior dependent on shift key
-      const qbAction = d3.event.shiftKey ?
-        QueryAction.toggleDistinctValue : QueryAction.setValue;
-      qbAction({
-        field: options.fieldName,
-        value: options.promoter(d.value),
-        unsetIfSet: true
-      });
+      // const qbAction = d3.event.shiftKey ?
+      // QueryAction.toggleDistinctValue : QueryAction.setValue;
+      alert('TODO: Use this action to build the project'); // mmmmm
+      // qbAction({
+      //   field: options.fieldName,
+      //   value: options.promoter(d.value),
+      //   unsetIfSet: true
+      // });
     } else if (d3.event.shiftKey && lastNonShiftRangeValue) {
-      QueryAction.setRangeValues({
-        field: options.fieldName,
-        min: options.promoter(Math.min(d.value, lastNonShiftRangeValue.value)),
-        max: options.promoter(Math.max(d.value + d.dx, lastNonShiftRangeValue.value + lastNonShiftRangeValue.dx)),
-        maxInclusive: d.dx === 0
-      });
+      alert('TODO: Use this action to build the project'); // mmmmm
+      // QueryAction.setRangeValues({
+      //   field: options.fieldName,
+      //   min: options.promoter(Math.min(d.value, lastNonShiftRangeValue.value)),
+      //   max: options.promoter(Math.max(d.value + d.dx, lastNonShiftRangeValue.value + lastNonShiftRangeValue.dx)),
+      //   maxInclusive: d.dx === 0
+      // });
     } else {
       // remember non-shift value so that range can be extended with shift
       lastNonShiftRangeValue = d;
       if (d.dx > 0) {
         // binned bars, turn single value into range
-        QueryAction.setRangeValues({
-          field: options.fieldName,
-          min: options.promoter(d.value),
-          max: options.promoter(d.value + d.dx),
-          unsetIfSet: true
-        });
+        alert('TODO: Use this action to build a project'); // mmmmm
+        // QueryAction.setRangeValues({
+        //   field: options.fieldName,
+        //   min: options.promoter(d.value),
+        //   max: options.promoter(d.value + d.dx),
+        //   unsetIfSet: true
+        // });
       } else {
         // bars don't represent bins, build single value query
-        QueryAction.setValue({
-          field: options.fieldName,
-          value: options.promoter(d.bson),
-          unsetIfSet: true
-        });
+        alert('TODO: Use this action to build a project'); // mmmmm
+        // QueryAction.setValue({
+        //   field: options.fieldName,
+        //   value: options.promoter(d.bson),
+        //   unsetIfSet: true
+        // });
       }
     }
     // document.querySelector('.navPanel img').closest('td')
-    console.log('Here! Avoid jquery - this may break...');
-    const parent = document.querySelector(this).closest('.minichart');
-    // const parent = $(this).closest('.minichart');
+    // console.log('Here! Avoid jquery - this may break...');
+    // const parent = document.querySelector(this).closest('.minichart');
+    const parent = $(this).closest('.minichart');
     const background = parent.find('g.brush > rect.background')[0];
     const brushNode = parent.find('g.brush')[0];
     const start = d3.mouse(background)[0];

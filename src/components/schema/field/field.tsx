@@ -165,7 +165,7 @@ class Field extends Component<props> {
         <Type
           key={index}
           activeType={this.state.activeType}
-          renderType={this.renderType}
+          renderType={() => this.renderType(type)}
           selfType={type}
           showSubTypes
 

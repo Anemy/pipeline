@@ -37,6 +37,7 @@ export const getInitialState = (mongoClient: MongoClient) => ({
   mongoClient,
   sampleCount: DEFAULT_SAMPLE_COUNT,
   showGraph: false,
+  // dxl . versions also good.
   stages: [new DataSource('ships', 'shipwrecks')]
 });
 

@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import d3 from 'd3';
 import bson from 'bson';
-import { assign } from 'lodash';
+
 import { InnerFieldType } from '../../../models/field-type';
 
 /**
@@ -42,6 +42,9 @@ class D3Component extends Component<props> {
     chart: null
   };
 
+  containerRef: any = null;
+  wrapperRef: any = null;
+
   componentWillMount() {
     this.setState({
       // Prop was local app registry V
@@ -62,18 +65,18 @@ class D3Component extends Component<props> {
   }
 
   _getContainer() {
-    let options = {
-      className: 'minichart',
-      ref: 'container'
-    };
     const sizeOptions = {
       width: this.props.width,
       height: this.props.height
     };
     if (this.props.renderMode === 'svg') {
-      options = assign(options, sizeOptions);
       return (
-        <svg {...options}>
+        <svg
+          className="minichart"
+          ref={ref => this.containerRef = ref}
+          width={this.props.width}
+          height={this.props.height}
+        >
           <defs>
             <pattern id="diagonal-stripes" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
               <rect width="2.5" height="4" transform="translate(0,0)" fill="white"></rect>
@@ -85,10 +88,11 @@ class D3Component extends Component<props> {
         </svg>
       );
     }
-    options = assign(options, {
-      style: sizeOptions
-    });
-    return <div {...options}></div>;
+    return <div
+      className="minichart"
+      ref={ref => this.containerRef = ref}
+      style={sizeOptions}
+    />;
   }
 
   _cleanup() {
@@ -98,7 +102,7 @@ class D3Component extends Component<props> {
   }
 
   _redraw() {
-    const el = ReactDOM.findDOMNode(this.refs.container);
+    const el = ReactDOM.findDOMNode(this.containerRef);
     this.state.chart
       .width(this.props.width)
       .height(this.props.height);
@@ -123,7 +127,7 @@ class D3Component extends Component<props> {
   render() {
     const container = this._getContainer();
     return (
-      <div className="minichart-wrapper" ref="wrapper">
+      <div className="minichart-wrapper" ref={ref => this.wrapperRef = ref}>
         {container}
       </div>
     );

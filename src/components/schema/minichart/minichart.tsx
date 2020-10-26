@@ -6,10 +6,9 @@ import CoordinatesMinichart from '../coordinates-minichart/coordinates-minichart
 import D3Component from '../d3-component/d3-component';
 
 import { includes } from 'lodash';
-import { SCHEMA_CONSTANTS } from '../../../store/store';
 import { ArrayFieldType, InnerFieldType, ObjectFieldType, Types } from '../../../models/field-type';
 
-const vizFns = require('../../../modules');
+import vizFns from '../../../modules';
 
 type props = {
   fieldName: string,
@@ -87,14 +86,14 @@ class MiniChart extends Component<props> {
   minichartFactory() {
     // cast all numeric types to Number pseudo-type
     // when drawing charts, group all the types of dates together
-    const typeName = includes([SCHEMA_CONSTANTS.DECIMAL_128, SCHEMA_CONSTANTS.DOUBLE, SCHEMA_CONSTANTS.INT_32, SCHEMA_CONSTANTS.LONG], this.props.type.name)
-      ? SCHEMA_CONSTANTS.NUMBER : includes([SCHEMA_CONSTANTS.UTCDATETIME, SCHEMA_CONSTANTS.TIMESTAMP], this.props.type.name)
-        ? SCHEMA_CONSTANTS.DATE : this.props.type.name;
+    const typeName = includes([Types.DECIMAL_128, Types.DOUBLE, Types.INT_32, Types.LONG], this.props.type.name)
+      ? Types.NUMBER : includes([Types.UTCDATETIME, Types.TIMESTAMP], this.props.type.name)
+        ? Types.DATE : this.props.type.name;
 
     const fieldName = this.props.fieldName;
     const queryValue = this.state.filter[fieldName];
     const hasDuplicates = this.props.type.has_duplicates;
-    const fn = vizFns[typeName.toLowerCase()];
+    const fn = (vizFns as any)[typeName.toLowerCase()];
     const width = this.state.containerWidth;
 
     if (!width) {
@@ -102,7 +101,7 @@ class MiniChart extends Component<props> {
       return;
     }
 
-    if (includes([SCHEMA_CONSTANTS.STRING, SCHEMA_CONSTANTS.NUMBER], typeName) && !hasDuplicates) {
+    if (includes([Types.STRING, Types.NUMBER], typeName) && !hasDuplicates) {
       return (
         <UniqueMiniChart
           key={typeName}

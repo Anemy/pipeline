@@ -48,11 +48,11 @@ class StageEditor extends React.Component<StateProps & DispatchProps> {
           samplingState={SAMPLING_STATES.complete}
           schema={sampleDocumentsSchema}
         />
-        {/* <div> */}
-          {/* <pre>
+        {/* <div>
+          <pre>
             Sample docs Schema: {JSON.stringify(sampleDocumentsSchema, null, 2)}
-          </pre> */}
-        {/* </div> */}
+          </pre>
+        </div> */}
       </div>
     );
   }
