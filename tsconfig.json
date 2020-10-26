@@ -13,8 +13,10 @@
     "moduleResolution": "node",
     // "noEmit": false,
     "jsx": "react",
-    "noEmit": false
+    "noEmit": false,
     // "outDir": "dist"
+    "allowJs": true,
+    "noImplicitThis": false // Added for the `modules` from compass-schema
   },
   "exclude": [
     "node_modules",

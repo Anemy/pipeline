@@ -24,7 +24,7 @@ class App extends React.Component {
       errorConnectingToDataService: ''
     });
 
-    const connectionUri = 'mongodb://localhost:27017';
+    const connectionUri = process.env.MONGODB_URI || 'mongodb://localhost:27017';
     const client = new MongoClient(connectionUri, {
       useUnifiedTopology: true
     });

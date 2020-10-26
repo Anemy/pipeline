@@ -1,15 +1,15 @@
 /* eslint camelcase: 0 */
-import d3 from 'd3';
+import { select as d3Select } from 'd3';
 import { assign, map, groupBy, orderBy } from 'lodash';
 import few from './few';
 import many from './many';
 import shared from './shared';
 
-const minicharts_d3fns_string = (appRegistry) => {
+const minicharts_d3fns_string = (appRegistry: any) => {
   // --- beginning chart setup ---
   let width = 400;
   let height = 100;
-  const options = {
+  const options: any = {
     query: {}
   };
 
@@ -18,17 +18,17 @@ const minicharts_d3fns_string = (appRegistry) => {
   const margin = shared.margin;
   // --- end chart setup ---
 
-  function chart(selection) {
-    selection.each(function(data) {
-      const el = d3.select(this);
+  function chart(selection: any) {
+    selection.each(function (data: any) {
+      const el = d3Select(this);
       const innerWidth = width - margin.left - margin.right;
       const innerHeight = height - margin.top - margin.bottom;
 
       // group into labels and values per bucket, sort descending
-      const gr = groupBy(data, function(d) {
+      const gr = groupBy(data, function (d) {
         return d;
       });
-      const grm = map(gr, function(v, k) {
+      const grm = map(gr, function (v, k) {
         return {
           label: k,
           value: k,
@@ -59,7 +59,7 @@ const minicharts_d3fns_string = (appRegistry) => {
     });
   }
 
-  chart.width = function(value) {
+  chart.width = function (value: number) {
     if (!arguments.length) {
       return width;
     }
@@ -67,7 +67,7 @@ const minicharts_d3fns_string = (appRegistry) => {
     return chart;
   };
 
-  chart.height = function(value) {
+  chart.height = function (value: number) {
     if (!arguments.length) {
       return height;
     }
@@ -75,7 +75,7 @@ const minicharts_d3fns_string = (appRegistry) => {
     return chart;
   };
 
-  chart.options = function(value) {
+  chart.options = function (value: any) {
     if (!arguments.length) {
       return options;
     }
@@ -83,7 +83,7 @@ const minicharts_d3fns_string = (appRegistry) => {
     return chart;
   };
 
-  chart.cleanup = function() {
+  chart.cleanup = function () {
     fewChart.cleanup();
     manyChart.cleanup();
     return chart;

@@ -4,7 +4,7 @@ import { assign, groupBy, defaults, map, orderBy } from 'lodash';
 import few from './few';
 import shared from './shared';
 
-const minicharts_d3fns_boolean = (localAppRegistry) => {
+const minicharts_d3fns_boolean = (localAppRegistry: any) => {
   // --- beginning chart setup ---
   let width = 400;
   let height = 100;
@@ -15,21 +15,21 @@ const minicharts_d3fns_boolean = (localAppRegistry) => {
   const margin = shared.margin;
   // --- end chart setup ---
 
-  function chart(selection) {
-    selection.each(function(data) {
+  function chart(selection: any) {
+    selection.each(function (data: any) {
       const el = d3.select(this);
       const innerWidth = width - margin.left - margin.right;
       const innerHeight = height - margin.top - margin.bottom;
 
       // group by true/false
-      const gr = groupBy(data, function(d) {
+      const gr = groupBy(data, function (d) {
         return d;
       });
       const grd = defaults(gr, {
         false: [],
         true: []
       });
-      const grdm = map(grd, function(v, k) {
+      const grdm = map(grd, function (v, k) {
         return {
           label: k,
           value: k === 'true',
@@ -54,7 +54,7 @@ const minicharts_d3fns_boolean = (localAppRegistry) => {
     });
   }
 
-  chart.width = function(value) {
+  chart.width = function (value: number) {
     if (!arguments.length) {
       return width;
     }
@@ -62,7 +62,7 @@ const minicharts_d3fns_boolean = (localAppRegistry) => {
     return chart;
   };
 
-  chart.height = function(value) {
+  chart.height = function (value: number) {
     if (!arguments.length) {
       return height;
     }
@@ -70,7 +70,7 @@ const minicharts_d3fns_boolean = (localAppRegistry) => {
     return chart;
   };
 
-  chart.options = function(value) {
+  chart.options = function (value: any) {
     if (!arguments.length) {
       return options;
     }
@@ -78,7 +78,7 @@ const minicharts_d3fns_boolean = (localAppRegistry) => {
     return chart;
   };
 
-  chart.cleanup = function() {
+  chart.cleanup = function () {
     fewChart.cleanup();
     return chart;
   };

@@ -1,10 +1,12 @@
 /* eslint camelcase: 0 */
-import d3 from 'd3';
+import { format as d3Format } from 'd3';
 
 // source: http://bit.ly/1Tc9Tp5
-function decimalPlaces(number) {
+function decimalPlaces(number: any) {
   return ((+number).toFixed(20)).replace(/^-?\d*\.?|0+$/g, '').length;
 }
+
+const d3Round = (x: number, n: number) => n ? Math.round(x * (n = Math.pow(10, n))) / n : Math.round(x);
 
 const minicharts_d3fns_shared = {
   margin: {
@@ -14,26 +16,26 @@ const minicharts_d3fns_shared = {
     left: 40
   },
 
-  friendlyPercentFormat: function(vmax) {
-    const prec1Format = d3.format('.1r');
-    const intFormat = d3.format('.0f');
+  friendlyPercentFormat: function (vmax: any) {
+    const prec1Format = d3Format('.1r');
+    const intFormat = d3Format('.0f');
     const format = vmax > 1 ? intFormat : prec1Format;
-    const maxFormatted = format(vmax);
+    const maxFormatted = Number(format(vmax));
     const maxDecimals = decimalPlaces(maxFormatted);
 
-    return function(v, incPrec) {
+    return function (v: any, incPrec?: any) {
       if (v === vmax) {
         return maxFormatted + '%';
       }
       if (v > 1 && !incPrec) { // v > vmax || maxFormatted % 2 === 0
-        return d3.round(v, maxDecimals) + '%';
+        return d3Round(v, maxDecimals) + '%';
       }
       // adjust for corrections, if increased precision required
-      return d3.round(v / vmax * maxFormatted, maxDecimals + 1) + '%';
+      return d3Round(v / vmax * maxFormatted, maxDecimals + 1) + '%';
     };
   },
 
-  truncateTooltip: function(text, maxLength) {
+  truncateTooltip: function (text: string, maxLength: number) {
     maxLength = maxLength || 500;
     if (text.length > maxLength) {
       text = text.substring(0, maxLength - 1) + '&hellip;';
@@ -41,7 +43,7 @@ const minicharts_d3fns_shared = {
     return text;
   },
 
-  tooltip: function(label, count) {
+  tooltip: function (label: any, count: any) {
     return `
       <div class="tooltip-wrapper">
         <div class="tooltip-label">${label}</div>

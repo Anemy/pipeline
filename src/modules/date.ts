@@ -13,7 +13,7 @@ import {
   map
 } from 'lodash';
 
-import $ from 'jquery';
+// import $ from 'jquery';
 import moment from 'moment';
 import shared from './shared';
 import many from './many';
@@ -21,15 +21,15 @@ import { inValueRange } from 'mongodb-query-util';
 
 require('./d3-tip')(d3);
 
-function generateDefaults(n) {
-  const doc = {};
-  range(n).forEach(function(d) {
+function generateDefaults(n: any) {
+  const doc: any = {};
+  range(n).forEach(function (d: any) {
     doc[d] = [];
   });
   return doc;
 }
 
-function extractTimestamp(d) {
+function extractTimestamp(d: any) {
   // We need to get a timestamp from a string that could be an actual date, or
   // an object id.
   // So, at first try creating a bson ObjectId, and if that fails, create a new
@@ -45,17 +45,17 @@ function extractTimestamp(d) {
   }
 }
 
-const minicharts_d3fns_date = (appRegistry) => {
+const minicharts_d3fns_date = (appRegistry: any) => {
   // --- beginning chart setup ---
   let width = 400;
   let height = 100;
-  let el;
-  let lastNonShiftRangeValue = null;
+  let el: any;
+  let lastNonShiftRangeValue: any = null;
 
   const upperRatio = 2.5;
   const upperMargin = 20;
-  const options = {};
-  const subcharts = [];
+  const options: any = {};
+  const subcharts: any = [];
 
   const weekdayLabels = moment.weekdays();
 
@@ -68,7 +68,7 @@ const minicharts_d3fns_date = (appRegistry) => {
   // set up tooltips
   const tip = d3.tip()
     .attr('class', 'd3-tip d3-tip-date')
-    .html(function(d) {
+    .html(function (d: any) {
       return d.label;
     })
     .direction('n')
@@ -102,7 +102,7 @@ const minicharts_d3fns_date = (appRegistry) => {
     lines.classed('selected', false);
 
     // get elements within the brush
-    const selected = lines.filter(function(d) {
+    const selected = lines.filter(function (d: any) {
       return s[0] <= d.ts && d.ts <= s[1];
     });
 
@@ -121,12 +121,13 @@ const minicharts_d3fns_date = (appRegistry) => {
       }
     }
 
-    const minValue = min(selected.data(), function(d) {
+    // TODO: These values gonna need fixing @rhys
+    const minValue: any = min(selected.data()/*, function (d: any) {
       return d.ts;
-    });
-    const maxValue = max(selected.data(), function(d) {
+    }*/);
+    const maxValue: any = max(selected.data()/*, function (d: any) {
       return d.ts;
-    });
+    }*/);
 
     if (isEqual(minValue.ts, maxValue.ts)) {
       // if values are the same, single equality query
@@ -154,7 +155,7 @@ const minicharts_d3fns_date = (appRegistry) => {
   }
 
 
-  function handleMouseDown(d) {
+  function handleMouseDown(d: any) {
     const QueryAction = appRegistry.getAction('Query.Actions');
     if (d3.event.shiftKey && lastNonShiftRangeValue) {
       const minVal = d.ts < lastNonShiftRangeValue.ts ? d.value : lastNonShiftRangeValue.value;
@@ -175,7 +176,9 @@ const minicharts_d3fns_date = (appRegistry) => {
       });
     }
 
-    const parent = $(this).closest('.minichart');
+    console.log('Here! Avoid jquery - this may break...');
+    const parent = document.querySelector(this).closest('.minichart');
+    // const parent = $(this).closest('.minichart');
     const background = parent.find('g.brush > rect.background')[0];
     const brushNode = parent.find('g.brush')[0];
     const start = barcodeX.invert(d3.mouse(background)[0]);
@@ -199,29 +202,29 @@ const minicharts_d3fns_date = (appRegistry) => {
     }
   }
 
-  function selectFromQuery(lines) {
+  function selectFromQuery(lines: any) {
     if (options.query === undefined) {
       lines.classed('unselected', false);
       lines.classed('selected', false);
       lines.classed('half', false);
       return;
     }
-    lines.each(function(d) {
+    lines.each(function (d: any) {
       d.inRange = inValueRange(options.query, d);
     });
 
-    lines.classed('selected', function(d) {
+    lines.classed('selected', function (d: any) {
       return d.inRange === 'yes';
     });
-    lines.classed('unselected', function(d) {
+    lines.classed('unselected', function (d: any) {
       return d.inRange === 'no';
     });
   }
 
 
-  function chart(selection) {
-    selection.each(function(data) {
-      const values = data.map(function(d) {
+  function chart(selection: any) {
+    selection.each(function (data: any) {
+      const values = data.map(function (d: any) {
         const ts = extractTimestamp(d);
         return {
           label: format(ts),
@@ -242,17 +245,17 @@ const minicharts_d3fns_date = (appRegistry) => {
       const upperBarBottom = innerHeight / 2 - 20;
 
       barcodeX
-        .domain(d3.extent(values, function(d) {
+        .domain(d3.extent(values, function (d: any) {
           return d.ts;
         }))
         .range([0, innerWidth]);
 
       // group by weekdays
-      const w = groupBy(values, function(d) {
+      const w = groupBy(values, function (d: any) {
         return moment(d.ts).weekday();
       });
       const wd = defaults(w, generateDefaults(7));
-      const weekdays = map(wd, function(d, i) {
+      const weekdays = map(wd, function (d, i: number) {
         return {
           label: weekdayLabels[i],
           count: d.length
@@ -261,11 +264,11 @@ const minicharts_d3fns_date = (appRegistry) => {
 
       // group by hours
       const hourLabels = d3.range(24);
-      const h = groupBy(values, function(d) {
+      const h = groupBy(values, function (d: any) {
         return d.ts.getHours();
       });
       const hd = defaults(h, generateDefaults(24));
-      const hours = map(hd, function(d, i) {
+      const hours = map(hd, function (d, i: number) {
         return {
           label: hourLabels[i] + ':00',
           count: d.length
@@ -319,13 +322,13 @@ const minicharts_d3fns_date = (appRegistry) => {
       gEnter.append('g')
         .attr('class', 'line-container');
 
-      const lines = g.select('.line-container').selectAll('.selectable').data(values, function(d) {
+      const lines = g.select('.line-container').selectAll('.selectable').data(values, function (d: any) {
         return d.ts;
       });
 
       lines.enter().append('line')
         .attr('class', 'line selectable')
-        .style('opacity', function() {
+        .style('opacity', function () {
           return lines.size() > 200 ? 0.3 : 1.0;
         })
         .on('mouseover', tip.show)
@@ -338,10 +341,10 @@ const minicharts_d3fns_date = (appRegistry) => {
       lines
         .attr('y1', barcodeTop)
         .attr('y2', barcodeBottom)
-        .attr('x2', function(d) {
+        .attr('x2', function (d: any) {
           return barcodeX(d.ts);
         })
-        .attr('x1', function(d) {
+        .attr('x1', function (d: any) {
           return barcodeX(d.ts);
         });
 
@@ -364,13 +367,13 @@ const minicharts_d3fns_date = (appRegistry) => {
         .attr('y', barcodeBottom + 5);
 
       text
-        .attr('x', function(d, i) {
+        .attr('x', function (d: any, i: number) {
           return i * innerWidth;
         })
-        .attr('text-anchor', function(d, i) {
+        .attr('text-anchor', function (d: any, i: number) {
           return i ? 'end' : 'start';
         })
-        .text(function(d, i) {
+        .text(function (d: any, i: number) {
           if (format(barcodeX.domain()[0]) === format(barcodeX.domain()[1])) {
             if (i === 0) {
               return 'inserted: ' + format(d);
@@ -392,7 +395,7 @@ const minicharts_d3fns_date = (appRegistry) => {
           bgbars: true,
           labels: {
             'text-anchor': 'middle',
-            text: function(d) {
+            text: function (d: any) {
               return d.label[0];
             }
           }
@@ -409,7 +412,7 @@ const minicharts_d3fns_date = (appRegistry) => {
           selectable: false,
           bgbars: true,
           labels: {
-            text: function(d, i) {
+            text: function (d: any, i: number) {
               return i % 6 === 0 || i === 23 ? d.label : '';
             }
           }
@@ -419,7 +422,7 @@ const minicharts_d3fns_date = (appRegistry) => {
     });
   }
 
-  chart.width = function(value) {
+  chart.width = function (value: any) {
     if (!arguments.length) {
       return width;
     }
@@ -427,7 +430,7 @@ const minicharts_d3fns_date = (appRegistry) => {
     return chart;
   };
 
-  chart.height = function(value) {
+  chart.height = function (value: any) {
     if (!arguments.length) {
       return height;
     }
@@ -435,7 +438,7 @@ const minicharts_d3fns_date = (appRegistry) => {
     return chart;
   };
 
-  chart.options = function(value) {
+  chart.options = function (value: any) {
     if (!arguments.length) {
       return options;
     }
@@ -443,7 +446,7 @@ const minicharts_d3fns_date = (appRegistry) => {
     return chart;
   };
 
-  chart.cleanup = function() {
+  chart.cleanup = function () {
     for (const subchart of subcharts) {
       subchart.cleanup();
     }

@@ -43,15 +43,19 @@ module.exports = {
           {
             loader: 'postcss-loader',
             options: {
-              plugins: function () {
-                return [autoprefixer()];
+              postcssOptions: {
+                plugins: function () {
+                  return [autoprefixer()];
+                }
               }
             }
           },
           {
             loader: 'less-loader',
             options: {
-              noIeCompat: true
+              lessOptions: {
+                noIeCompat: true              
+              }
             }
           }
         ]
@@ -59,12 +63,12 @@ module.exports = {
       {
         test: /\.(jpe?g|png|gif)$/,
         use: [{ loader: 'file-loader?name=img/[name]__[hash:base64:5].[ext]' }],
-        include: defaultInclude
+        // include: defaultInclude
       },
       {
         test: /\.(eot|svg|ttf|woff|woff2)$/,
         use: [{ loader: 'file-loader?name=font/[name]__[hash:base64:5].[ext]' }],
-        include: defaultInclude
+        // include: defaultInclude
       }
     ]
   },

@@ -4,10 +4,26 @@
 //
 // Tooltips for d3.js SVG visualizations
 
-(function(root, factory) {
+type XYCoord = {
+  x: number;
+  y: number;
+}
+
+type BBoxType = {
+  n: XYCoord,
+  s: XYCoord,
+  e: XYCoord,
+  w: XYCoord,
+  nw: XYCoord,
+  sw: XYCoord,
+  ne: XYCoord,
+  se: XYCoord
+};
+
+(function (root: any, factory) {
   if (typeof module === 'object' && module.exports) {
     // CommonJS
-    module.exports = function(d3) {
+    module.exports = function (d3: any) {
       d3.tip = factory(d3);
       return d3.tip;
     };
@@ -15,20 +31,20 @@
     // Browser global.
     root.d3.tip = factory(root.d3);
   }
-}(this, function(d3) {
+}(this, function (d3: any) {
   // Public - contructs a new tooltip
   //
   // Returns a tip
-  return function() {
+  return function () {
     let direction = d3_tip_direction;
     let offset = d3_tip_offset;
     let node = initNode();
     let html = d3_tip_html;
     let svg = null;
-    let point = null;
-    let target = null;
+    let point: any = null;
+    let target: any = null;
 
-    function tip(vis) {
+    function tip(vis: any) {
       svg = getSVGNode(vis);
       if (!svg) {
         return;
@@ -40,8 +56,8 @@
     // Public - show the tooltip on the screen
     //
     // Returns a tip
-    tip.show = function() {
-      const args = Array.prototype.slice.call(arguments);
+    tip.show = function () {
+      const args: any = Array.prototype.slice.call(arguments);
       if (args[args.length - 1] instanceof SVGElement) {
         target = args.pop();
       }
@@ -78,7 +94,7 @@
     // Public - hide the tooltip
     //
     // Returns a tip
-    tip.hide = function() {
+    tip.hide = function () {
       const nodel = getNodeEl();
       nodel.style({
         opacity: 0,
@@ -94,7 +110,7 @@
     // v - value of the attribute
     //
     // Returns tip or attribute value
-    tip.attr = function(n, v) {
+    tip.attr = function (n: any, v: any) {
       if (arguments.length < 2 && typeof n === 'string') {
         return getNodeEl().attr(n);
       } else {
@@ -111,7 +127,7 @@
     // v - value of the property
     //
     // Returns tip or style property value
-    tip.style = function(n, v) {
+    tip.style = function (n: any, v: any) {
       if (arguments.length < 2 && typeof n === 'string') {
         return getNodeEl().style(n);
       } else {
@@ -128,7 +144,7 @@
     //     sw(southwest), ne(northeast) or se(southeast)
     //
     // Returns tip or direction
-    tip.direction = function(v) {
+    tip.direction = function (v: any) {
       if (!arguments.length) {
         return direction;
       }
@@ -142,7 +158,7 @@
     // v - Array of [x, y] offset
     //
     // Returns offset or
-    tip.offset = function(v) {
+    tip.offset = function (v: any) {
       if (!arguments.length) {
         return offset;
       }
@@ -156,7 +172,7 @@
     // v - String value of the tip
     //
     // Returns html value or tip
-    tip.html = function(v) {
+    tip.html = function (v: any) {
       if (!arguments.length) {
         return html;
       }
@@ -168,7 +184,7 @@
     // Public: destroys the tooltip and removes it from the DOM
     //
     // Returns a tip
-    tip.destroy = function() {
+    tip.destroy = function () {
       if (node) {
         getNodeEl().remove();
         node = null;
@@ -187,15 +203,15 @@
     }
 
     const direction_callbacks = d3.map({
-        n: direction_n,
-        s: direction_s,
-        e: direction_e,
-        w: direction_w,
-        nw: direction_nw,
-        ne: direction_ne,
-        sw: direction_sw,
-        se: direction_se
-      }),
+      n: direction_n,
+      s: direction_s,
+      e: direction_e,
+      w: direction_w,
+      nw: direction_nw,
+      ne: direction_ne,
+      sw: direction_sw,
+      se: direction_se
+    }),
 
       directions = direction_callbacks.keys();
 
@@ -277,7 +293,7 @@
       return node.node();
     }
 
-    function getSVGNode(el) {
+    function getSVGNode(el: any) {
       el = el.node();
       if (!el) {
         return;
@@ -311,7 +327,7 @@
     //    +-+-+
     //
     // Returns an Object {n, s, e, w, nw, sw, ne, se}
-    function getScreenBBox() {
+    function getScreenBBox(): BBoxType {
       let targetel = target;
       if (!targetel) targetel = d3.event.target;
 
@@ -319,7 +335,7 @@
         targetel = targetel.parentNode;
       }
 
-      const bbox = {};
+      const bbox: any = {};
       const matrix = targetel.getScreenCTM();
       const tbbox = targetel.getBBox();
       const width = tbbox.width;

@@ -1,6 +1,6 @@
 /* eslint no-use-before-define: 0, camelcase: 0 */
 import d3 from 'd3';
-import $ from 'jquery';
+// import $ from 'jquery';
 import {
   assign,
   defaults,
@@ -15,16 +15,16 @@ import { hasDistinctValue, inValueRange } from 'mongodb-query-util';
 
 require('./d3-tip')(d3);
 
-const minicharts_d3fns_many = (appRegistry) => {
+const minicharts_d3fns_many = (appRegistry: any) => {
   const QueryAction = appRegistry.getAction('Query.Actions');
 
   // --- beginning chart setup ---
   let width = 400; // default width
   let height = 100; // default height
-  let el;
-  let lastNonShiftRangeValue = null;
+  let el: any;
+  let lastNonShiftRangeValue: any = null;
 
-  const options = {
+  const options: any = {
     bgbars: false,
     scale: false,
     labels: false, // label defaults will be set further below
@@ -44,7 +44,7 @@ const minicharts_d3fns_many = (appRegistry) => {
   const brush = d3.svg.brush()
     .on('brush', brushed)
     .on('brushend', brushend);
-    // --- end chart setup ---
+  // --- end chart setup ---
 
   function handleDrag() {
     // ignore this event when shift is pressed for distinct selections.
@@ -58,7 +58,7 @@ const minicharts_d3fns_many = (appRegistry) => {
     // add `unselected` class to all elements
     bars.classed('unselected', true);
     // get elements within the brush
-    const selected = bars.filter(function(d) {
+    const selected = bars.filter(function (d: any) {
       const left = xScale(d.label);
       const right = left + xScale.rangeBand();
       return s[0] <= right && left <= s[1];
@@ -86,12 +86,12 @@ const minicharts_d3fns_many = (appRegistry) => {
         return;
       }
       // numeric types
-      const minValue = min(selected.data(), function(d) {
+      const minValue: any = min(selected.data()/*, function (d) {
         return d.value;
-      });
-      const maxValue = max(selected.data(), function(d) {
+      }*/);
+      const maxValue: any = max(selected.data(), /*function (d) {
         return d.value;
-      });
+      }*/);
 
       if (minValue.value === maxValue.value + maxValue.dx) {
         // if not binned and values are the same, single equality query
@@ -139,7 +139,7 @@ const minicharts_d3fns_many = (appRegistry) => {
    *
    * @param  {Document} d    the data associated with the clicked bar
    */
-  function handleMouseDown(d) {
+  function handleMouseDown(d: any) {
     if (!options.selectable) {
       return;
     }
@@ -180,8 +180,10 @@ const minicharts_d3fns_many = (appRegistry) => {
         });
       }
     }
-
-    const parent = $(this).closest('.minichart');
+    // document.querySelector('.navPanel img').closest('td')
+    console.log('Here! Avoid jquery - this may break...');
+    const parent = document.querySelector(this).closest('.minichart');
+    // const parent = $(this).closest('.minichart');
     const background = parent.find('g.brush > rect.background')[0];
     const brushNode = parent.find('g.brush')[0];
     const start = d3.mouse(background)[0];
@@ -204,7 +206,7 @@ const minicharts_d3fns_many = (appRegistry) => {
     }
   }
 
-  function selectFromQuery(bars) {
+  function selectFromQuery(bars: any) {
     if (options.query === undefined) {
       bars.classed('unselected', false);
       bars.classed('selected', false);
@@ -213,34 +215,34 @@ const minicharts_d3fns_many = (appRegistry) => {
     }
     // handle distinct selections
     if (options.selectionType === 'distinct') {
-      bars.each(function(d) {
+      bars.each(function (d: any) {
         d.hasDistinct = hasDistinctValue(options.query, d.value);
       });
-      bars.classed('selected', function(d) {
+      bars.classed('selected', function (d: any) {
         return d.hasDistinct;
       });
-      bars.classed('unselected', function(d) {
+      bars.classed('unselected', function (d: any) {
         return !d.hasDistinct;
       });
     } else if (options.selectionType === 'range') {
-      bars.each(function(d) {
+      bars.each(function (d: any) {
         d.inRange = inValueRange(options.query, d);
       });
-      bars.classed('selected', function(d) {
+      bars.classed('selected', function (d: any) {
         return d.inRange === 'yes';
       });
-      bars.classed('half-selected', function(d) {
+      bars.classed('half-selected', function (d: any) {
         return d.inRange === 'partial';
       });
-      bars.classed('unselected', function(d) {
+      bars.classed('unselected', function (d: any) {
         return d.inRange === 'no';
       });
     }
   }
 
-  function chart(selection) {
+  function chart(selection: any) {
     /* eslint complexity: 0 */
-    selection.each(function(data) {
+    selection.each(function (data: any) {
       const values = map(data, 'count');
       const maxValue = d3.max(values);
       const sumValues = d3.sum(values);
@@ -262,7 +264,7 @@ const minicharts_d3fns_many = (appRegistry) => {
       // set label defaults
       if (options.labels) {
         defaults(labels, {
-          'text-anchor': function(d, i) {
+          'text-anchor': function (d: any, i: number) {
             if (i === 0) {
               return 'start';
             }
@@ -271,7 +273,7 @@ const minicharts_d3fns_many = (appRegistry) => {
             }
             return 'middle';
           },
-          x: labels['text-anchor'] === 'middle' ? xScale.rangeBand() / 2 : function(d, i) {
+          x: labels['text-anchor'] === 'middle' ? xScale.rangeBand() / 2 : function (d: any, i: number) {
             if (i === 0) {
               return 0;
             }
@@ -282,28 +284,28 @@ const minicharts_d3fns_many = (appRegistry) => {
           },
           y: height + 5,
           dy: '0.75em',
-          text: function(d) {
+          text: function (d: any) {
             return d.count;
           }
         });
       }
 
       // setup tool tips
-      tip.html(function(d, i) {
+      tip.html(function (d: any, i: number) {
         if (typeof d.tooltip === 'function') {
           return d.tooltip(d, i);
         }
-        return d.tooltip || shared.tooltip(shared.truncateTooltip(d.label), percentFormat(d.count / sumValues * 100));
+        return d.tooltip || shared.tooltip(shared.truncateTooltip(d.label, 500), percentFormat(d.count / sumValues * 100));
       });
       el.call(tip);
 
       // draw scale labels and lines if requested
       if (options.scale) {
-        const triples = function(v) {
+        const triples = function (v: any) {
           return [v, v / 2, 0];
         };
 
-        const scaleLabels = map(triples(maxValue / sumValues * 100), function(x) {
+        const scaleLabels = map(triples(maxValue / sumValues * 100), function (x) {
           return percentFormat(x, true);
         });
 
@@ -334,12 +336,12 @@ const minicharts_d3fns_many = (appRegistry) => {
 
         // update legend elements
         legend
-          .attr('transform', function(d) {
+          .attr('transform', function (d: any) {
             return 'translate(0, ' + labelScale(d) + ')';
           });
 
         legend.select('text')
-          .text(function(d) {
+          .text(function (d: any) {
             return d;
           });
 
@@ -361,7 +363,7 @@ const minicharts_d3fns_many = (appRegistry) => {
 
       // select all g.bar elements
       const bar = el.selectAll('.bar')
-        .data(data, function(d) {
+        .data(data, function (d: any) {
           return d.label; // identify data by its label
         });
 
@@ -370,7 +372,7 @@ const minicharts_d3fns_many = (appRegistry) => {
         .attr('class', 'bar');
 
       bar
-        .attr('transform', function(d) {
+        .attr('transform', function (d: any) {
           return 'translate(' + xScale(d.label) + ', 0)';
         });
 
@@ -423,11 +425,11 @@ const minicharts_d3fns_many = (appRegistry) => {
 
       bar.selectAll('.fg')
         // .transition()
-        .attr('y', function(d) {
+        .attr('y', function (d: any) {
           return yScale(d.count);
         })
         .attr('width', xScale.rangeBand())
-        .attr('height', function(d) {
+        .attr('height', function (d: any) {
           return height - yScale(d.count);
         });
 
@@ -450,7 +452,7 @@ const minicharts_d3fns_many = (appRegistry) => {
     });
   }
 
-  chart.width = function(value) {
+  chart.width = function (value: any): any {
     if (!arguments.length) {
       return width;
     }
@@ -458,7 +460,7 @@ const minicharts_d3fns_many = (appRegistry) => {
     return chart;
   };
 
-  chart.height = function(value) {
+  chart.height = function (value: any): any {
     if (!arguments.length) {
       return height;
     }
@@ -466,7 +468,7 @@ const minicharts_d3fns_many = (appRegistry) => {
     return chart;
   };
 
-  chart.options = function(value) {
+  chart.options = function (value: any) {
     if (!arguments.length) {
       return options;
     }
@@ -474,7 +476,7 @@ const minicharts_d3fns_many = (appRegistry) => {
     return chart;
   };
 
-  chart.cleanup = function() {
+  chart.cleanup = function () {
     tip.destroy();
     return chart;
   };

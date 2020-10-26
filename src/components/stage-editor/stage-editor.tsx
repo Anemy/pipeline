@@ -11,8 +11,9 @@ import {
   AppState
 } from '../../store/store';
 import Stage from '../../models/stage';
-import Schema from '../../models/schema';
+import SchemaType from '../../models/schema';
 import Loading from '../loading/loading';
+import Schema, { SAMPLING_STATES } from '../schema/schema';
 
 type StateProps = {
   activeStage: number;
@@ -20,7 +21,7 @@ type StateProps = {
   errorAnalyzingDocumentsSchema: string;
   hasAnalyzedSchema: boolean;
   isAnalyszingSchema: boolean;
-  sampleDocumentsSchema: Schema;
+  sampleDocumentsSchema: SchemaType;
 };
 
 type DispatchProps = {
@@ -31,11 +32,11 @@ type DispatchProps = {
 class StageEditor extends React.Component<StateProps & DispatchProps> {  
   render() {
     const {
-      activeStage,
+      // activeStage,
       hasAnalyzedSchema,
       isAnalyszingSchema,
       sampleDocumentsSchema,
-      stages
+      // stages
     } = this.props;
 
     if (isAnalyszingSchema || !hasAnalyzedSchema) {
@@ -44,10 +45,14 @@ class StageEditor extends React.Component<StateProps & DispatchProps> {
 
     return (
       <div className="stage-editor-container">
+        <Schema
+          samplingState={SAMPLING_STATES.complete}
+          schema={sampleDocumentsSchema}
+        />
         <div>
-          <pre>
+          {/* <pre>
             Sample docs Schema: {JSON.stringify(sampleDocumentsSchema, null, 2)}
-          </pre>
+          </pre> */}
         </div>
       </div>
     );

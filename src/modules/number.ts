@@ -17,12 +17,12 @@ import shared from './shared';
 * @param {Any} value     value to be converted to a number
 * @return {Number}       converted value
 */
-function extractNumericValueFromBSON(value) {
+function extractNumericValueFromBSON(value: any) {
   if (has(value, '_bsontype')) {
-    if (includes([ 'Decimal128', 'Long' ], value._bsontype)) {
-      return parseFloat(value.toString(), 10);
+    if (includes(['Decimal128', 'Long'], value._bsontype)) {
+      return parseFloat(value.toString());
     }
-    if (includes([ 'Double', 'Int32' ], value._bsontype)) {
+    if (includes(['Double', 'Int32'], value._bsontype)) {
       return value.value;
     }
   }
@@ -30,18 +30,18 @@ function extractNumericValueFromBSON(value) {
   return value;
 }
 
-const minicharts_d3fns_number = (appRegistry) => {
+const minicharts_d3fns_number = (appRegistry: any) => {
   let width = 400;
   let height = 100;
-  const options = {
+  const options: any = {
     view: null
   };
   const margin = shared.margin;
   const xBinning = d3.scale.linear();
   const manyChart = many(appRegistry);
 
-  function chart(selection) {
-    selection.each(function(data) {
+  function chart(selection: any) {
+    selection.each(function (data: any) {
       let grouped;
       const el = d3.select(this);
       const innerWidth = width - margin.left - margin.right;
@@ -49,19 +49,19 @@ const minicharts_d3fns_number = (appRegistry) => {
 
       // transform data
       if (options.unique < 20) {
-        const g = groupBy(data, function(d) {
+        const g = groupBy(data, function (d) {
           return extractNumericValueFromBSON(d);
         });
-        const gr = map(g, function(v, k) {
+        const gr = map(g, function (v: any, k) {
           v.label = k;
-          v.x = parseFloat(k, 10);
+          v.x = parseFloat(k);
           v.value = v.x;
           v.dx = 0;
           v.count = v.length;
           v.bson = v[0];
           return v;
         });
-        grouped = sortBy(gr, function(v) {
+        grouped = sortBy(gr, function (v) {
           return v.value;
         });
       } else {
@@ -78,7 +78,7 @@ const minicharts_d3fns_number = (appRegistry) => {
 
         grouped = hist(data);
 
-        grouped.forEach(function(d, i) {
+        grouped.forEach(function (d: any, i: number) {
           let label;
           if (i === 0) {
             label = '< ' + (d.x + d.dx);
@@ -106,7 +106,7 @@ const minicharts_d3fns_number = (appRegistry) => {
         labels = true;
       } else {
         labels = {
-          text: function(d, i) {
+          text: function (d: any, i: number) {
             if (i === 0) {
               return 'min: ' + d3.min(data);
             }
@@ -131,7 +131,7 @@ const minicharts_d3fns_number = (appRegistry) => {
     });
   }
 
-  chart.width = function(value) {
+  chart.width = function (value: number) {
     if (!arguments.length) {
       return width;
     }
@@ -139,7 +139,7 @@ const minicharts_d3fns_number = (appRegistry) => {
     return chart;
   };
 
-  chart.height = function(value) {
+  chart.height = function (value: number) {
     if (!arguments.length) {
       return height;
     }
@@ -147,7 +147,7 @@ const minicharts_d3fns_number = (appRegistry) => {
     return chart;
   };
 
-  chart.options = function(value) {
+  chart.options = function (value: any) {
     if (!arguments.length) {
       return options;
     }
@@ -155,7 +155,7 @@ const minicharts_d3fns_number = (appRegistry) => {
     return chart;
   };
 
-  chart.cleanup = function() {
+  chart.cleanup = function () {
     manyChart.cleanup();
     return chart;
   };

@@ -8,7 +8,7 @@ const RADIANS = 3963.2;
  *
  * @returns {Number} radians.
  */
-const radians = (meters) => {
+const radians = (meters: number) => {
   return (meters / METERS_IN_MILE) / RADIANS;
 };
 
@@ -19,7 +19,7 @@ const radians = (meters) => {
  *
  * @returns {Object} The query.
  */
-const polygon = (layer) => ({
+const polygon = (layer: any) => ({
   [layer.field]: {
     $geoWithin: {
       $geometry: {
@@ -37,10 +37,10 @@ const polygon = (layer) => ({
  *
  * @returns {Object} The $centerSphere query.
  */
-const centerSphere = (layer) => ({
+const centerSphere = (layer: any) => ({
   [layer.field]: {
     $geoWithin: {
-      $centerSphere: [[ layer.lng, layer.lat ], radians(layer.radius) ]
+      $centerSphere: [[layer.lng, layer.lat], radians(layer.radius)]
     }
   }
 });
@@ -52,9 +52,9 @@ const centerSphere = (layer) => ({
  *
  * @returns {Array} The coordinates array.
  */
-const coordinates = (ring) => {
+const coordinates = (ring: any[]) => {
   return ring.map((latlngs) => {
-    const coords = latlngs.map((latlng) => ([ latlng.lng, latlng.lat ]));
+    const coords = latlngs.map((latlng: any) => ([latlng.lng, latlng.lat]));
     // Leaflet doesn't close the ring for us.
     coords.push(coords[0]);
     return coords;
@@ -68,7 +68,7 @@ const coordinates = (ring) => {
  *
  * @returns {Object} The query.
  */
-const generateSingle = (layer) => {
+const generateSingle = (layer: any) => {
   if (layer.type === 'circle') {
     return centerSphere(layer);
   } else if (layer.type === 'polygon') {
@@ -83,8 +83,8 @@ const generateSingle = (layer) => {
  *
  * @returns {Object} The query.
  */
-const generateMulti = (layers) => ({
-  $or: layers.map(layer => generateSingle(layer))
+const generateMulti = (layers: any) => ({
+  $or: layers.map((layer: any) => generateSingle(layer))
 });
 
 /**
@@ -94,7 +94,7 @@ const generateMulti = (layers) => ({
  *
  * @returns {Object} The query.
  */
-export const generateGeoQuery = (allLayers) => {
+export const generateGeoQuery = (allLayers: number) => {
   const layers = Object.values(allLayers);
   if (layers.length === 1) {
     return generateSingle(layers[0]);
@@ -111,7 +111,7 @@ export const generateGeoQuery = (allLayers) => {
  *
  * @returns {Object} All the layers with the new layer added.
  */
-const addCircleLayer = (field, layer, allLayers) => {
+const addCircleLayer = (field: any, layer: any, allLayers: any) => {
   const layers = { ...allLayers };
   layers[layer._leaflet_id] = {
     field: field,
@@ -132,7 +132,7 @@ const addCircleLayer = (field, layer, allLayers) => {
  *
  * @returns {Object} All the layers with the new layer added.
  */
-const addPolygonLayer = (field, layer, allLayers) => {
+const addPolygonLayer = (field: any, layer: any, allLayers: any) => {
   const layers = { ...allLayers };
   layers[layer._leaflet_id] = {
     field: field,
@@ -151,7 +151,7 @@ const addPolygonLayer = (field, layer, allLayers) => {
  *
  * @returns {Object} The new layers.
  */
-export const addLayer = (field, layer, layers) => {
+export const addLayer = (field: any, layer: any, layers: any) => {
   if (layer._latlngs) {
     return addPolygonLayer(field, layer, layers);
   } else if (layer._latlng) {
