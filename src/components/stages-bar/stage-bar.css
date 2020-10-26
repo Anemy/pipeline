@@ -8,4 +8,16 @@
 .stages-bar-stages-area {
   flex-grow: 1;
   border: 1px solid black;
+  padding: 4px;
+}
+
+.stages-bar-expand-button {
+  float: right;
+}
+
+.stages-bar-stage {
+  padding: 4px 8px;
+  border-radius: 3px;
+  border: 1px solid black;
+  display: inline-block;
 }

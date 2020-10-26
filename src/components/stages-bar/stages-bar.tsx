@@ -23,6 +23,7 @@ class StagesBar extends React.Component<StateProps & DispatchProps> {
   addNewStage = (): void => {
     alert('new stage');
     this.props.updateStore({
+      activeStage: this.props.stages.length,
       stages: [
         ...this.props.stages,
         new Stage(STAGES.FILTER)
@@ -44,8 +45,10 @@ class StagesBar extends React.Component<StateProps & DispatchProps> {
     alert('run clicked');
   };
 
-  onStageClicked = (): void => {
-    alert('stage clicked');
+  onStageClicked = (stageIndex: number): void => {
+    this.props.updateStore({
+      activeStage: stageIndex
+    });
   };
 
   renderStages = (): React.ReactNode => {
@@ -53,10 +56,10 @@ class StagesBar extends React.Component<StateProps & DispatchProps> {
 
     return (
       <React.Fragment>
-        {stages.map(stage => (
+        {stages.map((stage, stageIndex) => (
           <div
             className="stages-bar-stage"
-            onClick={this.onStageClicked}
+            onClick={() => this.onStageClicked(stageIndex)}
           >
             Stage: {stage.type}
           </div>
@@ -76,6 +79,7 @@ class StagesBar extends React.Component<StateProps & DispatchProps> {
             +
           </button>
           <button
+            className="stages-bar-expand-button"
             onClick={this.onExpandClicked}
           >
             Expand
