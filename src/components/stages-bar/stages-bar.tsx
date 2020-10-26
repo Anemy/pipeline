@@ -27,12 +27,26 @@ class StagesBar extends React.Component<StateProps & DispatchProps> {
         ...this.props.stages,
         new Stage(STAGES.FILTER)
       ]
-    })
-  }
+    });
+  };
+
+  onExpandClicked = (): void => {
+    this.props.updateStore({
+      showGraph: true
+    });
+  };
+
+  onExportClicked = (): void => {
+    alert('export clicked');
+  };
+
+  onRunClicked = (): void => {
+    alert('run clicked');
+  };
 
   onStageClicked = (): void => {
     alert('stage clicked');
-  }
+  };
 
   renderStages = (): React.ReactNode => {
     const { stages } = this.props;
@@ -54,8 +68,7 @@ class StagesBar extends React.Component<StateProps & DispatchProps> {
   render() {
     return (
       <div className="stages-bar-container">
-        Stages Bar
-        <div>
+        <div className="stages-bar-stages-area">
           {this.renderStages()}
           <button
             onClick={this.addNewStage}
@@ -63,18 +76,18 @@ class StagesBar extends React.Component<StateProps & DispatchProps> {
             +
           </button>
           <button
-            onClick={this.addNewStage}
+            onClick={this.onExpandClicked}
           >
             Expand
           </button>
         </div>
         <button
-          onClick={this.addNewStage}
+          onClick={this.onRunClicked}
         >
           Run
         </button>
         <button
-          onClick={this.addNewStage}
+          onClick={this.onExportClicked}
         >
           Export
         </button>

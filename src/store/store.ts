@@ -5,11 +5,13 @@ export const NO_ACTIVE_STAGE = -1;
 
 export interface AppState {
   activeStage: number,
+  showGraph: boolean,
   stages: Stage[]
 }
 
 export const initialState: AppState = {
   activeStage: NO_ACTIVE_STAGE,
+  showGraph: false,
   stages: []
 };
 

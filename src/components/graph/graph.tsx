@@ -9,6 +9,8 @@ import LimitStageNode, { limitStageNodeType } from './nodes/limit-stage-node';
 
 import 'litegraph.js/css/litegraph.css';
 
+import './graph.css';
+
 // var node_time = LiteGraph.createNode('basic/time');
 // graph.add(node_time);
 
@@ -20,7 +22,12 @@ import 'litegraph.js/css/litegraph.css';
 
 // graph.start();
 
-class Graph extends React.Component {
+type props = {
+  width: number;
+  height: number;
+}
+
+class Graph extends React.Component<props> {
   componentDidMount() {
     this.createGraph();
   }
@@ -89,15 +96,18 @@ class Graph extends React.Component {
   }
 
   render() {
+    const {
+      width,
+      height
+    } = this.props;
+
     return (
-      <div className="graph-canvas-container">
-        <canvas
-          className="graph-canvas"
-          id="mycanvas"
-          width={window.innerWidth - 20}
-          height={window.innerHeight - 20}
-        />
-      </div>
+      <canvas
+        className="graph-canvas"
+        id="mycanvas"
+        width={width - 20}
+        height={height - 40}
+      />
     );
   }
 }

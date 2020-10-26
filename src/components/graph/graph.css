@@ -1,0 +1,22 @@
+.graph-container {
+  background-color: #212121;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+
+.graph-container-collapse-button {
+  z-index: 2000;
+  float: right;
+}
+
+.graph-canvas {
+  border: 1px solid purple;
+  position: absolute;
+  left: 10px;
+  /* right: 10px; */
+  top: 30px;
+  /* bottom: 10px; */
+}
