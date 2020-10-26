@@ -29,7 +29,7 @@ export interface AppState {
 
 export const getInitialState = (mongoClient: MongoClient) => ({
   activeStage: NO_ACTIVE_STAGE,
-  dataSource: new DataSource('test', 'shipwrecks'),
+  dataSource: new DataSource('test', 'sales'),
   mongoClient,
   showGraph: false,
   stages: []

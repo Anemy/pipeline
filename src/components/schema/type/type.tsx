@@ -105,7 +105,9 @@ class Type extends Component<props> {
    * possibly with subtypes included for Array type.
    */
   render() {
-    const type = this.props.bsonType.toLowerCase();
+    const type = this.props.bsonType
+      ? this.props.bsonType.toLowerCase()
+      : Types.UNDEFINED;
     let cls = `${TYPE_CLASS} schema-field-type-${type}`;
     if (this.props.activeType === this.props.selfType) {
       cls += ' active';

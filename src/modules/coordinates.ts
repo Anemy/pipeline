@@ -112,7 +112,7 @@ const minicharts_d3fns_geo = (localAppRegistry: any) => {
         }, 100);
       });
 
-    function clear(dontUpdate: any) {
+    function clear(dontUpdate?: boolean) {
       circleCenter = null;
       circleOuter = null;
       circleSelected = false;
@@ -338,7 +338,7 @@ const minicharts_d3fns_geo = (localAppRegistry: any) => {
 
       // compute bounds from data
       const bounds = new mapboxgl.LngLatBounds();
-      data.forEach(function (d) {
+      data.forEach(function (d: any) {
         bounds.extend(getLL(d));
       });
 
@@ -363,7 +363,7 @@ const minicharts_d3fns_geo = (localAppRegistry: any) => {
         const container = map.getCanvasContainer();
         svg = d3.select(container).append('svg');
 
-        circleControl = new CircleSelector(svg)
+        circleControl = new (CircleSelector as any)(svg)
           .projection(project)
           .inverseProjection(function (a: any) {
             return map.unproject({ x: a[0], y: a[1] });
