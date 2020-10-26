@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faArrowRight,
   faExpandAlt,
+  faPlus,
   faTimes
 } from '@fortawesome/free-solid-svg-icons';
 
@@ -131,7 +132,7 @@ class StagesBar extends React.Component<StateProps & DispatchProps> {
               onClick={() => this.onStageClicked(stageIndex)}
             >
               <div>
-                Stage: {stage.type}
+                {Stage.getNiceStageNameForStageType(stage.type)}
               </div>
               <FontAwesomeIcon
                 onClick={() => this.onDeleteStageClicked(stageIndex)}
@@ -152,9 +153,12 @@ class StagesBar extends React.Component<StateProps & DispatchProps> {
           {this.renderDataSource()}
           {this.renderStages()}
           <button
+            className="stages-bar-add-stage-button"
             onClick={this.addNewStage}
           >
-            +
+            <FontAwesomeIcon
+              icon={faPlus}
+            />
           </button>
           <div className="stages-bar-stages-empty-space" />
           <button

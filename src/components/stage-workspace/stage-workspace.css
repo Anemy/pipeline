@@ -1,11 +1,15 @@
-.stage-editor-container {
+.stage-workspace-empty-state {
+  margin: 40px auto;
+}
+
+.stage-workspace-container {
   position: relative;
   display: flex;
   flex-grow: 1;
   overflow: auto;
 }
 
-.stage-editor-workspace {
+.stage-workspace {
   width: 100%;
   display: flex;
   flex-grow: 1;

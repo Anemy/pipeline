@@ -1,0 +1,7 @@
+.stage-editor-container {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  overflow: auto;
+  flex-grow: 1;
+}

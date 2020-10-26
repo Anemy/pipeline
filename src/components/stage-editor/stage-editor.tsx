@@ -1,6 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
+import './stage-editor.css';
+
 import {
   ActionTypes,
   UpdateStoreAction
@@ -9,12 +11,16 @@ import {
   AppState
 } from '../../store/store';
 import Stage from '../../models/stage';
-
-import './stage-editor.css';
+import Schema from '../../models/schema';
+import Loading from '../loading/loading';
 
 type StateProps = {
   activeStage: number;
   stages: Stage[];
+  errorAnalyzingDocumentsSchema: string;
+  hasAnalyzedSchema: boolean;
+  isAnalyszingSchema: boolean;
+  sampleDocumentsSchema: Schema;
 };
 
 type DispatchProps = {
@@ -24,15 +30,24 @@ type DispatchProps = {
 
 class StageEditor extends React.Component<StateProps & DispatchProps> {  
   render() {
-    const { activeStage, stages } = this.props;
+    const {
+      activeStage,
+      hasAnalyzedSchema,
+      isAnalyszingSchema,
+      sampleDocumentsSchema,
+      stages
+    } = this.props;
+
+    if (isAnalyszingSchema || !hasAnalyzedSchema) {
+      return <Loading />;
+    }
 
     return (
       <div className="stage-editor-container">
         <div>
-          Stage Editor
-        </div>
-        <div>
-          Stage: {stages[activeStage].type}
+          <pre>
+            Sample docs Schema: {JSON.stringify(sampleDocumentsSchema, null, 2)}
+          </pre>
         </div>
       </div>
     );
@@ -40,9 +55,15 @@ class StageEditor extends React.Component<StateProps & DispatchProps> {
 }
 
 const mapStateToProps = (state: AppState): StateProps => {
+  const currentStage = state.stages[state.activeStage];
+
   return {
     activeStage: state.activeStage,
-    stages: state.stages
+    stages: state.stages,
+    errorAnalyzingDocumentsSchema: currentStage.errorAnalyzingDocumentsSchema,
+    hasAnalyzedSchema: currentStage.hasAnalyzedSchema,
+    isAnalyszingSchema: currentStage.isAnalyszingSchema,
+    sampleDocumentsSchema: currentStage.sampleDocumentsSchema
   };
 };
 

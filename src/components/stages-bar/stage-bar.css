@@ -58,7 +58,8 @@
   background: white;
   border-radius: 50%;
   position: absolute;
-  padding: 1px 3px;
+  /* padding: 1px 3px; */
+  padding: 0;
   z-index: 1;
   top: -7px;
   right: -7px;
@@ -75,4 +76,21 @@
 
 .stages-bar-stage-is-active {
   background-color: rgba(30, 30, 240, 0.4);
+}
+
+.stages-bar-add-stage-button {
+  border-radius: 50%;
+  border: 1px solid black;
+  width: 20px;
+  height: 20px;
+  margin-left: 2px;
+  font-size: 12px;
+  padding: 2px;
+  text-align: center;
+  margin-top: 4px;
+  vertical-align: middle;
+}
+
+.stages-bar-add-stage-button:hover {
+  cursor: pointer;
 }
