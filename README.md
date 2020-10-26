@@ -1,20 +1,29 @@
 # Pipeline
 
-## Available Scripts
+### Installation
 
-In the project directory, you can run:
+Install node js from https://nodejs.org/en/download/
 
-### `npm install`
+```bash
+$ # 1. Clone this repo and navigate to the cloned folder.
+$ # 2. Install the application's dependencies:
+$ npm install
+```
 
-Install the dependencies that our application needs.
+### Development
 
-### `npm start`
+```bash
+$ npm start
+```
 
 Runs the app in the development mode.<br />
+This will open a window which is running the application using [electron](https://www.electronjs.org/).<br />
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 The page will reload if you make edits.<br />
 You will also see any lint errors in the console.
+
+### Deployment
 
 ### `npm run build`
 
