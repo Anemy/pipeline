@@ -26,6 +26,7 @@ type StateProps = {
   dataSource: DataSource;
   documents: any[];
   mongoClient: MongoClient;
+  sampleCount: number;
   stages: Stage[];
 };
 
@@ -71,9 +72,7 @@ class StageWorkspace extends React.Component<StateProps & DispatchProps> {
 
   analyzeSchemaOfSampleDocuments = () => {
     const {
-      dataSource,
-      documents,
-      mongoClient
+      documents
     } = this.props;
 
     const currentStageId = this.props.stages[this.props.activeStage].id;
@@ -130,7 +129,8 @@ class StageWorkspace extends React.Component<StateProps & DispatchProps> {
   loadSampleDocuments = async () => {
     const {
       dataSource,
-      mongoClient
+      mongoClient,
+      sampleCount
     } = this.props;
 
     const currentStageId = this.props.stages[this.props.activeStage].id;
@@ -147,7 +147,7 @@ class StageWorkspace extends React.Component<StateProps & DispatchProps> {
     try {
       const db = mongoClient.db(dataSource.database);
 
-      const documents = await db.collection(dataSource.collection).find().limit(10).toArray();
+      const documents = await db.collection(dataSource.collection).find().limit(sampleCount).toArray();
 
       // Ensure we're still looking at the same stage.
       if (this.props.stages[this.props.activeStage].id === currentStageId) {
@@ -212,6 +212,7 @@ const mapStateToProps = (state: AppState): StateProps => {
     dataSource: state.stages[0] as DataSource,
     documents: hasValidStageSelected ? state.stages[state.activeStage].sampleDocuments : [],
     mongoClient: state.mongoClient,
+    sampleCount: state.sampleCount,
     stages: state.stages
   };
 };

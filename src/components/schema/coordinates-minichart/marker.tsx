@@ -1,8 +1,7 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React, { Component } from 'react';
 import { CircleMarker } from 'react-leaflet';
 
-const CustomPopup = require('./marker-popup');
+import MarkerPopup from './marker-popup';
 
 const DEFAULT_STYLES = {
   weight: 1,
@@ -10,43 +9,46 @@ const DEFAULT_STYLES = {
   fillOpacity: 0.6
 };
 
-// Give a popup to a react-leaflet marker component
-// e.g a CircleMarker, Polygon, Polyline, Rectangle
-const popupComponent = (ParentComponent: any, properties: any) => {
-  const props = {
-    ...DEFAULT_STYLES,
-    ...properties,
+// type PopupComponentProps = {
+//   fields: any[]
+// };
+
+type MarkerProps = {
+  data: any[]
+};
+
+class Marker extends Component<MarkerProps> {
+  render() {
+    // TODO: @RHYS Maybe need to pull data out of props.
+    const {
+      data
+    } = this.props;
+
+    return data.map((point: any, i: number) => {
+      point.key = i;
+
+      // Give a popup to a react-leaflet marker component
+      // e.g a CircleMarker, Polygon, Polyline, Rectangle
+      return (
+        <CircleMarker
+          {...point}
+          {...DEFAULT_STYLES}
+          onMouseOver={(e: any) => {
+            e.target.openPopup();
+          }}
+          onMouseOut={(e: any) => {
+            e.target.closePopup();
+          }}
+        >
+          <MarkerPopup
+            fields={point.fields}
+            {...DEFAULT_STYLES}
+          />
+        </CircleMarker>
+      );
+    });
   };
-
-  return (
-    <ParentComponent
-      {...props}
-      onMouseOver={(e: any) => {
-        e.target.openPopup();
-      }}
-      onMouseOut={(e: any) => {
-        e.target.closePopup();
-      }}
-    >
-      <CustomPopup {...props} />
-    </ParentComponent>
-  );
-};
-
-popupComponent.propTypes = {
-  fields: PropTypes.array,
-};
-
-const Marker = ({ data }: any) =>
-  data.map((point: any, i: number) => {
-    point.key = i;
-
-    return popupComponent(CircleMarker, point);
-  });
-
-Marker.propTypes = {
-  data: PropTypes.array.isRequired,
-};
+}
 
 export default Marker;
-export { Marker, popupComponent };
+export { Marker };

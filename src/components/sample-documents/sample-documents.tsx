@@ -18,6 +18,7 @@ type StateProps = {
   documents: any[];
   hasLoadedSampleDocuments: boolean;
   isLoadingSampleDocuments: boolean;
+  sampledCount: number;
   stages: Stage[];
 };
 
@@ -25,13 +26,15 @@ type DispatchProps = {
   updateStore: (update: any) => void;
 };
 
+const MAX_DOCS_CAN_SHOW = 20;
+
 class SampleDocuments extends React.Component<StateProps & DispatchProps> {
   renderSampleDocuments() {
     const {
       documents
     } = this.props;
 
-    return documents.map((document, documentIndex) => (
+    return documents.map((document, documentIndex) => documentIndex < MAX_DOCS_CAN_SHOW && (
       <div
         className="sample-documents-document"
         key={`${documentIndex}`}
@@ -47,7 +50,8 @@ class SampleDocuments extends React.Component<StateProps & DispatchProps> {
     const {
       errorLoadingSampleDocuments,
       isLoadingSampleDocuments,
-      hasLoadedSampleDocuments
+      hasLoadedSampleDocuments,
+      sampledCount
     } = this.props;
 
     if (isLoadingSampleDocuments || !hasLoadedSampleDocuments) {
@@ -56,7 +60,7 @@ class SampleDocuments extends React.Component<StateProps & DispatchProps> {
 
     return (
       <div className="sample-documents-container">
-        <h4>Sample Documents</h4>
+        <div>Showing {sampledCount > MAX_DOCS_CAN_SHOW ? `first ${MAX_DOCS_CAN_SHOW} of ${sampledCount}` : sampledCount} sample documents</div>
         {errorLoadingSampleDocuments && <div>
           Error loading sample documents: {errorLoadingSampleDocuments}
         </div>}
@@ -75,6 +79,7 @@ const mapStateToProps = (state: AppState): StateProps => {
     errorLoadingSampleDocuments: currentStage.errorLoadingSampleDocuments,
     hasLoadedSampleDocuments: currentStage.hasLoadedSampleDocuments,
     isLoadingSampleDocuments: currentStage.isLoadingSampleDocuments,
+    sampledCount: currentStage.sampleDocumentsSchema.count,
     stages: state.stages
   };
 };

@@ -1,35 +1,42 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React, { Component } from 'react';
 import { Popup } from 'react-leaflet';
 
 import styles from './marker-popup.less';
 
-const CustomPopup = ({ fields }: any) => {
-  return (
-    <Popup closeButton={false} className={styles.popup}>
-      <CustomPopupFields fields={fields} />
-    </Popup>
-  );
+type CustomPopupProps = {
+  fields: any[]
 };
 
-CustomPopup.propTypes = {
-  fields: PropTypes.array,
-};
+class CustomPopup extends Component<CustomPopupProps> {
+  render() {
+    const { fields } = this.props;
 
-const CustomPopupFields = ({ fields }: any) => {
-  return fields
-    .filter((field: any) => field.key)
-    .map((field: any) => {
-      const { key, value } = field;
+    return (
+      <Popup closeButton={false} className={styles.popup}>
+        <CustomPopupFields fields={fields} />
+      </Popup>
+    );
+  }
+}
 
-      return (
-        <span className={styles.line} key={key}>
-          <span className={styles.key}>{key}:</span>{' '}
-          <span className={styles.value}>{value}</span>
-        </span>
-      );
-    });
-};
+class CustomPopupFields extends Component<CustomPopupProps> {
+  render() {
+    const { fields } = this.props;
+
+    return fields
+      .filter((field: any) => field.key)
+      .map((field: any) => {
+        const { key, value } = field;
+
+        return (
+          <span className={styles.line} key={key}>
+            <span className={styles.key}>{key}:</span>{' '}
+            <span className={styles.value}>{value}</span>
+          </span>
+        );
+      });
+  }
+}
 
 export default CustomPopup;
 export { CustomPopup, CustomPopupFields };

@@ -126,16 +126,19 @@ class CoordinatesMinichart extends Component<props> {
     attributionMessage: ''
   };
 
+  // mapRef: HTMLDivElement | null = null;
+  mapRef: any = null;
+
   /**
    * Sets a map view that contains the given geographical bounds
    * with the maximum zoom level possible.
    */
   fitMapBounds() {
-    const { map } = this.refs;
+    const map = this.mapRef;
     if (!map) {
       return;
     }
-    const leaflet = (this.refs.map as any).leafletElement;
+    const leaflet = (map as any).leafletElement;
 
     const values = this.props.type.values.filter(isValidLatLng);
 
@@ -177,20 +180,19 @@ class CoordinatesMinichart extends Component<props> {
       return;
     }
 
-    const { map } = this.refs;
-    const attributionMessage = await attachAttribution(map);
+    const attributionMessage = await attachAttribution(this.mapRef);
     this.setState({ attributionMessage });
   }
 
   invalidateMapSize() {
-    const { map }: any = this.refs;
-    if (!map) {
+    const mapRef: any = this.mapRef;
+    if (!mapRef) {
       return;
     }
 
-    map.container.style.height = `${this.props.height}px`;
-    map.container.style.width = `${this.props.width}px`;
-    map.leafletElement.invalidateSize();
+    mapRef.container.style.height = `${this.props.height}px`;
+    mapRef.container.style.width = `${this.props.width}px`;
+    mapRef.leafletElement.invalidateSize();
   }
 
   onMoveEnd = debounce(() => {
@@ -248,7 +250,7 @@ class CoordinatesMinichart extends Component<props> {
         minZoom={1}
         viewport={{ center: [0, 0], zoom: 1 }}
         whenReady={this.whenMapReady}
-        ref="map"
+        ref={ref => { this.mapRef = ref; }}
         onMoveend={this.onMoveEnd}>
         {this.renderMapItems()}
         <TileLayer url={DEFAULT_TILE_URL} attribution={attributionMessage} />

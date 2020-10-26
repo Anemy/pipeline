@@ -20,10 +20,13 @@ export const SCHEMA_CONSTANTS = {
   'DATE': 'Date'
 };
 
+export const DEFAULT_SAMPLE_COUNT = 200;
+
 export interface AppState {
   activeStage: number,
   // dataSource: DataSource,
   mongoClient: MongoClient,
+  sampleCount: number,
   showGraph: boolean,
   stages: Stage[]
 }
@@ -32,8 +35,9 @@ export const getInitialState = (mongoClient: MongoClient) => ({
   activeStage: NO_ACTIVE_STAGE,
   // dataSource: new DataSource('test', 'sales'),
   mongoClient,
+  sampleCount: DEFAULT_SAMPLE_COUNT,
   showGraph: false,
-  stages: [new DataSource('test', 'sales')]
+  stages: [new DataSource('ships', 'shipwrecks')]
 });
 
 // eslint-disable-next-line complexity

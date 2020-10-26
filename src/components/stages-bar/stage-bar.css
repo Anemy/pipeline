@@ -18,6 +18,7 @@
   border-radius: 3px;
   border: 1px solid black;
   display: inline-block;
+  transition: 200ms all;
 }
 
 .stages-bar-data-source:hover {
@@ -25,7 +26,7 @@
 }
 
 .stages-bar-data-source-is-selected {
-  box-shadow: 0 2px 4px 0 rgba(60, 66, 87, .12), 0 1px 2px 0 rgba(0, 0, 0, .08);
+  box-shadow: 0 2px 4px 0 rgba(60, 66, 87, .14), 0 1px 2px 0 rgba(0, 0, 0, .1);
   border-color: blue;
 }
 
@@ -37,14 +38,6 @@
   float: right;
 }
 
-.stages-bar-stage {
-  padding: 4px 8px;
-  border-radius: 3px;
-  border: 1px solid black;
-  display: inline-block;
-  position: relative;
-}
-
 .stages-bar-stage-container {
   display: inline-block;
 }
@@ -53,8 +46,22 @@
   margin: 0 4px;
 }
 
+.stages-bar-stage {
+  padding: 4px 8px;
+  border-radius: 3px;
+  border: 1px solid black;
+  display: inline-block;
+  position: relative;
+  transition: 200ms all;
+}
+
 .stages-bar-stage:hover {
   cursor: pointer;
+}
+
+.stages-bar-stage-is-selected {
+  background-color: rgba(30, 30, 240, 0.4);
+  box-shadow: 0 2px 4px 0 rgba(39, 43, 58, 0.14), 0 1px 2px 0 rgba(0, 0, 0, .1);
 }
 
 .stages-bar-stage:hover .stages-bar-stage-delete-button {
@@ -81,11 +88,6 @@
 .stages-bar-stage-delete-button:hover {
   cursor: pointer;
   color: rgb(240, 50, 50);
-}
-
-.stages-bar-stage-is-selected {
-  background-color: rgba(30, 30, 240, 0.4);
-  box-shadow: 0 2px 4px 0 rgba(60, 66, 87, .12), 0 1px 2px 0 rgba(0, 0, 0, .08);
 }
 
 .stages-bar-add-new-stage-area {
@@ -120,8 +122,8 @@
   flex-direction: column;
 }
 
-.stages-bar-add-new-stage-dropdown:not(:last-child) {
-  border-bottom: 1px solid black;
+.stages-bar-add-new-stage-option:not(:last-child) {
+  border-bottom: 1px solid #999;
 }
 
 .stages-bar-add-new-stage-option {

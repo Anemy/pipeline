@@ -3,11 +3,17 @@ export enum Types {
   ARRAY = 'Array',
   COORDINATES = 'Coordinates',
   DATE = 'Date',
+  DECIMAL_128 = 'Decimal128',
   DOCUMENT = 'Document',
+  DOUBLE = 'Double',
+  INT_32 = 'Int32',
+  LONG = 'Long',
   NUMBER = 'Number',
   OBJECT_ID = 'ObjectID',
   STRING = 'String',
-  UNDEFINED = 'Undefined'
+  TIMESTAMP = 'Timestamp',
+  UNDEFINED = 'Undefined',
+  UTCDATETIME = 'UtcDatetime'
   // TODO
 };
 
