@@ -1,21 +1,16 @@
 import React from 'react';
 import { connect } from 'react-redux';
-// import { Resizable } from 're-resizable';
 
 import {
   ActionTypes,
   UpdateStoreAction
 } from '../../store/actions';
 import {
-  AppState,
-  NO_ACTIVE_STAGE
+  AppState
 } from '../../store/store';
 import Stage from '../../models/stage';
 
 import './stage-editor.css';
-
-import SampleDocuments from '../sample-documents/sample-documents';
-import StageControls from '../stage-controls/stage-controls';
 
 type StateProps = {
   activeStage: number;
@@ -26,40 +21,19 @@ type DispatchProps = {
   updateStore: (update: any) => void;
 };
 
-// const resizeableDirections = {
-//   top: false,
-//   right: true,
-//   bottom: false,
-//   left: false,
-//   topRight: false,
-//   bottomRight: false,
-//   bottomLeft: false,
-//   topLeft: false
-// };
 
-class StageEditor extends React.Component<StateProps & DispatchProps> {
-  renderNoActiveStage() {
-    return (
-      <div className="stage-editor-empty-state">
-        No active stage, please create a new one or choose one from above.
-      </div>
-    );
-  }
-  
+class StageEditor extends React.Component<StateProps & DispatchProps> {  
   render() {
     const { activeStage, stages } = this.props;
 
-    const hasValidStageSelected = activeStage !== NO_ACTIVE_STAGE && !!stages[activeStage];
-
     return (
       <div className="stage-editor-container">
-        {!hasValidStageSelected && this.renderNoActiveStage()}
-        {hasValidStageSelected && <div
-          className="stage-editor-workspace"
-        >
-          <SampleDocuments />
-          <StageControls />
-        </div>}
+        <div>
+          Stage Editor
+        </div>
+        <div>
+          Stage: {stages[activeStage].type}
+        </div>
       </div>
     );
   }

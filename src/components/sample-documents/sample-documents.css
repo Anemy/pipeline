@@ -2,6 +2,7 @@
   width: 40%;
   border-right: 1px solid black;
   padding: 10px;
+  overflow: auto;
 }
 
 .sample-documents-document {

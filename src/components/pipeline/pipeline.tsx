@@ -3,7 +3,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import GraphContainer from '../graph/graph-container';
-import StageEditor from '../stage-editor/stage-editor';
+import StageEditor from '../stage-workspace/stage-workspace';
 import {
   ActionTypes,
   UpdateStoreAction
