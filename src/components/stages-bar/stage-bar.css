@@ -58,8 +58,8 @@
   background: white;
   border-radius: 50%;
   position: absolute;
-  /* padding: 1px 3px; */
-  padding: 0;
+  padding: 1px 3px;
+  /* padding: 0; */
   z-index: 1;
   top: -7px;
   right: -7px;
@@ -78,12 +78,17 @@
   background-color: rgba(30, 30, 240, 0.4);
 }
 
+.stages-bar-add-new-stage-area {
+  display: inline-block;
+  margin-left: 2px;
+  position: relative;
+}
+
 .stages-bar-add-stage-button {
   border-radius: 50%;
   border: 1px solid black;
   width: 20px;
   height: 20px;
-  margin-left: 2px;
   font-size: 12px;
   padding: 2px;
   text-align: center;
@@ -93,4 +98,30 @@
 
 .stages-bar-add-stage-button:hover {
   cursor: pointer;
+}
+
+.stages-bar-add-new-stage-dropdown {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  border: 1px solid black;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+}
+
+.stages-bar-add-new-stage-dropdown:not(:last-child) {
+  border-bottom: 1px solid black;
+}
+
+.stages-bar-add-new-stage-option {
+  padding: 2px 6px;
+  background: white;
+  text-decoration: none;
+  color: #232323;
+}
+
+.stages-bar-add-new-stage-option:hover {
+  cursor: pointer;
+  background: #f5f5f5;
 }

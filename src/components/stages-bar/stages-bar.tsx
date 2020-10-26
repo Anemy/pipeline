@@ -31,12 +31,49 @@ type DispatchProps = {
 };
 
 class StagesBar extends React.Component<StateProps & DispatchProps> {
-  addNewStage = (): void => {
+  state = {
+    isChoosingNewStage: false
+  };
+
+  componentWillUnmount() {
+    if (this.state.isChoosingNewStage) {
+      window.removeEventListener('click', this.handleWindowClick);
+    }
+  }
+
+  handleWindowClick = (event: any) => {
+    if (!event.target.classList.contains('.stages-bar-add-new-stage-dropdown')) {
+      this.setState({
+        isChoosingNewStage: false
+      });
+      window.removeEventListener('click', this.handleWindowClick);
+    }
+  }
+
+  onClickAddNewStage = (): void => {
+    if (this.state.isChoosingNewStage) {
+      return;
+    }
+
+    this.setState({
+      isChoosingNewStage: true
+    });
+
+    setImmediate(() => {
+      window.addEventListener('click', this.handleWindowClick);
+    });
+  };
+
+  onClickAddStageOption = (newStageType: STAGES): void => {
+    this.setState({
+      isChoosingNewStage: false
+    });
+
     this.props.updateStore({
       activeStage: this.props.stages.length,
       stages: [
         ...this.props.stages,
-        new Stage(STAGES.FILTER)
+        new Stage(newStageType)
       ]
     });
   };
@@ -146,20 +183,45 @@ class StagesBar extends React.Component<StateProps & DispatchProps> {
     );
   }
 
+  renderStageOptions() {
+    return (
+      <div
+        className="stages-bar-add-new-stage-dropdown"
+      >
+        {Object.keys(STAGES).map((stage: string) => (
+          <a
+            className="stages-bar-add-new-stage-option"
+            key={`${stage}`}
+            onClick={() => this.onClickAddStageOption(stage as STAGES)}
+          >
+            {Stage.getNiceStageNameForStageType(stage as STAGES)}
+          </a>
+        ))}
+      </div>
+    );
+  }
+
   render() {
+    const {
+      isChoosingNewStage
+    } = this.state;
+
     return (
       <div className="stages-bar-container">
         <div className="stages-bar-stages-area">
           {this.renderDataSource()}
           {this.renderStages()}
-          <button
-            className="stages-bar-add-stage-button"
-            onClick={this.addNewStage}
-          >
-            <FontAwesomeIcon
-              icon={faPlus}
-            />
-          </button>
+          <div className="stages-bar-add-new-stage-area">
+            <button
+              className="stages-bar-add-stage-button"
+              onClick={this.onClickAddNewStage}
+            >
+              <FontAwesomeIcon
+                icon={faPlus}
+              />
+            </button>
+            {isChoosingNewStage && this.renderStageOptions()}
+          </div>
           <div className="stages-bar-stages-empty-space" />
           <button
             className="stages-bar-expand-button"
