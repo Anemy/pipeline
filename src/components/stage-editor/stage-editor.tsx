@@ -10,7 +10,7 @@ import {
   AppState,
   NO_ACTIVE_STAGE
 } from '../../store/store';
-import Stage from '../models/stage';
+import Stage from '../../models/stage';
 
 import './stage-editor.css';
 
@@ -41,7 +41,7 @@ class StageEditor extends React.Component<StateProps & DispatchProps> {
   renderNoActiveStage() {
     return (
       <div className="stage-editor-empty-state">
-        No active stage, please choose one from above
+        No active stage, please create a new one or choose one from above.
       </div>
     );
   }

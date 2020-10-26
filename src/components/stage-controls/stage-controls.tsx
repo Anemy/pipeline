@@ -8,7 +8,7 @@ import {
 import {
   AppState
 } from '../../store/store';
-import Stage from '../models/stage';
+import Stage from '../../models/stage';
 
 import './stage-controls.css';
 

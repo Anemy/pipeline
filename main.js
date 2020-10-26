@@ -8,11 +8,15 @@ let mainWindow;
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 900,
-    height: 680
+    height: 680,
+    // show: false, // Don't show until window is ready.
+    webPreferences: {
+      nodeIntegration: true
+    }
   });
   mainWindow.loadURL(isDev
-    ? 'http://localhost:3000'
-    : `file://${path.join(__dirname, '../build/index.html')}`
+    ? 'http://localhost:8080'
+    : `file://${path.join(__dirname, './build/index.html')}`
   );
   mainWindow.on('closed', () => (mainWindow = null));
 }
@@ -28,3 +32,5 @@ app.on('activate', () => {
     createWindow();
   }
 });
+
+console.log('Started electron main.js');

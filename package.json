@@ -2,10 +2,18 @@
   "name": "pipeline",
   "version": "0.1.0",
   "private": true,
-  "main": "public/electron.js",
+  "main": "./main.js",
   "homepage": "./",
   "build": {
     "appId": "com.pipeline"
+  },
+  "scripts": {
+    "prod": "webpack --mode production --config webpack.build.config.js && electron --noDevServer .",
+    "start": "webpack-dev-server --hot --host 0.0.0.0 --config=./webpack.dev.config.js --mode development",
+    "build": "webpack --config webpack.build.config.js --mode production",
+    "package": "npm run build",
+    "postpackage": "electron-packager ./ --out=./builds",
+    "old-start": "concurrently \"cross-env BROWSER=none npm run react-start\" \"wait-on http://localhost:3000 && electron .\""
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.32",
@@ -19,23 +27,14 @@
     "electron-is-dev": "^1.2.0",
     "litegraph.js": "^0.7.8",
     "mongodb": "^3.6.2",
+    "mongodb-client-encryption": "^1.1.0",
     "re-resizable": "^6.6.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-redux": "^7.2.1",
-    "react-scripts": "3.4.3",
     "react-splitter-layout": "^4.0.0",
     "redux": "^4.0.5",
     "wait-on": "^5.2.0"
-  },
-  "scripts": {
-    "react-start": "react-scripts start",
-    "react-build": "react-scripts build",
-    "react-eject": "react-scripts eject",
-    "electron-build": "electron-builder",
-    "release": "npm run react-build && electron-builder --publish=always",
-    "build": "npm run react-build && npm run electron-build",
-    "start": "concurrently \"cross-env BROWSER=none npm run react-start\" \"wait-on http://localhost:3000 && electron .\""
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -54,10 +53,21 @@
   },
   "devDependencies": {
     "@types/classnames": "^2.2.10",
+    "@types/mongodb": "^3.5.31",
     "@types/node": "^14.11.8",
     "@types/react": "^16.9.53",
     "@types/react-dom": "^16.9.8",
     "@types/react-redux": "^7.1.9",
-    "typescript": "^4.0.3"
+    "css-loader": "^5.0.0",
+    "file-loader": "^6.1.1",
+    "html-webpack-plugin": "^4.5.0",
+    "mini-css-extract-plugin": "^1.2.0",
+    "node-loader": "^1.0.2",
+    "style-loader": "^2.0.0",
+    "ts-loader": "^8.0.7",
+    "typescript": "^4.0.3",
+    "webpack": "^5.2.0",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.0"
   }
 }

@@ -14,8 +14,8 @@ import {
   UpdateStoreAction
 } from '../../store/actions';
 import { AppState, NO_ACTIVE_STAGE } from '../../store/store';
-import DataSource from '../models/data-source';
-import Stage, { STAGES } from '../models/stage';
+import DataSource from '../../models/data-source';
+import Stage, { STAGES } from '../../models/stage';
 
 import './stage-bar.css';
 

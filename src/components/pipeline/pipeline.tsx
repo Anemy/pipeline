@@ -43,13 +43,9 @@ class Pipeline extends React.Component<StateProps & DispatchProps> {
 
     return (
       <div className="pipeline-container">
-        {/* <Resizable>
-          <Graph />
-        </Resizable> */}
         {showGraph && <GraphContainer />}
         {!showGraph && <StagesBar />}
         {!showGraph && <StageEditor />}
-
       </div>
     );
   }

@@ -1,19 +1,78 @@
+import { MongoClient } from 'mongodb';
 import React from 'react';
-import Pipeline from './components/pipeline/pipeline';
-
 import { Provider } from 'react-redux';
 import { createStore } from 'redux';
 
-import { initialState, rootReducer } from './store/store';
-
-const store = createStore(rootReducer, initialState);
+import { getInitialState, rootReducer } from './store/store';
+import Pipeline from './components/pipeline/pipeline';
 
 class App extends React.Component {
+  state = {
+    connectingToDataService: true,
+    errorConnectingToDataService: ''
+  };
+
+  store: any;
+
+  componentDidMount() {
+    this.connectToMongodb();
+  }
+
+  connectToMongodb = async () => {
+    this.setState({
+      connectingToDataService: true,
+      errorConnectingToDataService: ''
+    });
+
+    const connectionUri = 'mongodb://localhost:27017';
+    const client = new MongoClient(connectionUri, {
+      useUnifiedTopology: true
+    });
+    
+    try {
+      await client.connect();
+
+      const initialState = getInitialState(client);
+      this.store = createStore(rootReducer, initialState);
+    } catch (err) {
+      console.log('unable to connect to mdb:', err);
+      this.setState({
+        errorConnectingToDataService: err.message
+      });
+    }
+    this.setState({
+      connectingToDataService: false
+    });
+  }
+
   render() {
+    const {
+      connectingToDataService,
+      errorConnectingToDataService
+    } = this.state;
+
     return (
-      <Provider store={store}>
-        <Pipeline />
-      </Provider>
+      <React.Fragment>
+        {connectingToDataService && <div className="app-connecting">
+          Connecting to database...
+        </div>}
+        {errorConnectingToDataService && <div className="app-connecting">
+          <div>
+            Unable to connect to database: {errorConnectingToDataService}
+          </div>
+          <button onClick={this.connectToMongodb}>
+            retry
+          </button>
+        </div>}
+        {/* <Resizable>
+          <Graph />
+        </Resizable> */}
+        {!connectingToDataService && !errorConnectingToDataService && (
+          <Provider store={this.store}>
+            <Pipeline />
+          </Provider>
+        )}
+      </React.Fragment>
     );
   }
 }
