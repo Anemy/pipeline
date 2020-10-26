@@ -9,6 +9,19 @@
   flex-grow: 1;
   border: 1px solid black;
   padding: 4px;
+  display: flex;
+}
+
+.stages-bar-data-source {
+  background-color: rgba(30, 240, 30, 0.4);
+  padding: 4px 8px;
+  border-radius: 3px;
+  border: 1px solid black;
+  display: inline-block;
+}
+
+.stages-bar-stages-empty-space {
+  flex-grow: 1;
 }
 
 .stages-bar-expand-button {
@@ -20,4 +33,46 @@
   border-radius: 3px;
   border: 1px solid black;
   display: inline-block;
+  position: relative;
+}
+
+.stages-bar-stage-container {
+  display: inline-block;
+}
+
+.stages-bar-stage-arrow-right {
+  margin: 0 4px;
+}
+
+.stages-bar-stage:hover {
+  cursor: pointer;
+}
+
+.stages-bar-stage:hover .stages-bar-stage-delete-button {
+  display: block;
+}
+
+.stages-bar-stage-delete-button {
+  display: none;
+  color: rgb(180, 50, 50);
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+  padding: 1px 3px;
+  z-index: 1;
+  top: -7px;
+  right: -7px;
+  width: 14px;
+  height: 14px;
+  transition: 200ms all;
+  font-size: 14px;
+}
+
+.stages-bar-stage-delete-button:hover {
+  cursor: pointer;
+  color: rgb(240, 50, 50);
+}
+
+.stages-bar-stage-is-active {
+  background-color: rgba(30, 30, 240, 0.4);
 }

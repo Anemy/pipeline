@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+// import { Resizable } from 're-resizable';
 
 import {
   ActionTypes,
@@ -25,6 +26,16 @@ type DispatchProps = {
   updateStore: (update: any) => void;
 };
 
+// const resizeableDirections = {
+//   top: false,
+//   right: true,
+//   bottom: false,
+//   left: false,
+//   topRight: false,
+//   bottomRight: false,
+//   bottomLeft: false,
+//   topLeft: false
+// };
 
 class StageEditor extends React.Component<StateProps & DispatchProps> {
   renderNoActiveStage() {
@@ -42,10 +53,13 @@ class StageEditor extends React.Component<StateProps & DispatchProps> {
 
     return (
       <div className="stage-editor-container">
-        Stage Editor
         {!hasValidStageSelected && this.renderNoActiveStage()}
-        {hasValidStageSelected && <SampleDocuments />}
-        {hasValidStageSelected && <StageControls />}
+        {hasValidStageSelected && <div
+          className="stage-editor-workspace"
+        >
+          <SampleDocuments />
+          <StageControls />
+        </div>}
       </div>
     );
   }

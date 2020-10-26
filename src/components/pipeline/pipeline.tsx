@@ -48,7 +48,7 @@ class Pipeline extends React.Component<StateProps & DispatchProps> {
         </Resizable> */}
         {showGraph && <GraphContainer />}
         {!showGraph && <StagesBar />}
-        <StageEditor />
+        {!showGraph && <StageEditor />}
 
       </div>
     );

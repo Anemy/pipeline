@@ -22,7 +22,7 @@ type DispatchProps = {
 class SampleDocuments extends React.Component<StateProps & DispatchProps> {
   render() {
     return (
-      <div className="stages-bar-container">
+      <div className="sample-documents-container">
         Sample Documents
       </div>
     );

@@ -7,6 +7,8 @@ import {
 } from '../../store/actions';
 import { AppState } from '../../store/store';
 import Graph from '../graph/graph';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCompressAlt } from '@fortawesome/free-solid-svg-icons';
 
 type StateProps = {};
 
@@ -59,7 +61,9 @@ class GraphContainer extends React.Component<StateProps & DispatchProps> {
           className="graph-container-collapse-button"
           onClick={this.onCollapseClicked}
         >
-          collapse
+          <FontAwesomeIcon
+            icon={faCompressAlt}
+          />
         </button>
       </div>
     );
