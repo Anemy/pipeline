@@ -209,7 +209,7 @@ const mapStateToProps = (state: AppState): StateProps => {
 
   return {
     activeStage: state.activeStage,
-    dataSource: state.dataSource,
+    dataSource: state.stages[0] as DataSource,
     documents: hasValidStageSelected ? state.stages[state.activeStage].sampleDocuments : [],
     mongoClient: state.mongoClient,
     stages: state.stages

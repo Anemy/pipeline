@@ -14,7 +14,11 @@ import {
   ActionTypes,
   UpdateStoreAction
 } from '../../store/actions';
-import { AppState, NO_ACTIVE_STAGE } from '../../store/store';
+import {
+  AppState,
+  DATA_SERVICE_STAGE_INDEX,
+  NO_ACTIVE_STAGE
+} from '../../store/store';
 import DataSource from '../../models/data-source';
 import Stage, { STAGES } from '../../models/stage';
 
@@ -79,7 +83,9 @@ class StagesBar extends React.Component<StateProps & DispatchProps> {
   };
 
   onDataSourceClicked = (): void => {
-    alert('data source clicked');
+    this.props.updateStore({
+      activeStage: DATA_SERVICE_STAGE_INDEX
+    });
   };
 
   onDeleteStageClicked = (stageIndexToDelete: number): void => {
@@ -118,7 +124,34 @@ class StagesBar extends React.Component<StateProps & DispatchProps> {
   };
 
   onRunClicked = (): void => {
-    alert('run clicked');
+    const {
+      activeStage,
+      stages
+    } = this.props
+
+    if (activeStage === NO_ACTIVE_STAGE) {
+      this.props.updateStore({
+        activeStage: DATA_SERVICE_STAGE_INDEX
+      });
+    } else {
+      const hasValidStageSelected = activeStage !== NO_ACTIVE_STAGE && !!stages[activeStage];
+
+      let newActiveStage = activeStage;
+
+      if (!hasValidStageSelected) {
+        newActiveStage = stages.length - 1;
+      }
+
+      // Reset docs in the current stage to ensure we run.
+      const updatedStages = [...stages];
+      updatedStages[activeStage].hasLoadedSampleDocuments = false;
+      updatedStages[activeStage].hasAnalyzedSchema = false;
+
+      this.props.updateStore({
+        activeStage: newActiveStage,
+        stages: updatedStages
+      });
+    }
   };
 
   onStageClicked = (stageIndex: number): void => {
@@ -129,13 +162,15 @@ class StagesBar extends React.Component<StateProps & DispatchProps> {
 
   renderDataSource = (): React.ReactNode => {
     const {
+      activeStage,
       dataSource
     } = this.props;
 
     return (
       <div
         className={classnames({
-          'stages-bar-data-source': true
+          'stages-bar-data-source': true,
+          'stages-bar-data-source-is-selected': activeStage === DATA_SERVICE_STAGE_INDEX
         })}
         onClick={() => this.onDataSourceClicked()}
       >
@@ -152,7 +187,7 @@ class StagesBar extends React.Component<StateProps & DispatchProps> {
 
     return (
       <React.Fragment>
-        {stages.map((stage, stageIndex) => (
+        {stages.map((stage, stageIndex) => (stageIndex > 0 && (
           <div
             className="stages-bar-stage-container"
             key={`${stageIndex}-${stage.type}`}
@@ -164,7 +199,7 @@ class StagesBar extends React.Component<StateProps & DispatchProps> {
             <div
               className={classnames({
                 'stages-bar-stage': true,
-                'stages-bar-stage-is-active': stageIndex === activeStage
+                'stages-bar-stage-is-selected': stageIndex === activeStage
               })}
               onClick={() => this.onStageClicked(stageIndex)}
             >
@@ -178,7 +213,7 @@ class StagesBar extends React.Component<StateProps & DispatchProps> {
               />
             </div>
           </div>
-        ))}
+        )))}
       </React.Fragment>
     );
   }
@@ -188,7 +223,7 @@ class StagesBar extends React.Component<StateProps & DispatchProps> {
       <div
         className="stages-bar-add-new-stage-dropdown"
       >
-        {Object.keys(STAGES).map((stage: string) => (
+        {Object.keys(STAGES).map((stage: string, i: number) => (
           <a
             className="stages-bar-add-new-stage-option"
             key={`${stage}`}
@@ -250,7 +285,7 @@ class StagesBar extends React.Component<StateProps & DispatchProps> {
 const mapStateToProps = (state: AppState): StateProps => {
   return {
     activeStage: state.activeStage,
-    dataSource: state.dataSource,
+    dataSource: state.stages[0] as DataSource,
     stages: state.stages
   };
 };

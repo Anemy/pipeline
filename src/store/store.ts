@@ -3,6 +3,7 @@ import DataSource from '../models/data-source';
 import Stage from '../models/stage';
 import { Actions, ActionTypes } from './actions';
 
+export const DATA_SERVICE_STAGE_INDEX = 0;
 export const NO_ACTIVE_STAGE = -1;
 
 export const SCHEMA_CONSTANTS = {
@@ -21,7 +22,7 @@ export const SCHEMA_CONSTANTS = {
 
 export interface AppState {
   activeStage: number,
-  dataSource: DataSource,
+  // dataSource: DataSource,
   mongoClient: MongoClient,
   showGraph: boolean,
   stages: Stage[]
@@ -29,10 +30,10 @@ export interface AppState {
 
 export const getInitialState = (mongoClient: MongoClient) => ({
   activeStage: NO_ACTIVE_STAGE,
-  dataSource: new DataSource('test', 'sales'),
+  // dataSource: new DataSource('test', 'sales'),
   mongoClient,
   showGraph: false,
-  stages: []
+  stages: [new DataSource('test', 'sales')]
 });
 
 // eslint-disable-next-line complexity

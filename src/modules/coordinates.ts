@@ -214,7 +214,7 @@ const minicharts_d3fns_geo = (localAppRegistry: any) => {
 
       map.dragPan.disable();
       mousedown = true;
-      const p = d3.mouse(this);
+      const p = d3.mouse(this as any);
       const ll = unproject([p[0], p[1]]);
 
       if (!circleCenter) {

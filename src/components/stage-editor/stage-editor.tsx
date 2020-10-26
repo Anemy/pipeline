@@ -28,7 +28,6 @@ type DispatchProps = {
   updateStore: (update: any) => void;
 };
 
-
 class StageEditor extends React.Component<StateProps & DispatchProps> {  
   render() {
     const {
@@ -49,11 +48,11 @@ class StageEditor extends React.Component<StateProps & DispatchProps> {
           samplingState={SAMPLING_STATES.complete}
           schema={sampleDocumentsSchema}
         />
-        <div>
+        {/* <div> */}
           {/* <pre>
             Sample docs Schema: {JSON.stringify(sampleDocumentsSchema, null, 2)}
           </pre> */}
-        </div>
+        {/* </div> */}
       </div>
     );
   }
