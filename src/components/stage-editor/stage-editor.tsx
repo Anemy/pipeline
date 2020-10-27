@@ -39,7 +39,9 @@ class StageEditor extends React.Component<StateProps & DispatchProps> {
     } = this.props;
 
     if (isAnalyszingSchema || !hasAnalyzedSchema) {
-      return <Loading />;
+      return <div className="stage-editor-container">
+        <Loading />
+      </div>;
     }
 
     return (

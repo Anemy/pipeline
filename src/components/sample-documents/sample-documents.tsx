@@ -55,7 +55,9 @@ class SampleDocuments extends React.Component<StateProps & DispatchProps> {
     } = this.props;
 
     if (isLoadingSampleDocuments || !hasLoadedSampleDocuments) {
-      return <Loading />;
+      return <div className="sample-documents-container">
+        <Loading />
+      </div>;
     }
 
     return (

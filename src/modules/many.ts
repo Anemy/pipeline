@@ -74,13 +74,15 @@ const minicharts_d3fns_many = (appRegistry: any) => {
         // QueryAction.clearValue({
         //   field: options.fieldName
         // });
-        alert('TODO: Use this action to clear a value from the project - maybe gone away'); // mmmmm
+        if (!hasBeenShown) alert('TODO: Use this action to clear a value from the project - maybe gone away'); // mmmmm
+        hasBeenShown = true;
         return;
       }
       // distinct values (strings)
       if (options.selectionType === 'distinct') {
         const values = map(selected.data(), 'value');
-        alert('TODO: Use this action to add to the projection'); // mmmmm
+        if (!hasBeenShown) alert('TODO: Use this action to add to the projection'); // mmmmm
+        hasBeenShown = true;
 
         // QueryAction.setDistinctValues({
         //   field: options.fieldName,
@@ -98,7 +100,8 @@ const minicharts_d3fns_many = (appRegistry: any) => {
 
       if (minValue.value === maxValue.value + maxValue.dx) {
         // if not binned and values are the same, single equality query
-        alert('TODO: Use this action to build project'); // mmmmm
+        if (!hasBeenShown) alert('TODO: Use this action to build project'); // mmmmm
+        hasBeenShown = true;
         // QueryAction.setValue({
         //   field: options.fieldName,
         //   value: options.promoter(minValue.bson)
@@ -107,7 +110,8 @@ const minicharts_d3fns_many = (appRegistry: any) => {
       }
       // binned values, build range query with $gte and $lt (if binned)
       // or $gte and $lte (if not binned)
-      alert('TODO: Use this action to build project'); // mmmmm
+      if (!hasBeenShown) alert('TODO: Use this action to build project'); // mmmmm
+      hasBeenShown = true;
       // QueryAction.setRangeValues({
       //   field: options.fieldName,
       //   min: options.promoter(minValue.value),
@@ -125,6 +129,7 @@ const minicharts_d3fns_many = (appRegistry: any) => {
     d3.select(this).call(brush.clear());
   }
 
+  let hasBeenShown = false;
 
   /**
    * Handles event of single mousedown (either as click, or beginning of a
@@ -153,14 +158,17 @@ const minicharts_d3fns_many = (appRegistry: any) => {
       // distinct values, behavior dependent on shift key
       // const qbAction = d3.event.shiftKey ?
       // QueryAction.toggleDistinctValue : QueryAction.setValue;
-      alert('TODO: Use this action to build the project'); // mmmmm
+      if (!hasBeenShown) alert('TODO: Use this action to build the project'); // mmmmm
+      hasBeenShown = true;
+      // ADDED BY RHYS REMOVE ^^
       // qbAction({
       //   field: options.fieldName,
       //   value: options.promoter(d.value),
       //   unsetIfSet: true
       // });
     } else if (d3.event.shiftKey && lastNonShiftRangeValue) {
-      alert('TODO: Use this action to build the project'); // mmmmm
+      if (!hasBeenShown) alert('TODO: Use this action to build the project'); // mmmmm
+      hasBeenShown = true;
       // QueryAction.setRangeValues({
       //   field: options.fieldName,
       //   min: options.promoter(Math.min(d.value, lastNonShiftRangeValue.value)),
@@ -172,7 +180,8 @@ const minicharts_d3fns_many = (appRegistry: any) => {
       lastNonShiftRangeValue = d;
       if (d.dx > 0) {
         // binned bars, turn single value into range
-        alert('TODO: Use this action to build a project'); // mmmmm
+        if (!hasBeenShown) alert('TODO: Use this action to build a project'); // mmmmm
+        hasBeenShown = true;
         // QueryAction.setRangeValues({
         //   field: options.fieldName,
         //   min: options.promoter(d.value),
@@ -181,7 +190,8 @@ const minicharts_d3fns_many = (appRegistry: any) => {
         // });
       } else {
         // bars don't represent bins, build single value query
-        alert('TODO: Use this action to build a project'); // mmmmm
+        if (!hasBeenShown) alert('TODO: Use this action to build a project'); // mmmmm
+        hasBeenShown = true;
         // QueryAction.setValue({
         //   field: options.fieldName,
         //   value: options.promoter(d.bson),
