@@ -1,5 +1,5 @@
 .sample-documents-container {
-  width: 40%;
+  /* width: 40%; */
   border-right: 1px solid black;
   padding: 10px;
   overflow: auto;

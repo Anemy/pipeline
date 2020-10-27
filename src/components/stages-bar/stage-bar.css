@@ -123,7 +123,7 @@
 }
 
 .stages-bar-add-new-stage-option:not(:last-child) {
-  border-bottom: 1px solid #999;
+  border-bottom: 1px solid #343434;
 }
 
 .stages-bar-add-new-stage-option {

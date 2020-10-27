@@ -3,6 +3,9 @@ import React from 'react';
 import { connect } from 'react-redux';
 // import { Resizable } from 're-resizable';
 const parseSchema = require('mongodb-schema');
+import SplitterLayout from 'react-splitter-layout';
+
+import 'react-splitter-layout/lib/index.css';
 
 import {
   ActionTypes,
@@ -177,6 +180,10 @@ class StageWorkspace extends React.Component<StateProps & DispatchProps> {
     }
   };
 
+  // onWorkspacePanelSizeChange = (newWidth: number) => {
+  //   console.log('New panel size:', newWidth);
+  // }
+
   renderNoActiveStage() {
     return (
       <div className="stage-workspace-empty-state">
@@ -196,8 +203,16 @@ class StageWorkspace extends React.Component<StateProps & DispatchProps> {
         {hasValidStageSelected && <div
           className="stage-workspace"
         >
-          <SampleDocuments />
-          <StageEditor />
+          <SplitterLayout
+            percentage
+            // onSecondaryPaneSizeChange={this.onWorkspacePanelSizeChange}
+            primaryMinSize={10}
+            secondaryInitialSize={60}
+            secondaryMinSize={10}
+          >
+            <SampleDocuments />
+            <StageEditor />
+          </SplitterLayout>
         </div>}
       </div>
     );
