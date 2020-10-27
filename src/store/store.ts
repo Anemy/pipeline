@@ -7,20 +7,10 @@ export const DATA_SERVICE_STAGE_INDEX = 0;
 export const NO_ACTIVE_STAGE = -1;
 
 export const SCHEMA_CONSTANTS = {
-  'SCHEMA_PROBABILITY_PERCENT': 'schema-probability-percent',
-  'LONG_RUNNING_QUERIES_URL': 'https://docs.mongodb.com/compass/current/faq/#what-happens-to-long-running-queries',
-  'DECIMAL_128': 'Decimal128',
-  'DOUBLE': 'Double',
-  'LONG': 'Long',
-  'INT_32': 'Int32',
-  'STRING': 'String',
-  'NUMBER': 'Number',
-  'UTCDATETIME': 'UtcDatetime',
-  'TIMESTAMP': 'Timestamp',
-  'DATE': 'Date'
+  'SCHEMA_PROBABILITY_PERCENT': 'schema-probability-percent'
 };
 
-export const DEFAULT_SAMPLE_COUNT = 200;
+export const DEFAULT_SAMPLE_COUNT = 50;
 
 export interface AppState {
   activeStage: number,
@@ -36,10 +26,10 @@ export const getInitialState = (mongoClient: MongoClient) => ({
   sampleCount: DEFAULT_SAMPLE_COUNT,
   showGraph: false,
   // The datasource here tells us which 'database', 'collection' to use.
-  // stages: [new DataSource('ships', 'shipwrecks')]
+  stages: [new DataSource('ships', 'shipwrecks')]
   // stages: [new DataSource('dxl', 'versions')]
   // stages: [new DataSource('test', 'sales')]
-  stages: [new DataSource('encryption', 'dataKeys')]
+  // stages: [new DataSource('encryption', 'dataKeys')]
 });
 
 // eslint-disable-next-line complexity

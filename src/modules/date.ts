@@ -113,7 +113,7 @@ const minicharts_d3fns_date = (appRegistry: any) => {
       // number of selected items has changed, trigger querybuilder event
       if (selected[0].length === 0) {
         // clear value
-        alert('TODO: Use this action to clear an item from the project'); // mmmm
+        // alert('TODO: Use this action to clear an item from the project'); // mmmm
         // QueryAction.clearValue({
         //   field: options.fieldName
         // });
@@ -131,7 +131,7 @@ const minicharts_d3fns_date = (appRegistry: any) => {
 
     if (isEqual(minValue.ts, maxValue.ts)) {
       // if values are the same, single equality query
-      alert('TODO: Use this action to build project'); // mmmmm
+      // alert('TODO: Use this action to build project'); // mmmmm
       // QueryAction.setValue({
       //   field: options.fieldName,
       //   value: minValue.value
@@ -139,7 +139,7 @@ const minicharts_d3fns_date = (appRegistry: any) => {
       return;
     }
     // binned values, build range query with $gte and $lte
-    alert('TODO: Use this action to build project'); // mmmmm
+    // alert('TODO: Use this action to build project'); // mmmmm
     // QueryAction.setRangeValues({
     //   field: options.fieldName,
     //   min: minValue.value,
@@ -162,7 +162,7 @@ const minicharts_d3fns_date = (appRegistry: any) => {
     if (d3.event.shiftKey && lastNonShiftRangeValue) {
       const minVal = d.ts < lastNonShiftRangeValue.ts ? d.value : lastNonShiftRangeValue.value;
       const maxVal = d.ts > lastNonShiftRangeValue.ts ? d.value : lastNonShiftRangeValue.value;
-      alert('TODO: Use this action to build project'); // mmmmm
+      // alert('TODO: Use this action to build project'); // mmmmm
       // QueryAction.setRangeValues({
       //   field: options.fieldName,
       //   min: minVal,
@@ -172,7 +172,7 @@ const minicharts_d3fns_date = (appRegistry: any) => {
     } else {
       // remember non-shift value so that range can be extended with shift
       lastNonShiftRangeValue = d;
-      alert('TODO: Use this action to build project'); // mmmmm
+      // alert('TODO: Use this action to build project'); // mmmmm
       // QueryAction.setValue({
       //   field: options.fieldName,
       //   value: d.value,

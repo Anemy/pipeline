@@ -61,7 +61,7 @@ const minicharts_d3fns_few = (localAppRegistry: any) => {
     // if selection has changed, trigger query builder event
     if (numSelected !== selected[0].length) {
       const values = map(selected.data(), 'value');
-      alert('TODO: Use this action to build project'); // mmmmm
+      // alert('TODO: Use this action to build project'); // mmmmm
       // QueryAction.setDistinctValues({
       //   field: options.fieldName,
       //   value: values.map((v) => options.promoter(v))
@@ -85,7 +85,6 @@ const minicharts_d3fns_few = (localAppRegistry: any) => {
     const brushNode = parent.find('g.brush')[0];
     const start = xScale.invert(d3.mouse(background)[0]);
 
-
     // const qbAction = d3.event.shiftKey ?
     //   QueryAction.toggleDistinctValue : QueryAction.setValue;
     // qbAction({
@@ -93,7 +92,7 @@ const minicharts_d3fns_few = (localAppRegistry: any) => {
     //   value: options.promoter(d.value),
     //   unsetIfSet: true
     // });
-    alert('TODO: Use this action to build project'); // mmmmm
+    // alert('TODO: Use this action to build project'); // mmmmm
 
     const w = d3.select(window)
       .on('mousemove', mousemove)

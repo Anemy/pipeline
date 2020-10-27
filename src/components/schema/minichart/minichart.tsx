@@ -1,14 +1,20 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { includes } from 'lodash';
+
 import UniqueMiniChart from '../unique-minichart/unique-minichart';
 import DocumentMinichart from '../document-minichart/document-minichart';
 import ArrayMinichart from '../array-minichart/array-minichart';
 import CoordinatesMinichart from '../coordinates-minichart/coordinates-minichart';
 import D3Component from '../d3-component/d3-component';
-
-import { includes } from 'lodash';
 import { ArrayFieldType, InnerFieldType, ObjectFieldType, Types } from '../../../models/field-type';
-
+import {
+  ActionTypes,
+  UpdateStoreAction
+} from '../../../store/actions';
 import vizFns from '../../../modules';
+import { STAGES } from '../../../models/stage';
+import { AppState } from '../../../store/store';
 
 type props = {
   fieldName: string,
@@ -18,17 +24,23 @@ type props = {
 
 type StateType = {
   containerWidth: number | null,
-  filter: any,
-  valid: boolean,
-  userTyping: boolean
+  // valid: boolean,
+  // userTyping: boolean
 };
 
-class MiniChart extends Component<props> {
+type StateProps = {
+  filter: any;
+};
+
+type DispatchProps = {
+  updateStore: (update: any) => void;
+};
+
+class MiniChart extends Component<props & StateProps & DispatchProps> {
   state: StateType = {
     containerWidth: null,
-    filter: {},
-    valid: true,
-    userTyping: false
+    // valid: true,
+    // userTyping: false
   };
 
   _mc: HTMLDivElement | null = null;
@@ -56,9 +68,9 @@ class MiniChart extends Component<props> {
     // this.unsubscribeMiniChartResize = this.props.actions.resizeMiniCharts.listen(this.resizeListener);
   }
 
-  shouldComponentUpdate(nextProps: props, nextState: StateType) {
-    return nextState.valid && !nextState.userTyping;
-  }
+  // shouldComponentUpdate(nextProps: props, nextState: StateType) {
+  //   return nextState.valid && !nextState.userTyping;
+  // }
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.handleResize);
@@ -91,7 +103,7 @@ class MiniChart extends Component<props> {
         ? Types.DATE : this.props.type.name;
 
     const fieldName = this.props.fieldName;
-    const queryValue = this.state.filter[fieldName];
+    const queryValue = this.props.filter[fieldName];
     const hasDuplicates = this.props.type.has_duplicates;
     const fn = (vizFns as any)[typeName.toLowerCase()];
     const width = this.state.containerWidth;
@@ -158,13 +170,28 @@ class MiniChart extends Component<props> {
   }
 
   render() {
-    const minichart = this.state.containerWidth ? this.minichartFactory() : null;
     return (
       <div ref={(chart) => { this._mc = chart; }}>
-        {minichart}
+        {this.state.containerWidth && this.minichartFactory()}
       </div>
     );
   }
 }
 
-export default MiniChart;
+const mapStateToProps = (state: AppState): StateProps => {
+  const currentStage = state.stages[state.activeStage];
+
+  return {
+    filter: currentStage.type === STAGES.MATCH ? { ...currentStage.content } : {},
+  };
+};
+
+const mapDispatchToProps: DispatchProps = {
+  // Resets URL validation if form was changed.
+  updateStore: (update: any): UpdateStoreAction => ({
+    type: ActionTypes.UPDATE_STORE,
+    update
+  })
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(MiniChart);

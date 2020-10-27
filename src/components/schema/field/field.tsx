@@ -204,8 +204,6 @@ class Field extends Component<props & StateProps & DispatchProps> {
       currentStage.content[newFieldName] = renameExpr;
     }
 
-    console.log('after rename:', { ...currentStage.content });
-
     this.props.updateStore({
       activeStage: newActiveStage,
       stages: newStages
