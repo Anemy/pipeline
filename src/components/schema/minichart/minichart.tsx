@@ -96,8 +96,8 @@ class MiniChart extends Component<props & StateProps & DispatchProps> {
   };
 
   minichartFactory() {
-    // cast all numeric types to Number pseudo-type
-    // when drawing charts, group all the types of dates together
+    // Cast all numeric types to Number pseudo-type,
+    // when drawing charts, group all the types of dates together.
     const typeName = includes([Types.DECIMAL_128, Types.DOUBLE, Types.INT_32, Types.LONG], this.props.type.name)
       ? Types.NUMBER : includes([Types.UTCDATETIME, Types.TIMESTAMP], this.props.type.name)
         ? Types.DATE : this.props.type.name;

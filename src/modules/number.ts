@@ -11,6 +11,8 @@ import {
 import many from './many';
 import shared from './shared';
 
+import { UpdateFilterMethod } from './update-filter-types';
+
 /**
 * extracts a Javascript number from a BSON type.
 *
@@ -30,7 +32,7 @@ function extractNumericValueFromBSON(value: any) {
   return value;
 }
 
-const minicharts_d3fns_number = (appRegistry: any) => {
+const minicharts_d3fns_number = (updateFilter: UpdateFilterMethod) => {
   let width = 400;
   let height = 100;
   const options: any = {
@@ -38,7 +40,7 @@ const minicharts_d3fns_number = (appRegistry: any) => {
   };
   const margin = shared.margin;
   const xBinning = d3.scale.linear();
-  const manyChart = many(appRegistry);
+  const manyChart = many(updateFilter);
 
   function chart(selection: any) {
     selection.each(function (data: any) {

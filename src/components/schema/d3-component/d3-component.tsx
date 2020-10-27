@@ -1,10 +1,19 @@
-/* eslint-disable valid-jsdoc */
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import d3 from 'd3';
 import bson from 'bson';
+import { connect } from 'react-redux';
+import { isArray, isPlainObject } from 'lodash';
+import { bsonEqual, hasDistinctValue } from 'mongodb-query-util';
 
+import Stage, { ensureWeAreOnValidStageForAction, STAGES } from '../../../models/stage';
 import { InnerFieldType } from '../../../models/field-type';
+import { AppState } from '../../../store/store';
+import {
+  ActionTypes,
+  UpdateStoreAction
+} from '../../../store/actions';
+import { UpdateFilterMethod, UPDATE_FILTER_TYPE } from '../../../modules/update-filter-types';
 
 /**
  * Convert back to BSON types from the raw JS.
@@ -25,11 +34,10 @@ const DEFAULT = (value: any) => { return value; };
 type props = {
   fieldName: string,
   type: InnerFieldType,
-  // localAppRegistry: object.,
   renderMode: string, // oneOf(['svg', 'div']),
   width: number,
   height: number,
-  fn: () => any,
+  fn: (updateFilter: UpdateFilterMethod) => any,
   query: any
 };
 
@@ -37,18 +45,28 @@ type StateType = {
   chart: any
 };
 
-class D3Component extends Component<props> {
+type StateProps = {
+  activeStage: number;
+  stages: Stage[];
+};
+
+type DispatchProps = {
+  updateStore: (update: any) => void;
+};
+
+class D3Component extends Component<props & StateProps & DispatchProps> {
   state: StateType = {
     chart: null
   };
 
   containerRef: any = null;
+  mounted = false;
   wrapperRef: any = null;
 
   componentWillMount() {
+    this.mounted = true;
     this.setState({
-      // Prop was local app registry V
-      chart: this.props.fn() // this.props.localAppRegistry
+      chart: this.props.fn(this.updateFilter)
     });
   }
 
@@ -61,8 +79,188 @@ class D3Component extends Component<props> {
   }
 
   componentWillUnmount() {
+    this.mounted = false;
     this._cleanup();
   }
+
+  // TODO - better pairing with types in update-filter-types in modules for this.
+  updateFilter: UpdateFilterMethod = (
+    options: any,
+    updateFilterType: UPDATE_FILTER_TYPE
+  ) => {
+    if (!this.mounted) {
+      return;
+    }
+
+    const {
+      activeStage,
+      stages
+    } = this.props;
+
+    const {
+      newActiveStage,
+      newStages
+    } = ensureWeAreOnValidStageForAction(STAGES.MATCH, stages, activeStage);
+
+    const currentStage = newStages[newActiveStage];
+
+    // Now we update....
+    // TODO: Maybe we want more deconstructing to make sure we're not
+    // editing refs of current stages.
+
+    // console.log('update type:', updateFilterType);
+    // console.log('options', options);
+    switch (updateFilterType) {
+      case UPDATE_FILTER_TYPE.SET_GEO_WITHIN_VALUE:
+        const newValue: any = {};
+        const radius = options.radius === undefined ? options.radius : 0;
+        const center = options.center === undefined ? options.center : null;
+
+        if (radius && center) {
+          newValue.$geoWithin = {
+            $centerSphere: [[center[0], center[1]], radius]
+          };
+          currentStage.content[options.field] = newValue;
+          break;
+        }
+        // Else if center or radius are not set, or radius is 0, clear field.
+        if (currentStage.content[options.field]) {
+          delete currentStage.content[options.field];
+        }
+
+        break;
+      case UPDATE_FILTER_TYPE.SET_RANGE_VALUES:
+        const value: any = {};
+        let op;
+        // Without min and max, clear the field.
+        const minValue = options.min;
+        const maxValue = options.max;
+        if (minValue === undefined && maxValue === undefined) {
+          if (currentStage.content[options.field]) {
+            delete currentStage.content[options.field];
+          }
+          break;
+        }
+
+        if (minValue !== undefined) {
+          // Default minInclusive to true. (could add this as option).
+          op = '$gte'// : '$gt';
+          value[op] = minValue;
+        }
+
+        if (maxValue !== undefined) {
+          op = !!options.maxInclusive ? '$lte' : '$lt';
+          value[op] = maxValue;
+        }
+
+        if (bsonEqual(currentStage.content[options.field], value)) {
+          delete currentStage.content[options.field];
+        } else {
+          currentStage.content[options.field] = value;
+        }
+        break;
+      case UPDATE_FILTER_TYPE.SET_VALUE:
+        if (bsonEqual(currentStage.content[options.field], options.value)) {
+          delete currentStage.content[options.field];
+        } else {
+          currentStage.content[options.field] = options.value;
+        }
+        break;
+      case UPDATE_FILTER_TYPE.TOGGLE_DISTINCT_VALUE:
+        const currentValue = currentStage.content[options.field];
+
+        if (hasDistinctValue(currentValue, options.value)) {
+          // Remove distinct field.
+          // We already have the value for this field, toggle remove it.
+          if (currentValue === undefined) {
+            break;
+          }
+
+          if (isPlainObject(currentValue)) {
+            if (currentValue && currentValue.$in) {
+              // Add value to $in array if it is not present yet.
+              const newArray = [...currentValue.$in];
+              newArray.splice(
+                newArray.indexOf(options.value),
+                1
+              );
+              // currentStage.content[options.field].$in.splice(
+              //   currentStage.content[options.field].$in.indexOf(options.value),
+              //   1
+              // );
+
+              // If $in array was reduced to single value, replace with primitive.
+              if (newArray.length > 1) {
+                currentStage.content[options.field].$in = newArray;
+              } else if (newArray.length === 1) {
+                currentStage.content[options.field] = newArray[0];
+              } else {
+                delete currentStage.content[options.field];
+              }
+              break;
+            }
+          }
+          // If value to remove is the same as the primitive value, unset field.
+          if (bsonEqual(currentValue, options.value)) {
+            delete currentStage.content[options.field];
+            break;
+          }
+          break;
+        }
+
+        // Below is add distinct value.
+
+        // Field not present in filter yet, add primitive value.
+        if (currentValue === undefined) {
+          currentStage.content[options.field] = options.value;
+          break;
+        }
+        // Field is object, could be a $in clause or a primitive value.
+        if (isPlainObject(currentValue)) {
+          if (currentValue && currentValue.$in) {
+            // Add value to $in array if it is not present yet.
+            const inArray: any[] = currentStage.content[options.field].$in;
+            if (!inArray.includes(options.value)) {
+              // TODO: @Rhys - we were using lodash contains
+              currentStage.content[options.field].$in.push(options.value);
+            }
+            break;
+          }
+          // It is not a $in operator, replace the value.
+          currentStage.content[options.field] = options.value;
+          break;
+        }
+        // In all other cases, we want to turn a primitive value into a $in list.
+        currentStage.content[options.field] = { $in: [currentValue, options.value] };
+        break;
+      case UPDATE_FILTER_TYPE.SET_DISTINCT_VALUES:
+        if (isArray(options.value)) {
+          if (options.value.length > 1) {
+            currentStage.content[options.field] = { $in: options.value };
+          } else if (options.value.length === 1) {
+            currentStage.content[options.field] = options.value[0];
+          } else {
+            delete currentStage.content[options.field];
+          }
+          break;
+        }
+        currentStage.content[options.field] = options.value;
+        break;
+      case UPDATE_FILTER_TYPE.CLEAR_VALUE:
+        if (currentStage.content[options.field]) {
+          delete currentStage.content[options.field];
+        }
+        break;
+      default:
+        console.log('UKNOWN FILTER UPDATE TYPE:', updateFilterType);
+        break;
+    }
+
+    this.props.updateStore({
+      activeStage: newActiveStage,
+      stages: newStages
+    });
+  };
 
   _getContainer() {
     const sizeOptions = {
@@ -134,4 +332,19 @@ class D3Component extends Component<props> {
   }
 }
 
-export default D3Component;
+const mapStateToProps = (state: AppState): StateProps => {
+  return {
+    activeStage: state.activeStage,
+    stages: state.stages
+  };
+};
+
+const mapDispatchToProps: DispatchProps = {
+  // Resets URL validation if form was changed.
+  updateStore: (update: any): UpdateStoreAction => ({
+    type: ActionTypes.UPDATE_STORE,
+    update
+  })
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(D3Component);

@@ -1,11 +1,12 @@
-/* eslint camelcase: 0 */
 import { select as d3Select } from 'd3';
 import { assign, map, groupBy, orderBy } from 'lodash';
+
 import few from './few';
 import many from './many';
 import shared from './shared';
+import { UpdateFilterMethod } from './update-filter-types';
 
-const minicharts_d3fns_string = (appRegistry: any) => {
+const minicharts_d3fns_string = (updateFilter: UpdateFilterMethod) => {
   // --- beginning chart setup ---
   let width = 400;
   let height = 100;
@@ -13,8 +14,8 @@ const minicharts_d3fns_string = (appRegistry: any) => {
     query: {}
   };
 
-  const manyChart = many(appRegistry);
-  const fewChart = few(appRegistry);
+  const manyChart = many(updateFilter);
+  const fewChart = few(updateFilter);
   const margin = shared.margin;
   // --- end chart setup ---
 

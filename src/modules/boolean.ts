@@ -1,17 +1,19 @@
 /* eslint camelcase: 0 */
 import d3 from 'd3';
 import { assign, groupBy, defaults, map, orderBy } from 'lodash';
+
 import few from './few';
 import shared from './shared';
+import { UpdateFilterMethod } from './update-filter-types';
 
-const minicharts_d3fns_boolean = (localAppRegistry: any) => {
+const minicharts_d3fns_boolean = (updateFilter: UpdateFilterMethod) => {
   // --- beginning chart setup ---
   let width = 400;
   let height = 100;
   const options = {
     view: null
   };
-  const fewChart = few(localAppRegistry);
+  const fewChart = few(updateFilter);
   const margin = shared.margin;
   // --- end chart setup ---
 

@@ -3,13 +3,16 @@ import { has, includes, isString } from 'lodash';
 import { hasDistinctValue } from 'mongodb-query-util';
 import { connect } from 'react-redux';
 
-import { AppState, DATA_SERVICE_STAGE_INDEX } from '../../../store/store';
+import { AppState } from '../../../store/store';
 import {
   ActionTypes,
   UpdateStoreAction
 } from '../../../store/actions';
 import { Types } from '../../../models/field-type';
-import Stage, { STAGES } from '../../../models/stage';
+import Stage, {
+  ensureWeAreOnValidStageForAction,
+  STAGES
+} from '../../../models/stage';
 
 type props = {
   fieldName: string,
@@ -27,65 +30,23 @@ type DispatchProps = {
 };
 
 class ValueBubble extends Component<props & StateProps & DispatchProps> {
-  // Adds a new stage of the type if we aren't already on that stage.
-  ensureWeAreOnValidStageForAction = (stageType: STAGES) => {
+  onBubbleClicked = (e: React.MouseEvent) => {
     const {
       activeStage,
-      stages
-    } = this.props;
-
-    let newActiveStage = activeStage;
-    const newStages = [...stages];
-
-    if (newStages[activeStage].type !== stageType || activeStage === DATA_SERVICE_STAGE_INDEX) {
-      if (newStages[activeStage + 1] && newStages[activeStage + 1].type === stageType) {
-        // When the next stage is the type we want
-        // we can just jump to that one and update.
-        newActiveStage = activeStage + 1;
-      } else {
-        // Create a new stage and set it as our active stage.
-        const newStage = new Stage(stageType);
-
-        // Copy details/sample docs from current stage.
-        // TODO: I think we actually want to make this re-render the docs
-        // or say the docs are out of date...
-        newStage.copyStageItems(newStages[activeStage]);
-
-        newStages.splice(newActiveStage + 1, 0, newStage);
-        newActiveStage++;
-      }
-    }
-
-    return {
-      newActiveStage,
-      newStages
-    };
-  }
-
-  onBubbleClicked = (e: React.MouseEvent) => {
-    // const QueryAction = this.props.localAppRegistry.getAction('Query.Actions');
-    // const action = e.shiftKey ?
-    //   QueryAction.toggleDistinctValue : QueryAction.setValue;
-    // action({
-    //   field: this.props.fieldName,
-    //   value: this.props.value,
-    //   unsetIfSet: true
-    // });
-
-    const {
       fieldName,
       queryValue,
+      stages,
       value
     } = this.props;
 
     const {
       newActiveStage,
       newStages
-    } = this.ensureWeAreOnValidStageForAction(STAGES.MATCH);
+    } = ensureWeAreOnValidStageForAction(STAGES.MATCH, stages, activeStage);
 
     const currentStage = newStages[newActiveStage];
 
-    // TODO: get rid of this query value and just use the stage with path.
+    // TODO: Get rid of this query value and just use the stage with path / current stage content.
 
     // It's already part of the match/filter, remove.
     if (hasDistinctValue(queryValue, value)) {

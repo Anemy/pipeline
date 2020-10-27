@@ -9,13 +9,14 @@ import {
   max,
   sortBy
 } from 'lodash';
-
-import shared from './shared';
 import { hasDistinctValue, inValueRange } from 'mongodb-query-util';
 
 require('./d3-tip')(d3);
 
-const minicharts_d3fns_many = (appRegistry: any) => {
+import shared from './shared';
+import { UpdateFilterMethod, UPDATE_FILTER_TYPE } from './update-filter-types';
+
+const minicharts_d3fns_many = (updateFilter: UpdateFilterMethod) => {
   // const QueryAction = appRegistry.getAction('Query.Actions');
 
   // --- beginning chart setup ---
@@ -70,24 +71,21 @@ const minicharts_d3fns_many = (appRegistry: any) => {
     // if selection has changed, trigger query builder event
     if (numSelected !== selected[0].length) {
       if (selected[0].length === 0) {
-        // clear value
-        // QueryAction.clearValue({
-        //   field: options.fieldName
-        // });
-        if (!hasBeenShown) alert('TODO: Use this action to clear a value from the project - maybe gone away'); // mmmmm
-        hasBeenShown = true;
+        updateFilter({
+          field: options.fieldName
+        }, UPDATE_FILTER_TYPE.CLEAR_VALUE);
+        // clearValue(options.fieldName);
         return;
       }
       // distinct values (strings)
       if (options.selectionType === 'distinct') {
         const values = map(selected.data(), 'value');
-        if (!hasBeenShown) alert('TODO: Use this action to add to the projection'); // mmmmm
-        hasBeenShown = true;
 
-        // QueryAction.setDistinctValues({
-        //   field: options.fieldName,
-        //   value: values.map((v) => options.promoter(v))
-        // });
+        updateFilter({
+          field: options.fieldName,
+          value: values.map((v) => options.promoter(v))
+        }, UPDATE_FILTER_TYPE.SET_DISTINCT_VALUES);
+        // setDistinctValues(options.fieldName, values.map((v) => options.promoter(v)));
         return;
       }
       // numeric types
@@ -99,25 +97,28 @@ const minicharts_d3fns_many = (appRegistry: any) => {
       }*/);
 
       if (minValue.value === maxValue.value + maxValue.dx) {
-        // if not binned and values are the same, single equality query
-        if (!hasBeenShown) alert('TODO: Use this action to build project'); // mmmmm
-        hasBeenShown = true;
-        // QueryAction.setValue({
-        //   field: options.fieldName,
-        //   value: options.promoter(minValue.bson)
-        // });
+        // If not binned and values are the same, single equality query.
+        updateFilter({
+          field: options.fieldName,
+          value: options.promoter(minValue.bson)
+        }, UPDATE_FILTER_TYPE.SET_VALUE);
+        // setValue(options.fieldName, options.promoter(minValue.bson));
         return;
       }
-      // binned values, build range query with $gte and $lt (if binned)
-      // or $gte and $lte (if not binned)
-      if (!hasBeenShown) alert('TODO: Use this action to build project'); // mmmmm
-      hasBeenShown = true;
-      // QueryAction.setRangeValues({
-      //   field: options.fieldName,
-      //   min: options.promoter(minValue.value),
-      //   max: options.promoter(maxValue.value + maxValue.dx),
-      //   maxInclusive: maxValue.dx === 0
-      // });
+      // Binned values, build range query with $gte and $lt (if binned)
+      // or $gte and $lte (if not binned).
+      updateFilter({
+        field: options.fieldName,
+        min: options.promoter(minValue.value),
+        max: options.promoter(maxValue.value + maxValue.dx),
+        maxInclusive: maxValue.dx === 0
+      }, UPDATE_FILTER_TYPE.SET_RANGE_VALUES);
+      // setRangeValues(
+      //   options.fieldName,
+      //   options.promoter(minValue.value),
+      //   options.promoter(maxValue.value + maxValue.dx),
+      //   maxValue.dx === 0
+      // );
     }
   }
 
@@ -128,8 +129,6 @@ const minicharts_d3fns_many = (appRegistry: any) => {
   function brushend() {
     d3.select(this).call(brush.clear());
   }
-
-  let hasBeenShown = false;
 
   /**
    * Handles event of single mousedown (either as click, or beginning of a
@@ -158,45 +157,53 @@ const minicharts_d3fns_many = (appRegistry: any) => {
       // distinct values, behavior dependent on shift key
       // const qbAction = d3.event.shiftKey ?
       // QueryAction.toggleDistinctValue : QueryAction.setValue;
-      if (!hasBeenShown) alert('TODO: Use this action to build the project'); // mmmmm
-      hasBeenShown = true;
-      // ADDED BY RHYS REMOVE ^^
-      // qbAction({
-      //   field: options.fieldName,
-      //   value: options.promoter(d.value),
-      //   unsetIfSet: true
-      // });
+
+      const updateFilterMethod = d3.event.shiftKey ? UPDATE_FILTER_TYPE.TOGGLE_DISTINCT_VALUE : UPDATE_FILTER_TYPE.SET_VALUE;
+      updateFilter({
+        field: options.fieldName,
+        value: options.promoter(d.value)
+      }, updateFilterMethod);
+      // if (d3.event.shiftKey) {
+      //   toggleDistinctValue(options.fieldName, options.promoter(d.value));
+      // } else {
+      //   setValue(options.fieldName, options.promoter(d.value));
+      // }
     } else if (d3.event.shiftKey && lastNonShiftRangeValue) {
-      if (!hasBeenShown) alert('TODO: Use this action to build the project'); // mmmmm
-      hasBeenShown = true;
-      // QueryAction.setRangeValues({
-      //   field: options.fieldName,
-      //   min: options.promoter(Math.min(d.value, lastNonShiftRangeValue.value)),
-      //   max: options.promoter(Math.max(d.value + d.dx, lastNonShiftRangeValue.value + lastNonShiftRangeValue.dx)),
-      //   maxInclusive: d.dx === 0
-      // });
+      updateFilter({
+        field: options.fieldName,
+        min: options.promoter(Math.min(d.value, lastNonShiftRangeValue.value)),
+        max: options.promoter(Math.max(d.value + d.dx, lastNonShiftRangeValue.value + lastNonShiftRangeValue.dx)),
+        maxInclusive: d.dx === 0
+      }, UPDATE_FILTER_TYPE.SET_RANGE_VALUES);
+      // setRangeValues(
+      //   options.fieldName,
+      //   options.promoter(Math.min(d.value, lastNonShiftRangeValue.value)),
+      //   options.promoter(Math.max(d.value + d.dx, lastNonShiftRangeValue.value + lastNonShiftRangeValue.dx)),
+      //   d.dx === 0
+      // );
     } else {
-      // remember non-shift value so that range can be extended with shift
+      // Remember non-shift value so that range can be extended with shift.
       lastNonShiftRangeValue = d;
       if (d.dx > 0) {
-        // binned bars, turn single value into range
-        if (!hasBeenShown) alert('TODO: Use this action to build a project'); // mmmmm
-        hasBeenShown = true;
-        // QueryAction.setRangeValues({
-        //   field: options.fieldName,
-        //   min: options.promoter(d.value),
-        //   max: options.promoter(d.value + d.dx),
-        //   unsetIfSet: true
-        // });
+        // Binned bars, turn single value into range.
+        updateFilter({
+          field: options.fieldName,
+          min: options.promoter(d.value),
+          max: options.promoter(d.value + d.dx),
+        }, UPDATE_FILTER_TYPE.SET_RANGE_VALUES);
+        // setRangeValues(
+        //   options.fieldName,
+        //   options.promoter(d.value),
+        //   options.promoter(d.value + d.dx),
+        //   true
+        // );
       } else {
-        // bars don't represent bins, build single value query
-        if (!hasBeenShown) alert('TODO: Use this action to build a project'); // mmmmm
-        hasBeenShown = true;
-        // QueryAction.setValue({
-        //   field: options.fieldName,
-        //   value: options.promoter(d.bson),
-        //   unsetIfSet: true
-        // });
+        // Bars don't represent bins, build single value query.
+        updateFilter({
+          field: options.fieldName,
+          value: options.promoter(d.bson)
+        }, UPDATE_FILTER_TYPE.SET_VALUE);
+        // setValue(options.fieldName, options.promoter(d.bson));
       }
     }
     // document.querySelector('.navPanel img').closest('td')

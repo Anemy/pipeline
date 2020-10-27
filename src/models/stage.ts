@@ -9,11 +9,15 @@ export enum STAGES {
   UNSET = 'UNSET'
 };
 
+export const DATA_SERVICE_STAGE_INDEX = 0;
+export const NO_ACTIVE_STAGE = -1;
+
 export class Stage {
   type: STAGES;
   // TODO: We can create different classes that extend this interface
   // with their own content definitions (certain stages have more defined syntax).
   content: any = {};
+  geoLayers: any = {};
   id: string;
 
   errorLoadingSampleDocuments = '';
@@ -120,6 +124,44 @@ export const buildAggregationPipelineFromStages = (stages: Stage[], sampleCount:
   }
 
   return pipeline;
+};
+
+// Adds a new stage of the type if we aren't already on that stage.
+// Returns the new stage and the index of where we should be.
+export const ensureWeAreOnValidStageForAction = (
+  stageType: STAGES,
+  stages: Stage[],
+  activeStage: number
+): {
+  newStages: Stage[],
+  newActiveStage: number
+} => {
+  let newActiveStage = activeStage;
+  const newStages = [...stages];
+
+  if (newStages[activeStage].type !== stageType || activeStage === DATA_SERVICE_STAGE_INDEX) {
+    if (newStages[activeStage + 1] && newStages[activeStage + 1].type === stageType) {
+      // When the next stage is the type we want
+      // we can just jump to that one and update.
+      newActiveStage = activeStage + 1;
+    } else {
+      // Create a new stage and set it as our active stage.
+      const newStage = new Stage(stageType);
+
+      // Copy details/sample docs from current stage.
+      // TODO: I think we actually want to make this re-render the docs
+      // or say the docs are out of date...
+      newStage.copyStageItems(newStages[activeStage]);
+
+      newStages.splice(newActiveStage + 1, 0, newStage);
+      newActiveStage++;
+    }
+  }
+
+  return {
+    newActiveStage,
+    newStages
+  };
 };
 
 export default Stage;

@@ -94,7 +94,7 @@ const generateMulti = (layers: any) => ({
  *
  * @returns {Object} The query.
  */
-export const generateGeoQuery = (allLayers: number) => {
+export const generateGeoQuery = (allLayers: any) => {
   const layers = Object.values(allLayers);
   if (layers.length === 1) {
     return generateSingle(layers[0]);
@@ -159,3 +159,7 @@ export const addLayer = (field: any, layer: any, layers: any) => {
   }
   return layers;
 };
+
+export const isLayerWeCanAdd = (layer: any) => {
+  return !!layer._latlngs || !!layer._latlng;
+}

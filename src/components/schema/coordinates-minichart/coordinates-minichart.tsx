@@ -1,23 +1,31 @@
-/* eslint-disable react/sort-comp */
 import React, { Component } from 'react';
-
+import { connect } from 'react-redux';
 import L from 'leaflet';
-
 import { Map, TileLayer, FeatureGroup } from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css';
 import 'leaflet-defaulticon-compatibility';
+import { debounce } from 'lodash';
+
 import './coordinates-minichart.css';
 
 import GeoscatterMapItem from './marker';
-
 import { DEFAULT_TILE_URL } from './constants';
-import { debounce } from 'lodash';
 import { InnerFieldType } from '../../../models/field-type';
-
-const { getHereAttributionMessage } = require('./utils');
+import {
+  ActionTypes,
+  UpdateStoreAction
+} from '../../../store/actions';
+import {
+  AppState
+} from '../../../store/store';
+import Stage, {
+  ensureWeAreOnValidStageForAction, STAGES
+} from '../../../models/stage';
+import { getHereAttributionMessage } from './utils';
+import { addLayer, isLayerWeCanAdd, generateGeoQuery } from '../../../modules/geo';
 
 // TODO: Disable boxZoom handler for circle lasso.
 //
@@ -114,13 +122,21 @@ type props = {
   // _id: string,
   type: InnerFieldType,
   width: number,
-  // actions: object,
   height: number,
   fieldName: string
 };
 
+type StateProps = {
+  activeStage: number;
+  stages: Stage[];
+};
+
+type DispatchProps = {
+  updateStore: (update: any) => void;
+};
+
 // From charts geospatial map-item.
-class CoordinatesMinichart extends Component<props> {
+class CoordinatesMinichart extends Component<props & StateProps & DispatchProps> {
   state = {
     ready: false,
     attributionMessage: ''
@@ -221,20 +237,109 @@ class CoordinatesMinichart extends Component<props> {
   }
 
   onCreated = (evt: any) => {
-    console.log('ON CREATED NEED ACTIONS');
+    // console.log('ON CREATED NEED ACTIONS');
     // this.props.actions.geoLayerAdded(this.props.fieldName, evt.layer);
+
+    // in action V
+    // this.geoLayers = addLayer(field, layer, this.geoLayers);
+    //   this.localAppRegistry.emit('compass:schema:geo-query', generateGeoQuery(this.geoLayers));
+
+    const {
+      activeStage,
+      fieldName,
+      stages
+    } = this.props;
+
+    const {
+      newActiveStage,
+      newStages
+    } = ensureWeAreOnValidStageForAction(STAGES.MATCH, stages, activeStage);
+
+    const currentStage = newStages[newActiveStage];
+
+    // TODO: Currently we don't allow 2 layers.
+    // In Compass-schema other fields on the query bar are wiped when
+    // more than 1 layer is added, since we don't want that we just only allow one.
+    if (isLayerWeCanAdd(evt.layer)) {
+      currentStage.geoLayers = addLayer(fieldName, evt.layer, {});
+    }
+
+    const geoQuery: any = generateGeoQuery(currentStage.geoLayers);
+
+    if (geoQuery && geoQuery[fieldName]) {
+      currentStage.content[fieldName] = geoQuery[fieldName];
+    }
+
+    this.props.updateStore({
+      activeStage: newActiveStage,
+      stages: newStages
+    });
   }
 
   onEdited = (evt: any) => {
-    console.log('ON EDITED NEED ACTIONS');
+    // console.log('ON EDITED NEED ACTIONS');
 
     // this.props.actions.geoLayersEdited(this.props.fieldName, evt.layers);
+
+    const {
+      activeStage,
+      fieldName,
+      stages
+    } = this.props;
+
+    const {
+      newActiveStage,
+      newStages
+    } = ensureWeAreOnValidStageForAction(STAGES.MATCH, stages, activeStage);
+
+    const currentStage = newStages[newActiveStage];
+
+    evt.layers.eachLayer((layer: any) => {
+      // this.geoLayerAdded(field, layer);
+      currentStage.geoLayers = addLayer(fieldName, layer, currentStage.geoLayers);
+    });
+
+    // TODO: Maybe we don't need the whole ensure thing for edit and delete layers.
+    currentStage.content = generateGeoQuery(currentStage.geoLayers);
+
+    this.props.updateStore({
+      activeStage: newActiveStage,
+      stages: newStages
+    });
   }
 
   onDeleted = (evt: any) => {
-    console.log('ON DELETED NEED ACTIONS');
+    // console.log('ON DELETED NEED ACTIONS');
 
     // this.props.actions.geoLayersDeleted(evt.layers);
+
+    // layers.eachLayer((layer) => {
+    //   delete this.geoLayers[layer._leaflet_id];
+    // });
+    // this.localAppRegistry.emit('compass:schema:geo-query', generateGeoQuery(this.geoLayers));
+
+    const {
+      activeStage,
+      stages
+    } = this.props;
+
+    const {
+      newActiveStage,
+      newStages
+    } = ensureWeAreOnValidStageForAction(STAGES.MATCH, stages, activeStage);
+
+    const currentStage = newStages[newActiveStage];
+
+    evt.layers.eachLayer((layer: any) => {
+      delete currentStage.geoLayers[layer._leaflet_id];
+    });
+
+    currentStage.content = generateGeoQuery(currentStage.geoLayers);
+
+    this.props.updateStore({
+      activeStage: newActiveStage,
+      stages: newStages
+    });
   }
 
   /**
@@ -276,5 +381,19 @@ class CoordinatesMinichart extends Component<props> {
   }
 }
 
-export default CoordinatesMinichart;
-export { CoordinatesMinichart };
+const mapStateToProps = (state: AppState): StateProps => {
+  return {
+    activeStage: state.activeStage,
+    stages: state.stages
+  };
+};
+
+const mapDispatchToProps: DispatchProps = {
+  // Resets URL validation if form was changed.
+  updateStore: (update: any): UpdateStoreAction => ({
+    type: ActionTypes.UPDATE_STORE,
+    update
+  })
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(CoordinatesMinichart);

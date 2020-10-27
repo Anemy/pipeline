@@ -12,7 +12,7 @@
 
 .sample-documents-document {
   margin: 10px 0;
-  background-color: #f5f5f5;
+  background-color: white;
   /* white-space: normal; */
   overflow: auto;
 }

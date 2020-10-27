@@ -10,6 +10,7 @@
   border: 1px solid black;
   padding: 4px;
   display: flex;
+  background: white;
 }
 
 .stages-bar-data-source {
@@ -87,7 +88,7 @@
   width: 14px;
   height: 14px;
   transition: 150ms all;
-  font-size: 14px;
+  font-size: 20px;
 }
 
 .stages-bar-stage-delete-button:hover {

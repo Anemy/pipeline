@@ -15,12 +15,15 @@ import {
   UpdateStoreAction
 } from '../../store/actions';
 import {
-  AppState,
-  DATA_SERVICE_STAGE_INDEX,
-  NO_ACTIVE_STAGE
+  AppState
 } from '../../store/store';
 import DataSource from '../../models/data-source';
-import Stage, { buildAggregationPipelineFromStages, STAGES } from '../../models/stage';
+import Stage, {
+  buildAggregationPipelineFromStages,
+  DATA_SERVICE_STAGE_INDEX,
+  NO_ACTIVE_STAGE,
+  STAGES
+} from '../../models/stage';
 
 import './stage-bar.css';
 

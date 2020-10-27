@@ -4,7 +4,6 @@ import { sampleSize } from 'lodash';
 import { InnerFieldType } from '../../../models/field-type';
 
 type props = {
-  // localAppRegistry: object,
   fieldName: string,
   queryValue: string,
   type: InnerFieldType,
@@ -39,7 +38,6 @@ class UniqueMiniChart extends Component<props> {
     const randomValueList = samp.map((value, i) => {
       return (
         <ValueBubble
-          // localAppRegistry={this.props.localAppRegistry}
           key={`${fieldName}-${typeName}-${i}`}
           value={value}
           queryValue={this.props.queryValue}

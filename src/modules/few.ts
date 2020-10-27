@@ -13,7 +13,9 @@ import { hasDistinctValue } from 'mongodb-query-util';
 
 require('./d3-tip')(d3);
 
-const minicharts_d3fns_few = (localAppRegistry: any) => {
+import { UpdateFilterMethod, UPDATE_FILTER_TYPE } from './update-filter-types';
+
+const minicharts_d3fns_few = (updateFilter: UpdateFilterMethod) => {
   // --- beginning chart setup ---
   let width = 400; // default width
   let height = 100; // default height
@@ -54,18 +56,18 @@ const minicharts_d3fns_few = (localAppRegistry: any) => {
       const right = left + d.count;
       return s[0] <= right && left <= s[1];
     });
-    // add `selected` class and remove `unselected` class
+    // Add `selected` class and remove `unselected` class.
     selected.classed('selected', true);
     selected.classed('unselected', false);
 
-    // if selection has changed, trigger query builder event
+    // If selection has changed, trigger query builder event.
     if (numSelected !== selected[0].length) {
       const values = map(selected.data(), 'value');
-      // alert('TODO: Use this action to build project'); // mmmmm
-      // QueryAction.setDistinctValues({
-      //   field: options.fieldName,
-      //   value: values.map((v) => options.promoter(v))
-      // });
+      updateFilter({
+        field: options.fieldName,
+        value: values.map((v) => options.promoter(v))
+      }, UPDATE_FILTER_TYPE.SET_DISTINCT_VALUES);
+      // setDistinctValues(options.fieldName, values.map((v) => options.promoter(v)));
     }
   }
 
@@ -87,12 +89,16 @@ const minicharts_d3fns_few = (localAppRegistry: any) => {
 
     // const qbAction = d3.event.shiftKey ?
     //   QueryAction.toggleDistinctValue : QueryAction.setValue;
-    // qbAction({
-    //   field: options.fieldName,
-    //   value: options.promoter(d.value),
-    //   unsetIfSet: true
-    // });
-    // alert('TODO: Use this action to build project'); // mmmmm
+    const methodType = d3.event.shiftKey ? UPDATE_FILTER_TYPE.TOGGLE_DISTINCT_VALUE : UPDATE_FILTER_TYPE.SET_VALUE;
+    updateFilter({
+      field: options.fieldName,
+      value: options.promoter(d.value)
+    }, methodType);
+    // if (d3.event.shiftKey) {
+    //   toggleDistinctValue(options.fieldName, options.promoter(d.value));
+    // } else {
+    //   setValue(options.fieldName, options.promoter(d.value));
+    // }
 
     const w = d3.select(window)
       .on('mousemove', mousemove)

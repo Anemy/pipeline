@@ -20,7 +20,7 @@ import {
   ObjectFieldType,
   Types
 } from '../../../models/field-type';
-import Stage, { STAGES } from '../../../models/stage';
+import Stage, { ensureWeAreOnValidStageForAction, STAGES } from '../../../models/stage';
 import { AppState } from '../../../store/store';
 import {
   ActionTypes,
@@ -126,47 +126,14 @@ class Field extends Component<props & StateProps & DispatchProps> {
     });
   };
 
-  // Adds a new stage of the type if we aren't already on that stage.
-  ensureWeAreOnValidStageForAction = (stageType: STAGES) => {
-    const {
-      activeStage,
-      stages
-    } = this.props;
-
-    let newActiveStage = activeStage;
-    const newStages = [...stages];
-
-    if (newStages[activeStage].type !== stageType) {
-      if (newStages[activeStage + 1] && newStages[activeStage + 1].type === stageType) {
-        // When the next stage is the type we want
-        // we can just jump to that one and update.
-        newActiveStage = activeStage + 1;
-      } else {
-        // Create a new stage and set it as our active stage.
-        const newStage = new Stage(stageType);
-
-        // Copy details/sample docs from current stage.
-        // TODO: I think we actually want to make this re-render the docs
-        // or say the docs are out of date...
-        newStage.copyStageItems(newStages[activeStage]);
-
-        newStages.splice(newActiveStage + 1, 0, newStage);
-        newActiveStage++;
-      }
-    }
-
-    return {
-      newActiveStage,
-      newStages
-    };
-  }
-
   onClickRenameField = async () => {
     const {
+      activeStage,
       isRenamedField,
       name,
       path,
-      renamedFieldName
+      renamedFieldName,
+      stages
     } = this.props;
 
     let newFieldName;
@@ -184,7 +151,7 @@ class Field extends Component<props & StateProps & DispatchProps> {
     const {
       newActiveStage,
       newStages
-    } = this.ensureWeAreOnValidStageForAction(STAGES.PROJECT);
+    } = ensureWeAreOnValidStageForAction(STAGES.PROJECT, stages, activeStage);
 
     // https://docs.mongodb.com/manual/reference/operator/aggregation/project/#pipe._S_project
 
@@ -212,14 +179,16 @@ class Field extends Component<props & StateProps & DispatchProps> {
 
   onClickToggleHideField = (): void => {
     const {
+      activeStage,
       isHiddenField,
-      path
+      path,
+      stages
     } = this.props;
 
     const {
       newActiveStage,
       newStages
-    } = this.ensureWeAreOnValidStageForAction(STAGES.UNSET);
+    } = ensureWeAreOnValidStageForAction(STAGES.UNSET, stages, activeStage);
 
     // Update the stage's unset to include or remove the field.
     const currentStage = newStages[newActiveStage];

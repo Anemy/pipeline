@@ -1,10 +1,8 @@
 import { MongoClient } from 'mongodb';
-import DataSource from '../models/data-source';
-import Stage from '../models/stage';
-import { Actions, ActionTypes } from './actions';
 
-export const DATA_SERVICE_STAGE_INDEX = 0;
-export const NO_ACTIVE_STAGE = -1;
+import DataSource from '../models/data-source';
+import Stage, { NO_ACTIVE_STAGE } from '../models/stage';
+import { Actions, ActionTypes } from './actions';
 
 export const SCHEMA_CONSTANTS = {
   'SCHEMA_PROBABILITY_PERCENT': 'schema-probability-percent'

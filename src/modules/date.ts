@@ -1,5 +1,4 @@
 /* eslint no-use-before-define: 0, camelcase:0 */
-import bson from 'bson';
 import d3 from 'd3';
 import {
   assign,
@@ -12,7 +11,6 @@ import {
   defaults,
   map
 } from 'lodash';
-
 import $ from 'jquery';
 import moment from 'moment';
 import shared from './shared';
@@ -20,6 +18,8 @@ import many from './many';
 import { inValueRange } from 'mongodb-query-util';
 
 require('./d3-tip')(d3);
+
+import { UpdateFilterMethod, UPDATE_FILTER_TYPE } from './update-filter-types';
 
 function generateDefaults(n: any) {
   const doc: any = {};
@@ -44,7 +44,7 @@ function extractTimestamp(d: any) {
   }
 }
 
-const minicharts_d3fns_date = (appRegistry: any) => {
+const minicharts_d3fns_date = (updateFilter: UpdateFilterMethod) => {
   // --- beginning chart setup ---
   let width = 400;
   let height = 100;
@@ -110,13 +110,11 @@ const minicharts_d3fns_date = (appRegistry: any) => {
     selected.classed('unselected', false);
 
     if (numSelected !== selected[0].length) {
-      // number of selected items has changed, trigger querybuilder event
+      // Number of selected items has changed, trigger querybuilder event.
       if (selected[0].length === 0) {
-        // clear value
-        // alert('TODO: Use this action to clear an item from the project'); // mmmm
-        // QueryAction.clearValue({
-        //   field: options.fieldName
-        // });
+        updateFilter({
+          field: options.fieldName
+        }, UPDATE_FILTER_TYPE.CLEAR_VALUE);
         return;
       }
     }
@@ -130,22 +128,21 @@ const minicharts_d3fns_date = (appRegistry: any) => {
     }*/);
 
     if (isEqual(minValue.ts, maxValue.ts)) {
-      // if values are the same, single equality query
-      // alert('TODO: Use this action to build project'); // mmmmm
-      // QueryAction.setValue({
-      //   field: options.fieldName,
-      //   value: minValue.value
-      // }, true);
+      // If values are the same, single equality query.
+      updateFilter({
+        field: options.fieldName,
+        value: minValue.value
+      }, UPDATE_FILTER_TYPE.SET_VALUE); // @rhys This used to have boolean true at the end...
       return;
     }
     // binned values, build range query with $gte and $lte
-    // alert('TODO: Use this action to build project'); // mmmmm
-    // QueryAction.setRangeValues({
-    //   field: options.fieldName,
-    //   min: minValue.value,
-    //   max: maxValue.value,
-    //   maxInclusive: true
-    // });
+    updateFilter({
+      field: options.fieldName,
+      min: minValue.value,
+      max: maxValue.value,
+      maxInclusive: true
+    }, UPDATE_FILTER_TYPE.SET_RANGE_VALUES);
+    // setRangeValues(options.fieldName, minValue.value, maxValue.value, true);
   }
 
   function brushed() {
@@ -162,22 +159,21 @@ const minicharts_d3fns_date = (appRegistry: any) => {
     if (d3.event.shiftKey && lastNonShiftRangeValue) {
       const minVal = d.ts < lastNonShiftRangeValue.ts ? d.value : lastNonShiftRangeValue.value;
       const maxVal = d.ts > lastNonShiftRangeValue.ts ? d.value : lastNonShiftRangeValue.value;
-      // alert('TODO: Use this action to build project'); // mmmmm
-      // QueryAction.setRangeValues({
-      //   field: options.fieldName,
-      //   min: minVal,
-      //   max: maxVal,
-      //   maxInclusive: true
-      // });
+      updateFilter({
+        field: options.fieldName,
+        min: minVal,
+        max: maxVal,
+        maxInclusive: true
+      }, UPDATE_FILTER_TYPE.SET_RANGE_VALUES);
+      // setRangeValues(options.fieldName, minVal, maxVal, true);
     } else {
       // remember non-shift value so that range can be extended with shift
       lastNonShiftRangeValue = d;
-      // alert('TODO: Use this action to build project'); // mmmmm
-      // QueryAction.setValue({
-      //   field: options.fieldName,
-      //   value: d.value,
-      //   unsetIfSet: true
-      // });
+      updateFilter({
+        field: options.fieldName,
+        value: d.value
+      }, UPDATE_FILTER_TYPE.SET_VALUE);
+      // setValue(options.fieldName, d.value);
     }
 
     // console.log('Here! Avoid jquery - this may break...');
@@ -391,7 +387,7 @@ const minicharts_d3fns_date = (appRegistry: any) => {
 
       let chartWidth = innerWidth / (upperRatio + 1) - upperMargin;
       const weekdayContainer = g.select('g.weekday').data([weekdays]);
-      const manyDayChart = many(appRegistry)
+      const manyDayChart = many(updateFilter)
         .width(chartWidth)
         .height(upperBarBottom)
         .options({
@@ -413,7 +409,7 @@ const minicharts_d3fns_date = (appRegistry: any) => {
 
       chartWidth = innerWidth / (upperRatio + 1) * upperRatio - upperMargin;
       const hourContainer = g.select('g.hour').data([hours]);
-      const manyHourChart = many(appRegistry)
+      const manyHourChart = many(updateFilter)
         .width(chartWidth)
         .height(upperBarBottom)
         .options({

@@ -1,6 +1,8 @@
 import React from 'react';
-// import Resizable from 're-resizable';
 import { connect } from 'react-redux';
+import {
+  EJSON
+} from 'bson';
 
 import {
   ActionTypes,
@@ -40,7 +42,7 @@ class SampleDocuments extends React.Component<StateProps & DispatchProps> {
         key={`${documentIndex}`}
       >
         <pre>
-          {JSON.stringify(document, null, 2)}
+          {EJSON.stringify(document, null, 2)}
         </pre>
       </div>
     ));

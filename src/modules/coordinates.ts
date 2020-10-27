@@ -1,11 +1,13 @@
 /* eslint camelcase: 0 */
 import d3 from 'd3';
 import { assign, defer, get, isEqual } from 'lodash';
-import shared from './shared';
 import turfDistance from 'turf-distance';
 import turfPoint from 'turf-point';
 import turfDestination from 'turf-destination';
 import mapboxgl from 'mapbox-gl/dist/mapbox-gl.js';
+
+import shared from './shared';
+import { UpdateFilterMethod, UPDATE_FILTER_TYPE } from './update-filter-types';
 
 const SELECTED_COLOR = '#F68A1E';
 const UNSELECTED_COLOR = '#43B1E5';
@@ -21,7 +23,7 @@ const API_URL = 'https://compass-maps.mongodb.com/compass/maptile';
 mapboxgl.config.ACCESS_TOKEN = '12345';
 mapboxgl.config.API_URL = API_URL;
 
-const minicharts_d3fns_geo = (localAppRegistry: any) => {
+const minicharts_d3fns_geo = (updateFilter: UpdateFilterMethod) => {
   // --- beginning chart setup ---
   let width = 400;
   let height = 100;
@@ -65,16 +67,17 @@ const minicharts_d3fns_geo = (localAppRegistry: any) => {
           'miles'
         );
         // alert('TODO: Use this action to build project');
-        // QueryAction.setGeoWithinValue({
-        //   field: options.fieldName,
-        //   center: [circleCenter.lng, circleCenter.lat],
-        //   radius: mileDistance / 3963.2
-        // });
+        updateFilter({
+          field: options.fieldName,
+          center: [circleCenter.lng, circleCenter.lat],
+          radius: mileDistance / 3963.2
+        }, UPDATE_FILTER_TYPE.SET_GEO_WITHIN_VALUE);
       } else {
         // alert('TODO: Use this action to clear something from the project - maybe this won\'t be a thing.');
-        // QueryAction.clearValue({
-        //   field: options.fieldName
-        // });
+        updateFilter({
+          field: options.fieldName
+        }, UPDATE_FILTER_TYPE.CLEAR_VALUE);
+        // clearValue(options.fieldName);
       }
     }
 

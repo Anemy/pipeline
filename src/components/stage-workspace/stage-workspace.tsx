@@ -11,10 +11,12 @@ import {
   UpdateStoreAction
 } from '../../store/actions';
 import {
-  AppState,
-  NO_ACTIVE_STAGE
+  AppState
 } from '../../store/store';
-import Stage, { buildAggregationPipelineFromStages } from '../../models/stage';
+import Stage, {
+  NO_ACTIVE_STAGE,
+  buildAggregationPipelineFromStages
+} from '../../models/stage';
 import DataSource from '../../models/data-source';
 import Schema, { placeHolderSchema } from '../../models/schema';
 
