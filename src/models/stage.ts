@@ -90,8 +90,23 @@ export const buildAggregationPipelineFromStages = (stages: Stage[], sampleCount:
         });
         break;
       case STAGES.PROJECT:
+        const projectContent = {
+          ...stage.content
+        };
+
+        // For now to make all the fields appear so we can control more
+        // of the projection details.
+        // This won't work if we don't find fields in the sample
+        // but we can handle that later.
+
+        // for (const field of stage.sampleDocumentsSchema.fields) {
+        //   if (!projectContent[]) {
+
+        //   }
+        // }
+
         pipeline.push({
-          $project: stage.content
+          $project: projectContent
         });
         break;
       case STAGES.UNSET:

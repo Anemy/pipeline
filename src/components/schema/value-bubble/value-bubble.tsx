@@ -85,14 +85,31 @@ class ValueBubble extends Component<props & StateProps & DispatchProps> {
 
     const currentStage = newStages[newActiveStage];
 
-    // TODO: Shift key handling
+    // TODO: get rid of this query value and just use the stage with path.
 
-    // If already renamed, remove old renaming.
+    // It's already part of the match/filter, remove.
     if (hasDistinctValue(queryValue, value)) {
-      delete currentStage.content[fieldName];
+      if (queryValue && queryValue.$in) {
+        // Remove it from the array.
+        queryValue.$in.splice(queryValue.$in.indexOf(value), 1);
 
-      // TODO: Remove it from the array of values instead of deleting the value
+        if (queryValue.$in.length === 0) {
+          delete currentStage.content[fieldName];
+        }
+      } else {
+        delete currentStage.content[fieldName];
+      }
+    } else if (e.shiftKey && queryValue !== undefined) {
+      // Add the value to the list of other values for this match on this field.
+      if (queryValue.$in) {
+        currentStage.content[fieldName].$in.push(value);
+      } else {
+        currentStage.content[fieldName] = {
+          $in: [queryValue, value]
+        }
+      }
     } else {
+      // Add the value to the field in the match.
       currentStage.content[fieldName] = value;
     }
 
@@ -103,7 +120,7 @@ class ValueBubble extends Component<props & StateProps & DispatchProps> {
   }
 
   /**
-   * converts the passed in value into a string, supports the 4 numeric
+   * Converts the passed in value into a string, supports the 4 numeric
    * BSON types as well.
    *
    * @param {Any} value     value to be converted to a string
