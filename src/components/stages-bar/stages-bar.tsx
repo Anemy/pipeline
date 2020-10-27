@@ -8,6 +8,7 @@ import {
   faPlus,
   faTimes
 } from '@fortawesome/free-solid-svg-icons';
+import smalltalk from 'smalltalk';
 
 import {
   ActionTypes,
@@ -19,13 +20,14 @@ import {
   NO_ACTIVE_STAGE
 } from '../../store/store';
 import DataSource from '../../models/data-source';
-import Stage, { STAGES } from '../../models/stage';
+import Stage, { buildAggregationPipelineFromStages, STAGES } from '../../models/stage';
 
 import './stage-bar.css';
 
 type StateProps = {
   activeStage: number,
   dataSource: DataSource,
+  sampleCount: number,
   stages: Stage[];
 };
 
@@ -119,7 +121,25 @@ class StagesBar extends React.Component<StateProps & DispatchProps> {
   };
 
   onExportClicked = (): void => {
-    alert('export clicked');
+    const {
+      activeStage,
+      sampleCount,
+      stages
+    } = this.props;
+
+    let stagesToRunInPipeline: Stage[] = [];
+    if (activeStage >= 1) {
+      stagesToRunInPipeline = stages.slice(1);
+    }
+    const pipeline = buildAggregationPipelineFromStages(
+      stagesToRunInPipeline,
+      sampleCount
+    );
+
+    smalltalk
+      .alert('Here\'s the current pipline we\'re running:', JSON.stringify(pipeline, null, 2))
+      .then(() => { })
+      .catch(() => { });
   };
 
   onRunClicked = (): void => {
@@ -285,6 +305,7 @@ const mapStateToProps = (state: AppState): StateProps => {
   return {
     activeStage: state.activeStage,
     dataSource: state.stages[0] as DataSource,
+    sampleCount: state.sampleCount,
     stages: state.stages
   };
 };
