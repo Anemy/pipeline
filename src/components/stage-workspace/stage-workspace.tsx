@@ -1,9 +1,8 @@
 import { MongoClient } from 'mongodb';
 import React from 'react';
 import { connect } from 'react-redux';
-// import { Resizable } from 're-resizable';
-const parseSchema = require('mongodb-schema');
 import SplitterLayout from 'react-splitter-layout';
+import parseSchema from 'mongodb-schema';
 
 import 'react-splitter-layout/lib/index.css';
 
@@ -15,7 +14,7 @@ import {
   AppState,
   NO_ACTIVE_STAGE
 } from '../../store/store';
-import Stage from '../../models/stage';
+import Stage, { buildAggregationPipelineFromStages } from '../../models/stage';
 import DataSource from '../../models/data-source';
 import Schema, { placeHolderSchema } from '../../models/schema';
 
@@ -23,6 +22,8 @@ import './stage-workspace.css';
 
 import SampleDocuments from '../sample-documents/sample-documents';
 import StageEditor from '../stage-editor/stage-editor';
+
+const DEFAULT_MAX_TIME_MS = 10000;
 
 type StateProps = {
   activeStage: number;
@@ -36,17 +37,6 @@ type StateProps = {
 type DispatchProps = {
   updateStore: (update: any) => void;
 };
-
-// const resizeableDirections = {
-//   top: false,
-//   right: true,
-//   bottom: false,
-//   left: false,
-//   topRight: false,
-//   bottomRight: false,
-//   bottomLeft: false,
-//   topLeft: false
-// };
 
 class StageWorkspace extends React.Component<StateProps & DispatchProps> {
   componentDidUpdate() {
@@ -131,6 +121,7 @@ class StageWorkspace extends React.Component<StateProps & DispatchProps> {
 
   loadSampleDocuments = async () => {
     const {
+      activeStage,
       dataSource,
       mongoClient,
       sampleCount
@@ -150,7 +141,27 @@ class StageWorkspace extends React.Component<StateProps & DispatchProps> {
     try {
       const db = mongoClient.db(dataSource.database);
 
-      const documents = await db.collection(dataSource.collection).find().limit(sampleCount).toArray();
+      let stagesToRunInPipeline: Stage[] = [];
+      if (activeStage >= 1) {
+        stagesToRunInPipeline = updatedStages.slice(1, activeStage);
+      }
+      const pipeline = buildAggregationPipelineFromStages(
+        stagesToRunInPipeline,
+        sampleCount
+      );
+
+      console.log('Running pipeline:', pipeline);
+
+      // http://mongodb.github.io/node-mongodb-native/3.6/api/Collection.html#aggregate
+      const documents = await db
+        .collection(dataSource.collection)
+        .aggregate(
+          pipeline,
+          {
+            maxTimeMS: DEFAULT_MAX_TIME_MS
+          }
+        ).toArray();
+      // const documents = await db.collection(dataSource.collection).find().limit(sampleCount).toArray();
 
       // Ensure we're still looking at the same stage.
       if (this.props.stages[this.props.activeStage].id === currentStageId) {

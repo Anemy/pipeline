@@ -1,5 +1,4 @@
 import React from 'react';
-// import Resizable from 're-resizable';
 import { connect } from 'react-redux';
 
 import GraphContainer from '../graph/graph-container';
@@ -12,20 +11,6 @@ import { AppState } from '../../store/store';
 
 import './pipeline.css';
 import StagesBar from '../stages-bar/stages-bar';
-
-// const resizeableDirections = {
-//   top: false, // This property is controlled in the component.
-//   right: false,
-//   bottom: false,
-//   left: false,
-//   topRight: false,
-//   bottomRight: false,
-//   bottomLeft: false,
-//   topLeft: false
-// };
-
-// const defaultGraphClosed = 24;
-// const defaultGraphHeightOpened = 240;
 
 type StateProps = {
   showGraph: boolean;

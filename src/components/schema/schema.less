@@ -91,7 +91,7 @@
 
 @inactiveIcon: @gray4;
 
-
+// mmmm carrots
 
 // minicharts
 @mc-blue0: #43B1E5;
@@ -189,6 +189,7 @@
       border-bottom: 3px solid @gray8;
       background: @pw;
       transition: all 250ms ease-out;
+      position: relative;
 
       .row {
         margin-bottom: 24px;
@@ -323,34 +324,20 @@
         display: inline-block;
       }
 
-      &.schema-field-object,
-      &.schema-field-array {
-        .schema-field-name {
-          cursor: pointer;
-        }
+      .schema-field-expand-collapse-button {
+        border: none;
+        background: none;
+        cursor: pointer;
+        width: 24px;
       }
 
       &.expanded {
-        .caret {
-          // .caret-down;
-          margin-right: 4px;
-          margin-left: -12px;
-          cursor: pointer;
-        }
-
         >.schema-field-list {
           display: block;
         }
       }
 
       &.collapsed {
-        .caret {
-          // .caret-right;
-          margin-right: 8px;
-          margin-left: -12px;
-          cursor: pointer;
-        }
-
         >.schema-field-list {
           display: none;
         }

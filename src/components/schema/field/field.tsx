@@ -1,11 +1,33 @@
 import React, { Component } from 'react';
-
+import { connect } from 'react-redux';
 import detectCoordinates from 'detect-coordinates';
 import { sortBy, find } from 'lodash';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faCaretDown,
+  faCaretRight,
+  faEllipsisH,
+  faHistory,
+  faPen
+} from '@fortawesome/free-solid-svg-icons';
+import smalltalk from 'smalltalk';
 
 import Type from '../type/type';
 import Minichart from '../minichart/minichart';
-import FieldType, { ArrayFieldType, InnerFieldType, ObjectFieldType, Types } from '../../../models/field-type';
+import {
+  ArrayFieldType,
+  InnerFieldType,
+  ObjectFieldType,
+  Types
+} from '../../../models/field-type';
+import Stage, { STAGES } from '../../../models/stage';
+import { AppState } from '../../../store/store';
+import {
+  ActionTypes,
+  UpdateStoreAction
+} from '../../../store/actions';
+
+import './field.css';
 
 // The full schema component class.
 const FIELD_CLASS = 'schema-field';
@@ -18,13 +40,40 @@ type props = {
 }
 
 type StateType = {
+  isFieldOptionsDropdownOpen: boolean,
   collapsed: boolean,
   activeType: null | InnerFieldType,
   types: InnerFieldType[]
 };
 
-class Field extends Component<props> {
+type StateProps = {
+  activeStage: number;
+  isHiddenField: boolean;
+  isRenamedField: boolean;
+  renamedFieldName: string;
+  stages: Stage[];
+};
+
+type DispatchProps = {
+  updateStore: (update: any) => void;
+};
+
+// https://docs.mongodb.com/manual/reference/aggregation-variables/#variable.REMOVE
+// Note - don't change this value, it's used in the pipeline ^
+// const HIDDEN_FIELD = '$$REMOVE';
+// {
+//   $cond: {
+//     if: { $eq: ["", "123"] },
+//     then: "$$REMOVE",
+//     else: "0"
+//   }
+// }; // '$$REMOVE';
+
+const HIDDEN_FIELD = 'HIDDEN_FIELD';
+
+class Field extends Component<props & StateProps & DispatchProps> {
   state: StateType = {
+    isFieldOptionsDropdownOpen: false,
     // Whether the nested fields are collapsed (true) or expanded (false).
     collapsed: true,
     // A reference to the active type object (only null initially).
@@ -48,8 +97,152 @@ class Field extends Component<props> {
     });
   }
 
+  componentWillUnmount() {
+    if (this.state.isFieldOptionsDropdownOpen) {
+      window.removeEventListener('click', this.handleWindowClick);
+    }
+  }
+
+  handleWindowClick = (event: any) => {
+    if (!event.target.classList.contains('.schema-field-options-dropdown')) {
+      this.setState({
+        isFieldOptionsDropdownOpen: false
+      });
+      window.removeEventListener('click', this.handleWindowClick);
+    }
+  }
+
+  onClickShowFieldOptions = (): void => {
+    if (this.state.isFieldOptionsDropdownOpen) {
+      return;
+    }
+
+    this.setState({
+      isFieldOptionsDropdownOpen: true
+    });
+
+    setImmediate(() => {
+      window.addEventListener('click', this.handleWindowClick);
+    });
+  };
+
+  // Adds a new stage of the type if we aren't already on that stage.
+  ensureWeAreOnValidStageForAction = (stageType: STAGES) => {
+    const {
+      activeStage,
+      stages
+    } = this.props;
+
+    let newActiveStage = activeStage;
+    const newStages = [...stages];
+
+    if (newStages[activeStage].type !== stageType) {
+      if (newStages[activeStage + 1] && newStages[activeStage + 1].type === stageType) {
+        // When the next stage is the type we want
+        // we can just jump to that one and update.
+        newActiveStage = activeStage + 1;
+      } else {
+        // Create a new stage and set it as our active stage.
+        const newStage = new Stage(stageType);
+
+        // Copy details/sample docs from current stage.
+        // TODO: I think we actually want to make this re-render the docs
+        // or say the docs are out of date...
+        newStage.copyStageItems(newStages[activeStage]);
+
+        newStages.splice(newActiveStage + 1, 0, newStage);
+        newActiveStage++;
+      }
+    }
+
+    return {
+      newActiveStage,
+      newStages
+    };
+  }
+
+  onClickRenameField = async () => {
+    const {
+      isRenamedField,
+      name,
+      path,
+      renamedFieldName
+    } = this.props;
+
+    let newFieldName;
+    try {
+      newFieldName = await smalltalk.prompt('Rename Field', 'Enter the new field name:', name);
+    } catch (err) {
+      // Cancelled prompt.
+      return;
+    }
+
+    if (newFieldName === null || newFieldName.replace(/\s+/g, '') === '') {
+      return;
+    }
+
+    const {
+      newActiveStage,
+      newStages
+    } = this.ensureWeAreOnValidStageForAction(STAGES.PROJECT);
+
+    // https://docs.mongodb.com/manual/reference/operator/aggregation/project/#pipe._S_project
+
+    const currentStage = newStages[newActiveStage];
+
+    // If already renamed, remove old renaming.
+    if (isRenamedField) {
+      // TODO: Do we want to remove all the rename occurences?
+      // This might conflict in the future.
+      // We probably want a more manual control of field renames.
+      delete currentStage.content[renamedFieldName];
+    }
+
+    // Only rename then if the new name isn't equal to the current name.
+    if (newFieldName !== path.split('.').slice(-1)[0]) {
+      const renameExpr = `$${path}`;
+      currentStage.content[newFieldName] = renameExpr;
+    }
+
+    console.log('after rename:', { ...currentStage.content });
+
+    this.props.updateStore({
+      activeStage: newActiveStage,
+      stages: newStages
+    });
+  };
+
+  onClickToggleHideField = (): void => {
+    const {
+      isHiddenField,
+      path
+    } = this.props;
+
+    const {
+      newActiveStage,
+      newStages
+    } = this.ensureWeAreOnValidStageForAction(STAGES.UNSET);
+
+    // Update the stage's unset to include or remove the field.
+    const currentStage = newStages[newActiveStage];
+
+    // TODO: Maybe we can use:
+    // https://docs.mongodb.com/manual/reference/aggregation-variables/#variable.REMOVE
+    // And put it all in one project?
+    if (isHiddenField) {
+      delete currentStage.content[path];
+    } else {
+      currentStage.content[path] = HIDDEN_FIELD;
+    }
+
+    this.props.updateStore({
+      activeStage: newActiveStage,
+      stages: newStages
+    });
+  };
+
   /**
-   * returns the field list (an array of <Field /> components) for nested
+   * Returns the field list (an array of <Field /> components) for nested
    * subdocuments.
    *
    * @return {component}  Field list or empty div
@@ -60,14 +253,14 @@ class Field extends Component<props> {
     let fieldList;
 
     if (this.state.collapsed) {
-      // return empty div if field is collapsed
+      // Return empty div if field is collapsed.
       fieldList = '';
     } else {
       fieldList = Object.keys(fields).map((key, index) => {
         const fieldToRender = fields[key as any];
 
         return (
-          <Field
+          <ConnectedField
             key={index}
             name={fieldToRender.name}
             path={fieldToRender.path}
@@ -85,7 +278,7 @@ class Field extends Component<props> {
   }
 
   /**
-   * returns Document type object of a nested document, either directly nested
+   * Returns Document type object of a nested document, either directly nested
    * or sub-documents inside an array.
    *
    * @return {Object}   object representation of `Document` type.
@@ -130,10 +323,10 @@ class Field extends Component<props> {
   }
 
   /**
-   * onclick handler to toggle collapsed/expanded state. This will hide/show
+   * Onclick handler to toggle collapsed/expanded state. This will hide/show
    * the nested fields and turn the disclosure triangle sideways.
    */
-  titleClicked() {
+  onClickToggleCollapse = () => {
     this.setState({ collapsed: !this.state.collapsed });
   }
 
@@ -148,14 +341,50 @@ class Field extends Component<props> {
     this.setState({ activeType: type });
   }
 
+  renderFieldOptions = () => {
+    const {
+      isHiddenField
+    } = this.props;
+
+    return (
+      <div
+        className="schema-field-options-dropdown"
+      >
+        <a
+          className="schema-field-options-dropdown-option"
+          onClick={this.onClickToggleHideField}
+        >
+          {isHiddenField ? 'Unhide' : 'Hide'}
+        </a>
+        <a
+          className="schema-field-options-dropdown-option"
+          onClick={this.onClickRenameField}
+        >
+          Rename
+        </a>
+      </div>
+    );
+  }
+
   /**
    * Render a single field;
    *
    * @returns {React.Component} A react component for a single field
    */
   render() {
+    const {
+      collapsed,
+      isFieldOptionsDropdownOpen
+    } = this.state;
+
+    const {
+      isHiddenField,
+      isRenamedField,
+      renamedFieldName
+    } = this.props;
+
     // top-level class of this component
-    const cls = FIELD_CLASS + ' ' + (this.state.collapsed ? 'collapsed' : 'expanded');
+    const cls = FIELD_CLASS + ' ' + (collapsed ? 'collapsed' : 'expanded');
 
     // Types represented as horizontal bars with labels.
     const typeList = Object.keys(this.state.types).map((key, index: number) => {
@@ -180,31 +409,110 @@ class Field extends Component<props> {
     const activeType = this.state.activeType;
     const nestedDocType = this.getNestedDocType();
 
-    // children fields in case of nested array / document
     return (
       <div className={cls}>
         <div className="row">
+          {isHiddenField && <div className="schema-field-is-hidden" />}
           <div className="col-sm-4">
-            <div className="schema-field-name" onClick={this.titleClicked.bind(this)}>
-              <span className={nestedDocType ? 'caret' : ''}></span>
-              <span>{this.props.name}</span>
+            <div className="schema-field-name">
+              {nestedDocType && (
+                <button
+                  className="schema-field-expand-collapse-button"
+                  onClick={this.onClickToggleCollapse}
+                >
+                  <FontAwesomeIcon
+                    icon={collapsed ? faCaretRight : faCaretDown}
+                  />
+                </button>
+              )}
+              <div className="schema-field-name-name">
+                {isRenamedField ? renamedFieldName : this.props.name}
+              </div>
+              <button
+                className="schema-field-name-rename-button"
+                onClick={this.onClickRenameField}
+              >
+                <FontAwesomeIcon
+                  icon={faPen}
+                />
+              </button>
             </div>
+            {isRenamedField && <div
+              className="schema-field-changes-area"
+            >
+              <FontAwesomeIcon
+                className="schema-field-changes-icon"
+                icon={faHistory}
+              />
+              <div className="schema-field-changes-list">
+                Renamed {this.props.name} to {renamedFieldName}
+              </div>
+            </div>
+            }
             <div className="schema-field-type-list">
               {typeList}
             </div>
           </div>
-          <div className="col-sm-7 col-sm-offset-1">
+          <div className="col-sm-7 offset-sm-1">
             <Minichart
               fieldName={this.props.path}
               type={activeType as InnerFieldType}
               nestedDocType={nestedDocType}
             />
           </div>
+          <button
+            className="schema-field-options-button"
+            onClick={this.onClickShowFieldOptions}
+          >
+            <FontAwesomeIcon
+              icon={faEllipsisH}
+            />
+          </button>
         </div>
+        {isFieldOptionsDropdownOpen && this.renderFieldOptions()}
         {this.getChildren()}
       </div>
     );
   }
 }
 
-export default Field;
+const mapStateToProps = (state: AppState, ownProps: props): StateProps => {
+  const currentStage = state.stages[state.activeStage];
+  let isHiddenField = currentStage.type === STAGES.UNSET
+    && currentStage.content[ownProps.path]
+    && currentStage.content[ownProps.path] === HIDDEN_FIELD;
+
+  // TODO: This only pulls in the first renaming.
+  // We should ensure we show all of the names this field has been renamed to.
+  let isRenamedField = false;
+  let renamedFieldName = '';
+  const renameExpr = `$${ownProps.path}`;
+  const alreadyRenamed = Object.keys(currentStage.content).filter(
+    (renamedPath: string) => currentStage.content[renamedPath] === renameExpr
+  );
+
+  if (alreadyRenamed && alreadyRenamed.length > 0) {
+    isRenamedField = true;
+    renamedFieldName = alreadyRenamed[0];
+  }
+
+  return {
+    activeStage: state.activeStage,
+    isHiddenField,
+    isRenamedField,
+    renamedFieldName,
+    stages: state.stages
+  };
+};
+
+const mapDispatchToProps: DispatchProps = {
+  // Resets URL validation if form was changed.
+  updateStore: (update: any): UpdateStoreAction => ({
+    type: ActionTypes.UPDATE_STORE,
+    update
+  })
+};
+
+const ConnectedField = connect(mapStateToProps, mapDispatchToProps)(Field);
+
+export default ConnectedField;

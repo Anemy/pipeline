@@ -5,7 +5,8 @@ export class DataSource extends Stage {
   collection: string;
 
   constructor(databaseName: string, collectionName: string) {
-    super(STAGES.FILTER); // PLACEHOLDER.
+    super(STAGES.MATCH); // PLACEHOLDER.
+    // Should be sample.
 
     this.database = databaseName;
     this.collection = collectionName;

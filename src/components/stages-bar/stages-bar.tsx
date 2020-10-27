@@ -1,6 +1,5 @@
 import classnames from 'classnames';
 import React from 'react';
-// import Resizable from 're-resizable';
 import { connect } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {

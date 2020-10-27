@@ -1,5 +1,4 @@
 import React from 'react';
-// import { Resizable } from 're-resizable';
 // const { LiteGraph, LGraphCanvas } = require('litegraph.js');
 import { LiteGraph, LGraphCanvas, LLink } from 'litegraph.js';
 

@@ -18,7 +18,7 @@
   border-radius: 3px;
   border: 1px solid black;
   display: inline-block;
-  transition: 200ms all;
+  transition: 150ms all;
 }
 
 .stages-bar-data-source:hover {
@@ -26,8 +26,10 @@
 }
 
 .stages-bar-data-source-is-selected {
-  box-shadow: 0 2px 4px 0 rgba(60, 66, 87, .14), 0 1px 2px 0 rgba(0, 0, 0, .1);
+  box-shadow: 0 2px 4px 0 rgba(39, 43, 58, 0.19), 0 1px 2px 0 rgba(0, 0, 0, .14);
   border-color: blue;
+  border-bottom: 2px solid blue;
+  padding-bottom: 3px;
 }
 
 .stages-bar-stages-empty-space {
@@ -60,8 +62,11 @@
 }
 
 .stages-bar-stage-is-selected {
-  background-color: rgba(30, 30, 240, 0.4);
-  box-shadow: 0 2px 4px 0 rgba(39, 43, 58, 0.14), 0 1px 2px 0 rgba(0, 0, 0, .1);
+  /* background-color: rgba(30, 30, 240, 0.4); */
+  border-color: blue;
+  border-bottom: 2px solid blue;
+  padding-bottom: 3px;
+  box-shadow: 0 2px 4px 0 rgba(39, 43, 58, 0.19), 0 1px 2px 0 rgba(0, 0, 0, .14);
 }
 
 .stages-bar-stage:hover .stages-bar-stage-delete-button {
@@ -81,7 +86,7 @@
   right: -7px;
   width: 14px;
   height: 14px;
-  transition: 200ms all;
+  transition: 150ms all;
   font-size: 14px;
 }
 

@@ -64,9 +64,6 @@ class App extends React.Component {
             retry
           </button>
         </div>}
-        {/* <Resizable>
-          <Graph />
-        </Resizable> */}
         {!connectingToDataService && !errorConnectingToDataService && (
           <Provider store={this.store}>
             <Pipeline />

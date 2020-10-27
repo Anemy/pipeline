@@ -24,7 +24,6 @@ export const DEFAULT_SAMPLE_COUNT = 200;
 
 export interface AppState {
   activeStage: number,
-  // dataSource: DataSource,
   mongoClient: MongoClient,
   sampleCount: number,
   showGraph: boolean,
@@ -33,12 +32,14 @@ export interface AppState {
 
 export const getInitialState = (mongoClient: MongoClient) => ({
   activeStage: NO_ACTIVE_STAGE,
-  // dataSource: new DataSource('test', 'sales'),
   mongoClient,
   sampleCount: DEFAULT_SAMPLE_COUNT,
   showGraph: false,
-  // dxl . versions also good.
-  stages: [new DataSource('ships', 'shipwrecks')]
+  // The datasource here tells us which 'database', 'collection' to use.
+  // stages: [new DataSource('ships', 'shipwrecks')]
+  // stages: [new DataSource('dxl', 'versions')]
+  // stages: [new DataSource('test', 'sales')]
+  stages: [new DataSource('encryption', 'dataKeys')]
 });
 
 // eslint-disable-next-line complexity
