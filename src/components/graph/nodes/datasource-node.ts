@@ -29,11 +29,31 @@ export default class DataSourceNode extends LGraphNode {
     this.boxcolor = 'black';
   }
 
-  onExecute(): void {
+  setSampleSize = (sampleSize: number) => {
+    this.properties.sampleSize = sampleSize;
+
+    this.addWidget(
+      'number',
+      'Sample Count',
+      this.properties.sampleSize,
+      (v) => {
+        // console.log('widget value change', v);
+        this.properties.sampleSize = v;
+      }, {
+      min: 1,
+      max: 1000,
+      step: 10
+    }
+    );
+  }
+
+  onExecute = (): void => {
     // Retrieve data from inputs.
     // const existingPipeline = this.getInputData(0);
 
-    const pipeline: Pipeline = [];
+    const pipeline: Pipeline = [{
+      $sample: this.properties.sampleSize
+    }];
 
     // Send data to output.
     this.setOutputData(0, {
@@ -41,8 +61,8 @@ export default class DataSourceNode extends LGraphNode {
         yes: true,
       },
       pipeline,
-      toToolTip: () => 'A useful description',
+      toToolTip: () => null// 'Show sample docs',
     });
-  }
+  };
 }
 

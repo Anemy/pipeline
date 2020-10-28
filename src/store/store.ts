@@ -1,6 +1,6 @@
 import { MongoClient } from 'mongodb';
 
-import Stage, { NO_ACTIVE_STAGE, DataSourceStage } from '../models/stage';
+import Stage, { NO_ACTIVE_STAGE, DataSourceStage, AggregateStage } from '../models/stage';
 import { Actions, ActionTypes } from './actions';
 
 export const SCHEMA_CONSTANTS = {

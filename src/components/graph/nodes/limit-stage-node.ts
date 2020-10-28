@@ -29,13 +29,13 @@ export default class LimitStageNode extends PipelineStageNode {
       'Documents',
       25,
       (v) => {
-        console.log('widget value change', v);
+        // console.log('widget value change', v);
         this.properties.limitAmount = v;
       }, {
-        min: 1,
-        max: 10,
-        step: 1
-      }
+      min: 1,
+      max: 1000,
+      step: 10
+    }
     );
 
     // this.addWidget('button', 'Log', null, () => {

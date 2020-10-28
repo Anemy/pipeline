@@ -5,6 +5,10 @@
   position: relative;
 }
 
+.stages-bar-container button:hover {
+  cursor: pointer;
+}
+
 .stages-bar-stages-area {
   flex-grow: 1;
   border: 1px solid black;

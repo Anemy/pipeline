@@ -147,7 +147,7 @@ class StagesBar extends React.Component<StateProps & DispatchProps> {
     );
 
     smalltalk
-      .alert('Here\'s the current pipline we\'re running:', JSON.stringify(pipeline, null, 2))
+      .alert('Here\'s the pipline:', JSON.stringify(pipeline, null, 2))
       .then(() => { })
       .catch(() => { });
   };

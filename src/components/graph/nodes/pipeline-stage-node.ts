@@ -15,6 +15,8 @@ export default class PipelineStageNode extends LGraphNode {
   title = 'Pipeline Stage';
   mouseOver = false;
 
+  pipeline: any[] = [];
+
   // horizontal = true;
 
   constructor() {
@@ -33,7 +35,7 @@ export default class PipelineStageNode extends LGraphNode {
     // this.size = this.computeSize();
   }
 
-  onExecute(): void {
+  onExecute = (): void => {
     // Retrieve data from inputs.
     let existingPipeline: Pipeline[];
     if (!this.getInputData(0) || !this.getInputData(0).pipeline) {
@@ -42,18 +44,21 @@ export default class PipelineStageNode extends LGraphNode {
       existingPipeline = this.getInputData(0).pipeline;
     }
 
-    const thisStage = {
-      $match: {
-        _id: {
-          $exists: true
-        }
-      }
-    };
+    // const thisStage = {
+    //   $match: {
+    //     _id: {
+    //       $exists: true
+    //     }
+    //   }
+    // };
 
     const pipeline = [
-      ...existingPipeline,
-      thisStage
+      ...existingPipeline
     ];
+
+    if (this.pipeline && this.pipeline.length > 0) {
+      pipeline.push(...this.pipeline);
+    }
 
     // Send data to output.
     this.setOutputData(0, {
@@ -61,9 +66,9 @@ export default class PipelineStageNode extends LGraphNode {
         yes: true,
       },
       pipeline,
-      toToolTip: () => 'tooltip',
+      toToolTip: () => null, // String for a real tooltip.
     });
-  }
+  };
 
   // onDrawBackground(actualCtx: HTMLCanvasElement, notCtx: CanvasRenderingContext2D) {
   //   // super();

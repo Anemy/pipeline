@@ -22,3 +22,12 @@ code {
   font-size: 16px;
   text-align: center;
 }
+
+.smalltalk .content-area {
+  white-space: pre;
+}
+
+.smalltalk input {
+  display: block;
+  margin-top: 4px !important;
+}
