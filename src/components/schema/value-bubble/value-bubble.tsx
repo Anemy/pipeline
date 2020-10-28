@@ -75,6 +75,8 @@ class ValueBubble extends Component<props & StateProps & DispatchProps> {
       currentStage.content[fieldName] = value;
     }
 
+    currentStage.sampleDocumentsAreUpToDate = false;
+
     this.props.updateStore({
       activeStage: newActiveStage,
       stages: newStages

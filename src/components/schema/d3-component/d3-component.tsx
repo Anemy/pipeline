@@ -151,14 +151,18 @@ class D3Component extends Component<props & StateProps & DispatchProps> {
           value[op] = maxValue;
         }
 
-        if (bsonEqual(currentStage.content[options.field], value)) {
+        if (currentStage.content[options.field] === value
+          || bsonEqual(currentStage.content[options.field], value)
+        ) {
           delete currentStage.content[options.field];
         } else {
           currentStage.content[options.field] = value;
         }
         break;
       case UPDATE_FILTER_TYPE.SET_VALUE:
-        if (bsonEqual(currentStage.content[options.field], options.value)) {
+        if (currentStage.content[options.field] === options.value
+          || bsonEqual(currentStage.content[options.field], options.value)
+        ) {
           delete currentStage.content[options.field];
         } else {
           currentStage.content[options.field] = options.value;
@@ -199,7 +203,9 @@ class D3Component extends Component<props & StateProps & DispatchProps> {
             }
           }
           // If value to remove is the same as the primitive value, unset field.
-          if (bsonEqual(currentValue, options.value)) {
+          if (currentValue === options.value
+            || bsonEqual(currentValue, options.value)
+          ) {
             delete currentStage.content[options.field];
             break;
           }
@@ -253,6 +259,8 @@ class D3Component extends Component<props & StateProps & DispatchProps> {
         new Error(`Unknown filter type: ${updateFilterType}`);
         break;
     }
+
+    currentStage.sampleDocumentsAreUpToDate = false;
 
     this.props.updateStore({
       activeStage: newActiveStage,

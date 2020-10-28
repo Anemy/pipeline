@@ -9,6 +9,8 @@ export const SCHEMA_CONSTANTS = {
 
 export const DEFAULT_SAMPLE_COUNT = 50;
 
+export const DEFAULT_MAX_TIME_MS = 10000;
+
 export interface AppState {
   activeStage: number,
   mongoClient: MongoClient,

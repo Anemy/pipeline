@@ -10,6 +10,7 @@ import {
   UpdateStoreAction
 } from '../../store/actions';
 import {
+  DEFAULT_MAX_TIME_MS,
   AppState
 } from '../../store/store';
 import Stage, {
@@ -22,9 +23,7 @@ import './stage-workspace.css';
 
 import SampleDocuments from '../sample-documents/sample-documents';
 import StageEditor from '../stage-editor/stage-editor';
-import { placeHolderSchema } from '../../models/schema';
-
-const DEFAULT_MAX_TIME_MS = 10000;
+// import { placeHolderSchema } from '../../models/schema';
 
 type StateProps = {
   activeStage: number;
@@ -48,10 +47,10 @@ class StageWorkspace extends React.Component<StateProps & DispatchProps> {
     const hasValidStageSelected = activeStage !== NO_ACTIVE_STAGE && !!stages[activeStage];
 
     if (hasValidStageSelected) {
-      if (
+      if (!this.props.stages[activeStage].sampleDocumentsAreUpToDate || (
         !this.props.stages[activeStage].hasLoadedSampleDocuments &&
         !this.props.stages[activeStage].isLoadingSampleDocuments
-      ) {
+      )) {
         this.loadSampleDocuments();
       }
     }
@@ -70,12 +69,12 @@ class StageWorkspace extends React.Component<StateProps & DispatchProps> {
     const updatedStages = [...this.props.stages];
     updatedStages[this.props.activeStage].isLoadingSampleDocuments = true;
     updatedStages[this.props.activeStage].hasLoadedSampleDocuments = false;
-    updatedStages[this.props.activeStage].documentsAreUpToDate = true;
-    updatedStages[this.props.activeStage].hasAnalyzedSchema = false;
-    updatedStages[this.props.activeStage].isAnalyszingSchema = false;
-    updatedStages[this.props.activeStage].sampleDocumentsSchema = {
-      ...placeHolderSchema
-    };
+    updatedStages[this.props.activeStage].sampleDocumentsAreUpToDate = true;
+    // updatedStages[this.props.activeStage].hasAnalyzedSchema = false;
+    // updatedStages[this.props.activeStage].isAnalyszingSchema = false;
+    // updatedStages[this.props.activeStage].sampleDocumentsSchema = {
+    //   ...placeHolderSchema
+    // };
 
     this.props.updateStore({
       stages: updatedStages
@@ -87,7 +86,7 @@ class StageWorkspace extends React.Component<StateProps & DispatchProps> {
 
       let stagesToRunInPipeline: Stage[] = [];
       if (activeStage >= 1) {
-        stagesToRunInPipeline = updatedStages.slice(1, activeStage);
+        stagesToRunInPipeline = updatedStages.slice(1, activeStage + 1);
       }
       const pipeline = buildAggregationPipelineFromStages(
         stagesToRunInPipeline,

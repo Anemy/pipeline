@@ -285,6 +285,8 @@ class CoordinatesMinichart extends Component<props & StateProps & DispatchProps>
       currentStage.content[fieldName] = geoQuery[fieldName];
     }
 
+    currentStage.sampleDocumentsAreUpToDate = false;
+
     this.props.updateStore({
       activeStage: newActiveStage,
       stages: newStages
@@ -316,6 +318,8 @@ class CoordinatesMinichart extends Component<props & StateProps & DispatchProps>
 
     // TODO: Maybe we don't need the whole ensure thing for edit and delete layers.
     currentStage.content = generateGeoQuery(currentStage.geoLayers);
+
+    currentStage.sampleDocumentsAreUpToDate = false;
 
     this.props.updateStore({
       activeStage: newActiveStage,
@@ -350,6 +354,8 @@ class CoordinatesMinichart extends Component<props & StateProps & DispatchProps>
     });
 
     currentStage.content = generateGeoQuery(currentStage.geoLayers);
+
+    currentStage.sampleDocumentsAreUpToDate = false;
 
     this.props.updateStore({
       activeStage: newActiveStage,

@@ -159,6 +159,8 @@ class AggregateEditor extends React.Component<StateProps & DispatchProps> {
       measure: metricConfigMeasure ? metricConfigMeasure.value : ''
     };
 
+    currentStage.sampleDocumentsAreUpToDate = false;
+
     this.props.updateStore({
       stages: newStages
     });
@@ -179,6 +181,8 @@ class AggregateEditor extends React.Component<StateProps & DispatchProps> {
     if (currentStage.metrics[metricName]) {
       delete currentStage.metrics[metricName];
     }
+
+    currentStage.sampleDocumentsAreUpToDate = false;
 
     this.props.updateStore({
       stages: newStages

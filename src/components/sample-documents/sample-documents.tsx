@@ -83,7 +83,7 @@ const mapStateToProps = (state: AppState): StateProps => {
     errorLoadingSampleDocuments: currentStage.errorLoadingSampleDocuments,
     hasLoadedSampleDocuments: currentStage.hasLoadedSampleDocuments,
     isLoadingSampleDocuments: currentStage.isLoadingSampleDocuments,
-    sampledCount: currentStage.sampleDocumentsSchema.count,
+    sampledCount: currentStage.sampleDocuments.length,
     stages: state.stages
   };
 };

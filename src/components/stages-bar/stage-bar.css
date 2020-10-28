@@ -14,14 +14,14 @@
 }
 
 .stages-run-export-buttons {
-  background-color: rgba(255,255,255,1);
+  background-color: rgba(255, 255, 255, 1);
   text-transform: uppercase;
   font-size: 9pt;
   font-family: Arial, Helvetica, sans-serif;
   color: #000000;
   font-weight: bolder;
   padding: 4px 18px;
-  margin-left:1px;
+  margin-left: 1px;
   border: 1px solid black;
 }
 
@@ -31,10 +31,11 @@
   padding: 4px;
   display: flex;
   background: white;
+  align-items: center;
 }
 
 .stages-bar-data-source {
-  background-color:#4CA35A;
+  background-color: #4CA35A;
   text-transform: uppercase;
   font-size: 9pt;
   font-family: Arial, Helvetica, sans-serif;
@@ -53,7 +54,7 @@
 
 .stages-bar-data-source-is-selected {
   box-shadow: 0 2px 4px 0 rgba(61, 63, 63, 0.19), 0 1px 2px 0 rgba(0, 0, 0, .14);
-  border-color:#ffa318;
+  border-color: #ffa318;
   border-bottom: 2px solid rgb(61, 63, 63);
   padding-bottom: 3px;
 }
@@ -140,8 +141,6 @@
   font-size: 10px;
   padding: 2px;
   text-align: center;
-  margin-top: 4px;
-  vertical-align: middle;
   transform: scale(0.7);
 }
 

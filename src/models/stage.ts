@@ -27,17 +27,17 @@ export interface Stage {
   // geoLayers: any;
   id: string;
 
+  sampleDocumentsAreUpToDate: boolean;
+  sampleDocuments: any[];
   errorLoadingSampleDocuments: string;
   hasLoadedSampleDocuments: boolean;
   isLoadingSampleDocuments: boolean;
 
-  sampleDocuments: any[];
-
+  schemaDocumentsAreUpToDate: boolean;
+  // sampleDocumentsForSchema: any[];
   errorAnalyzingDocumentsSchema: string;
   hasAnalyzedSchema: boolean;
   isAnalyszingSchema: boolean;
-
-  documentsAreUpToDate: boolean;
 
   sampleDocumentsSchema: Schema;
 
@@ -51,6 +51,8 @@ class BasicStage implements Stage {
 
   id: string;
 
+  sampleDocumentsAreUpToDate = true;
+  sampleDocuments: any[] = [];
   errorLoadingSampleDocuments = '';
   hasLoadedSampleDocuments = false;
   isLoadingSampleDocuments = false;
@@ -58,10 +60,10 @@ class BasicStage implements Stage {
   // Used when we quick create a stage and want to display
   // that the documents the user is seeing aren't representative of
   // what exists at that stage.
-  documentsAreUpToDate = true;
+  // documentsAreUpToDate = true;
 
-  sampleDocuments: any[] = [];
-
+  schemaDocumentsAreUpToDate = true;
+  // sampleDocumentsForSchema: any[] = [];
   errorAnalyzingDocumentsSchema = '';
   hasAnalyzedSchema = false;
   isAnalyszingSchema = false;
@@ -336,7 +338,11 @@ export const ensureWeAreOnValidStageForAction = (
       // Copy details/sample docs from current stage.
       newStage.copyStageItems(newStages[activeStage]);
       if (activeStage !== 0 && !(newStages[activeStage].type === STAGES.FILTER && Object.keys((newStages[activeStage] as FilterStage).content).length === 0)) {
-        newStage.documentsAreUpToDate = false;
+        newStage.schemaDocumentsAreUpToDate = false;
+
+        // Most of the functions that call this function
+        // will already do this manually, but it's good to be sure.
+        newStage.sampleDocumentsAreUpToDate = false;
       }
 
       newStages.splice(newActiveStage + 1, 0, newStage);

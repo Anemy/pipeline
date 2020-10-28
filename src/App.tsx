@@ -35,7 +35,7 @@ class App extends React.Component {
       const initialState = getInitialState(client);
       this.store = createStore(rootReducer, initialState);
     } catch (err) {
-      console.log('unable to connect to mdb:', err);
+      console.log('Unable to connect to mdb:', err);
       this.setState({
         errorConnectingToDataService: err.message
       });

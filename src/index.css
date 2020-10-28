@@ -20,6 +20,7 @@ code {
 
 .app-connecting {
   margin: 100px auto;
+  padding: 60px;
   font-size: 16px;
   text-align: center;
 }

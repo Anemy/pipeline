@@ -172,6 +172,8 @@ class Field extends Component<props & StateProps & DispatchProps> {
       currentStage.renamedFields[path] = newFieldName;
     }
 
+    currentStage.sampleDocumentsAreUpToDate = false;
+
     this.props.updateStore({
       activeStage: newActiveStage,
       stages: newStages
@@ -202,6 +204,8 @@ class Field extends Component<props & StateProps & DispatchProps> {
     } else {
       currentStage.hiddenFields[path] = true;
     }
+
+    currentStage.sampleDocumentsAreUpToDate = false;
 
     this.props.updateStore({
       activeStage: newActiveStage,
@@ -392,6 +396,8 @@ class Field extends Component<props & StateProps & DispatchProps> {
       replaceWithValue: replaceValue
     };
 
+    currentStage.sampleDocumentsAreUpToDate = false;
+
     this.props.updateStore({
       activeStage: newActiveStage,
       stages: newStages
@@ -403,7 +409,7 @@ class Field extends Component<props & StateProps & DispatchProps> {
   renderFindAndReplace = () => {
     const {
       findValue,
-      ignoreCase,
+      // ignoreCase,
       replaceValue
     } = this.state;
 
@@ -570,7 +576,7 @@ class Field extends Component<props & StateProps & DispatchProps> {
             <div className="schema-field-type-list">
               {typeList}
             </div>
-       
+
             <Minichart
               fieldName={this.props.path}
               type={activeType as InnerFieldType}
