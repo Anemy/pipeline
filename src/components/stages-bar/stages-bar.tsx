@@ -315,12 +315,12 @@ class StagesBar extends React.Component<StateProps & DispatchProps> {
             />
           </button>
         </div>
-        <button
+        <button className="stages-run-export-buttons"
           onClick={this.onRunClicked}
         >
           Run
         </button>
-        <button
+        <button className="stages-run-export-buttons"
           onClick={this.onExportClicked}
         >
           Export
