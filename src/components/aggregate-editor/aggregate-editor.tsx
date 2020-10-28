@@ -116,6 +116,7 @@ class AggregateEditor extends React.Component<StateProps & DispatchProps> {
         alert('Metric with that name already exists, please specify a unique name');
       }
     } else {
+      // let measureMessage = metricConfigMeasure ? ` with ${metricConfigMeasure.value}` : '';
       newMetricName = `Group by '${Object.keys(selectedGroupBy).join(', ')}' and ${metricConfigAccumulator.label}`;
     }
 
@@ -134,7 +135,6 @@ class AggregateEditor extends React.Component<StateProps & DispatchProps> {
       // null as a measure for (like $sum).
       measure: metricConfigMeasure ? metricConfigMeasure.value : ''
     };
-    // TODO: Add the group by.
 
     this.props.updateStore({
       stages: newStages

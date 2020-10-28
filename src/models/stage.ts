@@ -234,8 +234,6 @@ export class AggregateStage extends BasicStage implements Stage {
       return pipeline;
     }
 
-    console.log('build aggregate stage', this.metrics);
-
     let groupBy: string | { [fieldName: string]: string } = {};
 
     // Currently we assume every metric has same group by.
@@ -253,10 +251,11 @@ export class AggregateStage extends BasicStage implements Stage {
     };
 
     for (const metricName of Object.keys(this.metrics)) {
+      const metric = this.metrics[metricName];
       groupStage[metricName] = {
-        [this.metrics[metricName].accumulator]: getAccumulator(
-          this.metrics[metricName].accumulator as ACCUMULATORS
-        ).buildAccumulatorWithMeasure(this.metrics[metricName].measure)
+        [metric.accumulator]: getAccumulator(
+          metric.accumulator as ACCUMULATORS
+        ).buildAccumulatorWithMeasure(metric.measure)
       };
     }
 

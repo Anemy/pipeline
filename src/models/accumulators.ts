@@ -22,7 +22,7 @@ export interface AggAccumulator {
 
 const AddToSetAccumulator = {
   accumulator: ACCUMULATORS.ADD_TO_SET,
-  displayName: 'Add to set',
+  displayName: 'add to set',
   buildAccumulatorWithMeasure: (measure: string) => {
     if (!measure || measure.length === 0) {
       return 1;
@@ -34,7 +34,7 @@ const AddToSetAccumulator = {
 };
 const AvgAccumulator = {
   accumulator: ACCUMULATORS.AVG,
-  displayName: 'add to set',
+  displayName: 'average',
   buildAccumulatorWithMeasure: (measure: string) => {
     return 1;
   }
