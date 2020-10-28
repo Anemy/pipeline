@@ -37,6 +37,8 @@ export interface Stage {
   hasAnalyzedSchema: boolean;
   isAnalyszingSchema: boolean;
 
+  documentsAreUpToDate: boolean;
+
   sampleDocumentsSchema: Schema;
 
   getPipelineFromStage: () => any[];
@@ -52,6 +54,11 @@ class BasicStage implements Stage {
   errorLoadingSampleDocuments = '';
   hasLoadedSampleDocuments = false;
   isLoadingSampleDocuments = false;
+
+  // Used when we quick create a stage and want to display
+  // that the documents the user is seeing aren't representative of
+  // what exists at that stage.
+  documentsAreUpToDate = true;
 
   sampleDocuments: any[] = [];
 
@@ -220,9 +227,10 @@ export const ensureWeAreOnValidStageForAction = (
       const newStage = getNewStageForStageType(stageType);
 
       // Copy details/sample docs from current stage.
-      // TODO: I think we actually want to make this re-render the docs
-      // or say the docs are out of date...
       newStage.copyStageItems(newStages[activeStage]);
+      if (activeStage !== 0) {
+        newStage.documentsAreUpToDate = false;
+      }
 
       newStages.splice(newActiveStage + 1, 0, newStage);
       newActiveStage++;

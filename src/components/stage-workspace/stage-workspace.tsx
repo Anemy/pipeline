@@ -22,6 +22,7 @@ import './stage-workspace.css';
 
 import SampleDocuments from '../sample-documents/sample-documents';
 import StageEditor from '../stage-editor/stage-editor';
+import { placeHolderSchema } from '../../models/schema';
 
 const DEFAULT_MAX_TIME_MS = 10000;
 
@@ -69,6 +70,12 @@ class StageWorkspace extends React.Component<StateProps & DispatchProps> {
     const updatedStages = [...this.props.stages];
     updatedStages[this.props.activeStage].isLoadingSampleDocuments = true;
     updatedStages[this.props.activeStage].hasLoadedSampleDocuments = false;
+    updatedStages[this.props.activeStage].documentsAreUpToDate = true;
+    updatedStages[this.props.activeStage].hasAnalyzedSchema = false;
+    updatedStages[this.props.activeStage].isAnalyszingSchema = false;
+    updatedStages[this.props.activeStage].sampleDocumentsSchema = {
+      ...placeHolderSchema
+    };
 
     this.props.updateStore({
       stages: updatedStages

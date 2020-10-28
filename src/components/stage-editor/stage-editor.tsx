@@ -20,12 +20,13 @@ import AggregateEditor from '../aggregate-editor/aggregate-editor';
 type StateProps = {
   activeStage: number;
   activeStageType: STAGES;
-  stages: Stage[];
+  documentsAreUpToDate: boolean;
   errorAnalyzingDocumentsSchema: string;
   hasAnalyzedSchema: boolean;
   isAnalyszingSchema: boolean;
   sampleDocuments: any[];
   sampleDocumentsSchema: SchemaType;
+  stages: Stage[];
 };
 
 type DispatchProps = {
@@ -104,19 +105,45 @@ class StageEditor extends React.Component<StateProps & DispatchProps> {
     }
   }
 
+  onClickRefreshDocs = () => {
+    const {
+      activeStage,
+      stages
+    } = this.props
+
+    const updatedStages = [...stages];
+    updatedStages[activeStage].hasLoadedSampleDocuments = false;
+    updatedStages[activeStage].hasAnalyzedSchema = false;
+
+    this.props.updateStore({
+      stages: updatedStages
+    });
+  };
+
   renderSchemaEditor() {
     const {
       // activeStage,
+      documentsAreUpToDate,
       sampleDocumentsSchema,
       // stages
     } = this.props;
 
     return (
       <div className="stage-editor-container">
-        <Schema
-          samplingState={SAMPLING_STATES.complete}
-          schema={sampleDocumentsSchema}
-        />
+        {!documentsAreUpToDate && (
+          <div className="stage-editor-out-of-date-documents">
+            Displayed documents are not up to date for this stage, please <a
+              className="stage-editor-update-out-of-date-documents-button"
+              onClick={this.onClickRefreshDocs}
+            >fetch new documents</a> or click the 'Run' button above to retrieve up to date documents.
+          </div>
+        )}
+        <div className="stage-editor-schema">
+          <Schema
+            samplingState={SAMPLING_STATES.complete}
+            schema={sampleDocumentsSchema}
+          />
+        </div>
         {/* <div>
           <pre>
             Sample docs Schema: {JSON.stringify(sampleDocumentsSchema, null, 2)}
@@ -156,13 +183,13 @@ const mapStateToProps = (state: AppState): StateProps => {
   return {
     activeStage: state.activeStage,
     activeStageType: currentStage.type,
-    stages: state.stages,
+    documentsAreUpToDate: currentStage.documentsAreUpToDate,
     errorAnalyzingDocumentsSchema: currentStage.errorAnalyzingDocumentsSchema,
     hasAnalyzedSchema: currentStage.hasAnalyzedSchema,
     isAnalyszingSchema: currentStage.isAnalyszingSchema,
     sampleDocuments: currentStage.sampleDocuments,
     sampleDocumentsSchema: currentStage.sampleDocumentsSchema,
-    
+    stages: state.stages    
   };
 };
 

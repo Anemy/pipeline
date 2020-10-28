@@ -5,5 +5,27 @@
   right: 0;
   top: 0;
   bottom: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.stage-editor-out-of-date-documents {
+  width: 100%;
+  background-color: #fbb129;
+  border-bottom: 1px solid black;
+  padding: 10px;
+}
+
+.stage-editor-schema {
   padding: 16px;
+  overflow: auto;
+  flex-grow: 1;
+}
+
+.stage-editor-update-out-of-date-documents-button {
+  text-decoration: underline;
+}
+
+.stage-editor-update-out-of-date-documents-button:hover {
+  cursor: pointer;
 }
