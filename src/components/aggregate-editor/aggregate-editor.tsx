@@ -79,7 +79,10 @@ class AggregateEditor extends React.Component<StateProps & DispatchProps> {
             className="aggregate-editor-add-metric-button"
             onClick={this.onClickAddMetric}
           >
-            <FontAwesomeIcon className="aggregate-editor-add-metric-button-icon" icon={faPlus} />Add metric
+            <FontAwesomeIcon
+              className="aggregate-editor-add-metric-button-icon"
+              icon={faPlus}
+            /> Add metric
           </button>
         </div>
         <div className="aggregate-editor-metrics-list">

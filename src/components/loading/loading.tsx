@@ -1,5 +1,7 @@
 import React from 'react';
 
+import './loading.css';
+
 class Loading extends React.PureComponent {
   render() {
     return (

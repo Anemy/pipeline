@@ -12,6 +12,10 @@
   float: right;
 }
 
+.graph-container-collapse-button:hover {
+  cursor: pointer;
+}
+
 .graph-canvas {
   border: 1px solid purple;
   position: absolute;

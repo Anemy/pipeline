@@ -44,14 +44,21 @@ type props = {
 }
 
 type StateType = {
-  isFieldOptionsDropdownOpen: boolean,
-  collapsed: boolean,
-  activeType: null | InnerFieldType,
-  types: InnerFieldType[]
+  activeType: null | InnerFieldType;
+  collapsed: boolean;
+  isFieldOptionsDropdownOpen: boolean;
+  types: InnerFieldType[];
+
+  showFindAndReplace: boolean;
+  findValue: string;
+  replaceValue: string;
+  ignoreCase: boolean;
 };
 
 type StateProps = {
   activeStage: number;
+  changesHaveBeenMade: boolean;
+  isFindAndReplaceField: boolean;
   isHiddenField: boolean;
   isRenamedField: boolean;
   renamedFieldName: string;
@@ -64,12 +71,17 @@ type DispatchProps = {
 
 class Field extends Component<props & StateProps & DispatchProps> {
   state: StateType = {
-    isFieldOptionsDropdownOpen: false,
-    // Whether the nested fields are collapsed (true) or expanded (false).
-    collapsed: true,
     // A reference to the active type object (only null initially).
     activeType: null,
-    types: []
+    // Whether the nested fields are collapsed (true) or expanded (false).
+    collapsed: true,
+    isFieldOptionsDropdownOpen: false,
+    types: [],
+
+    showFindAndReplace: false,
+    findValue: '',
+    replaceValue: '',
+    ignoreCase: false
   }
 
   componentWillMount() {
@@ -123,7 +135,6 @@ class Field extends Component<props & StateProps & DispatchProps> {
       isRenamedField,
       name,
       path,
-      renamedFieldName,
       stages
     } = this.props;
 
@@ -197,6 +208,12 @@ class Field extends Component<props & StateProps & DispatchProps> {
       stages: newStages
     });
   };
+
+  onClickFindAndReplace = (): void => {
+    this.setState({
+      showFindAndReplace: true
+    });
+  }
 
   /**
    * Returns the field list (an array of <Field /> components) for nested
@@ -319,22 +336,176 @@ class Field extends Component<props & StateProps & DispatchProps> {
         >
           Rename
         </a>
+        <a
+          className="schema-field-options-dropdown-option"
+          onClick={this.onClickFindAndReplace}
+        >
+          Find &amp; Replace
+        </a>
       </div>
     );
   }
 
-  /**
-   * Render a single field;
-   *
-   * @returns {React.Component} A react component for a single field
-   */
+  resetFindAndReplace = () => {
+    this.setState({
+      showFindAndReplace: false,
+      findValue: '',
+      replaceValue: '',
+      ignoreCase: false
+    });
+  }
+
+  onClickAddFindAndReplace = () => {
+    const {
+      activeStage,
+      path,
+      stages
+    } = this.props;
+
+    const {
+      findValue,
+      ignoreCase,
+      replaceValue
+    } = this.state;
+
+    if (findValue === replaceValue) {
+      alert('Invalid find and replace, same value.');
+      return;
+    }
+
+    const {
+      newActiveStage,
+      newStages
+    } = ensureWeAreOnValidStageForAction(STAGES.TRANSFORM, stages, activeStage);
+
+    const currentStage = newStages[newActiveStage] as TransformStage;
+
+    // If already renamed, remove old renaming.
+    if (currentStage.findAndReplaceFields[path]) {
+      alert('Currently we only support 1 find and replace at a time.')
+      return;
+    }
+
+    currentStage.findAndReplaceFields[path] = {
+      findValue,
+      ignoreCase,
+      replaceWithValue: replaceValue
+    };
+
+    this.props.updateStore({
+      activeStage: newActiveStage,
+      stages: newStages
+    });
+
+    this.resetFindAndReplace();
+  }
+
+  renderFindAndReplace = () => {
+    const {
+      findValue,
+      ignoreCase,
+      replaceValue
+    } = this.state;
+
+    return (
+      <div
+        className="schema-field-find-and-replace-container"
+      >
+        <div className="schema-field-find-and-replace-form col-sm-4">
+          <div className="schema-field-find-and-replace-title">
+            <strong>
+              Find &amp; Replace
+            </strong>
+          </div>
+          <div className="schema-field-find-and-replace-item">
+            <div className="schema-field-find-and-replace-item-title">
+              Find
+            </div>
+            <input
+              className="schema-field-find-and-replace-item-field"
+              type="text"
+              onChange={e => this.setState({ findValue: e.target.value })}
+              value={findValue}
+            />
+          </div>
+          <div className="schema-field-find-and-replace-item">
+            <div className="schema-field-find-and-replace-item-title">
+              Replace With
+            </div>
+            <input
+              className="schema-field-find-and-replace-item-field"
+              type="text"
+              onChange={e => this.setState({ replaceValue: e.target.value })}
+              value={replaceValue}
+            />
+          </div>
+          {/* <div className="schema-field-find-and-replace-item">
+            <div className="schema-field-find-and-replace-item-title">
+              Ignore Case
+            </div>
+            <input
+              className="schema-field-find-and-replace-item-field"
+              type="checkbox"
+              onChange={() => this.setState({ ignoreCase: !ignoreCase })}
+              checked={ignoreCase}
+            />
+          </div> */}
+          <div className="schema-field-find-and-replace-item schema-field-find-and-replace-actions">
+            <button
+              onClick={this.resetFindAndReplace}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={this.onClickAddFindAndReplace}
+            >
+              Ok
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  renderChangesArea() {
+    const {
+      activeStage,
+      isFindAndReplaceField,
+      isRenamedField,
+      path,
+      renamedFieldName,
+      stages
+    } = this.props;
+
+    return (
+      <div
+        className="schema-field-changes-area"
+      >
+        <FontAwesomeIcon
+          className="schema-field-changes-icon"
+          icon={faHistory}
+        />
+        <div className="schema-field-changes-list">
+          {isRenamedField && <div className="schema-field-change-item">
+            Renamed '{this.props.name}' to '{renamedFieldName}'
+          </div>}
+          {isFindAndReplaceField && <div className="schema-field-change-item">
+            Replacing '{(stages[activeStage] as TransformStage).findAndReplaceFields[path].findValue}' with '{(stages[activeStage] as TransformStage).findAndReplaceFields[path].replaceWithValue}'
+          </div>}
+        </div>
+      </div>
+    );
+  }
+
   render() {
     const {
       collapsed,
-      isFieldOptionsDropdownOpen
+      isFieldOptionsDropdownOpen,
+      showFindAndReplace
     } = this.state;
 
     const {
+      changesHaveBeenMade,
       isHiddenField,
       isRenamedField,
       renamedFieldName
@@ -394,18 +565,7 @@ class Field extends Component<props & StateProps & DispatchProps> {
                 />
               </button>
             </div>
-            {isRenamedField && <div
-              className="schema-field-changes-area"
-            >
-              <FontAwesomeIcon
-                className="schema-field-changes-icon"
-                icon={faHistory}
-              />
-              <div className="schema-field-changes-list">
-                Renamed {this.props.name} to {renamedFieldName}
-              </div>
-            </div>
-            }
+            {changesHaveBeenMade && this.renderChangesArea()}
             <div className="schema-field-type-list">
               {typeList}
             </div>
@@ -426,6 +586,7 @@ class Field extends Component<props & StateProps & DispatchProps> {
             />
           </button>
         </div>
+        {showFindAndReplace && this.renderFindAndReplace()}
         {isFieldOptionsDropdownOpen && this.renderFieldOptions()}
         {this.getChildren()}
       </div>
@@ -436,29 +597,22 @@ class Field extends Component<props & StateProps & DispatchProps> {
 const mapStateToProps = (state: AppState, ownProps: props): StateProps => {
   const currentStage = state.stages[state.activeStage];
 
-  // TODO: This only pulls in the first renaming.
-  // We should ensure we show all of the names this field has been renamed to.
   let isRenamedField = false;
   let renamedFieldName = '';
-  // const renameExpr = `$${ownProps.path}`;
   let isHiddenField = false;
+  let isFindAndReplaceField = false;
   if (currentStage.type === STAGES.TRANSFORM) {
     isHiddenField = (currentStage as TransformStage).hiddenFields[ownProps.path];
 
     isRenamedField = !!(currentStage as TransformStage).renamedFields[ownProps.path];
     renamedFieldName = (currentStage as TransformStage).renamedFields[ownProps.path];
-    // Object.keys(currentStage.content).filter(
-    //   (renamedPath: string) => currentStage.content[renamedPath] === renameExpr
-    // );
+    isFindAndReplaceField = !!(currentStage as TransformStage).findAndReplaceFields[ownProps.path];
   }
-
-  // if (alreadyRenamed && alreadyRenamed.length > 0) {
-  //   isRenamedField = true;
-  //   renamedFieldName = alreadyRenamed[0];
-  // }
 
   return {
     activeStage: state.activeStage,
+    changesHaveBeenMade: isRenamedField || isFindAndReplaceField,
+    isFindAndReplaceField,
     isHiddenField,
     isRenamedField,
     renamedFieldName,

@@ -106,10 +106,17 @@ export class FilterStage extends BasicStage implements Stage {
   };
 }
 
+type FindAndReplace = {
+  findValue: any;
+  replaceWithValue: any;
+  ignoreCase?: boolean;
+};
+
 export class TransformStage extends BasicStage implements Stage {
   hiddenFields: { [fieldPath: string]: boolean } = {};
   renamedFields: { [fieldPath: string]: string } = {};
-  addedFields: { [fieldPath: string]: any } = {};
+  // addedFields: { [fieldPath: string]: any } = {};
+  findAndReplaceFields: { [fieldPath: string]: FindAndReplace } = {};
 
   constructor() {
     super(STAGES.TRANSFORM);
@@ -117,6 +124,56 @@ export class TransformStage extends BasicStage implements Stage {
 
   getPipelineFromStage = () => {
     const pipeline: any[] = [];
+
+
+    // let findValNiceLooking:: any;
+    const fieldsForFindAndReplaceProject: { [fieldPath: string]: any } = {};
+    for (const fieldPath of Object.keys(this.findAndReplaceFields)) {
+      let findValNiceLooking = this.findAndReplaceFields[fieldPath].findValue;
+      // if (isNaN(Number(findValNiceLooking))) {
+      //   findValNiceLooking = `"${findValNiceLooking}"`;
+      //   // When it's a string, wrap it in quotes.
+      // }
+
+      let replaceValNicelooking = this.findAndReplaceFields[fieldPath].replaceWithValue;
+      // if (isNaN(Number(replaceValNicelooking))) {
+      //   replaceValNicelooking = `"${replaceValNicelooking}"`;
+      //   // When it's a string, wrap it in quotes.
+      // }
+
+      // fieldsForFindAndReplaceProject[fieldPath] = `$cond: { if: { $eq: [ "$${fieldPath}", ${findValNiceLooking} ] }, then: ${replaceValNicelooking}, else: "$${fieldPath}" }`;
+      // $replaceAll: { input: "$name", find: "Cafe", replacement: "CAFE" }
+      // fieldsForFindAndReplaceProject[fieldPath] = {
+      //   // NOTE: New in version 4.4.
+      //   $replaceAll: {
+      //     input: `$${fieldPath}`,
+      //     find: findValNiceLooking,
+      //     replacement: replaceValNicelooking
+      //   }
+      // };
+      fieldsForFindAndReplaceProject[fieldPath] = {
+        $cond: {
+          if: {
+            $eq: [`$${fieldPath}`, findValNiceLooking]
+          },
+          then: replaceValNicelooking,
+          else: `$${fieldPath}`
+        }
+      };
+    }
+
+    if (Object.keys(fieldsForFindAndReplaceProject).length > 0) {
+      for (const field of this.sampleDocumentsSchema.fields) {
+        if (!fieldsForFindAndReplaceProject[field.path]) {
+          fieldsForFindAndReplaceProject[field.path] = 1;
+        }
+      }
+
+      // Now we add all of the keys...
+      pipeline.push({
+        $project: fieldsForFindAndReplaceProject
+      });
+    }
 
     const fieldsForProject: { [fieldPath: string]: string | number } = {};
     for (const renamedFieldPath of Object.keys(this.renamedFields)) {
@@ -261,7 +318,7 @@ export const getNiceStageNameForStageType = (stageType: STAGES) => {
 export const getDescriptionForStageType = (stageType: STAGES) => {
   switch (stageType) {
     case STAGES.TRANSFORM:
-      return 'Shape documents in your pipeline into a form you can work with: rename fields, hide fields, etc.';
+      return 'Shape documents in your pipeline into a form you can work with: rename fields, hide fields, replace field values, etc.';
     case STAGES.AGGREGATE:
       return 'Group your documents together, build averages, count fields, and more.';
     case STAGES.FILTER:
