@@ -254,12 +254,20 @@ export class AggregateStage extends BasicStage implements Stage {
 
     for (const metricName of Object.keys(this.metrics)) {
       const metric = this.metrics[metricName];
+
+      if (metric.accumulator == ACCUMULATORS.COUNT) {
+        groupStage[metricName] = {
+          '$sum': 1
+        };
+
+      } else {
       groupStage[metricName] = {
         [metric.accumulator]: getAccumulator(
           metric.accumulator as ACCUMULATORS
         ).buildAccumulatorWithMeasure(metric.measure)
       };
     }
+  }
 
     pipeline.push({
       $group: groupStage

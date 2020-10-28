@@ -10,7 +10,8 @@ export enum ACCUMULATORS {
   PUSH = '$push',
   STD_DEV_POP = '$stdDevPop',
   STD_DEV_SAMP = '$stdDevSamp',
-  SUM = '$sum'
+  SUM = '$sum',
+  COUNT ='$sum'
 }
 
 export interface AggAccumulator {
@@ -22,7 +23,7 @@ export interface AggAccumulator {
 
 const AddToSetAccumulator = {
   accumulator: ACCUMULATORS.ADD_TO_SET,
-  displayName: 'add to set',
+  displayName: 'Distinct Values',
   buildAccumulatorWithMeasure: (measure: string) => {
     if (!measure || measure.length === 0) {
       return 1;
@@ -34,7 +35,7 @@ const AddToSetAccumulator = {
 };
 const AvgAccumulator = {
   accumulator: ACCUMULATORS.AVG,
-  displayName: 'average',
+  displayName: 'Average',
   buildAccumulatorWithMeasure: (measure: string) => {
     if (!measure || measure.length === 0) {
       // This should probably error...
@@ -46,7 +47,7 @@ const AvgAccumulator = {
 };
 const FirstAccumulator = {
   accumulator: ACCUMULATORS.FIRST,
-  displayName: 'first',
+  displayName: 'First Value',
   buildAccumulatorWithMeasure: (measure: string) => {
     if (!measure || measure.length === 0) {
       // This should probably error...
@@ -58,7 +59,7 @@ const FirstAccumulator = {
 };
 const LastAccumulator = {
   accumulator: ACCUMULATORS.LAST,
-  displayName: 'last',
+  displayName: 'Last Value',
   buildAccumulatorWithMeasure: (measure: string) => {
     if (!measure || measure.length === 0) {
       // This should probably error...
@@ -70,7 +71,7 @@ const LastAccumulator = {
 };
 const MaxAccumulator = {
   accumulator: ACCUMULATORS.MAX,
-  displayName: 'max',
+  displayName: 'Maximum',
   buildAccumulatorWithMeasure: (measure: string) => {
     if (!measure || measure.length === 0) {
       // This should probably error...
@@ -82,7 +83,7 @@ const MaxAccumulator = {
 };
 const MinAccumulator = {
   accumulator: ACCUMULATORS.MIN,
-  displayName: 'min',
+  displayName: 'Minimum',
   buildAccumulatorWithMeasure: (measure: string) => {
     if (!measure || measure.length === 0) {
       // This should probably error...
@@ -94,7 +95,7 @@ const MinAccumulator = {
 };
 const PushAccumulator = {
   accumulator: ACCUMULATORS.PUSH,
-  displayName: 'add to array',
+  displayName: 'Add to Array',
   buildAccumulatorWithMeasure: (measure: string) => {
     if (!measure || measure.length === 0) {
       // This should probably error...
@@ -106,7 +107,7 @@ const PushAccumulator = {
 };
 const StdDevPopAccumulator = {
   accumulator: ACCUMULATORS.STD_DEV_POP,
-  displayName: 'standard deviation population',
+  displayName: 'Standard Deviation (population)',
   buildAccumulatorWithMeasure: (measure: string) => {
     if (!measure || measure.length === 0) {
       // This should probably error...
@@ -118,7 +119,7 @@ const StdDevPopAccumulator = {
 };
 const StdDevSampAccumulator = {
   accumulator: ACCUMULATORS.STD_DEV_SAMP,
-  displayName: 'standard deviation sample',
+  displayName: 'Standard Deviation Sample',
   buildAccumulatorWithMeasure: (measure: string) => {
     if (!measure || measure.length === 0) {
       // This should probably error...
@@ -128,9 +129,17 @@ const StdDevSampAccumulator = {
     return `$${measure}`;
   }
 };
+const CountAccumulator = {
+  accumulator: ACCUMULATORS.COUNT,
+  displayName: 'Count',
+  buildAccumulatorWithMeasure: (measure: string) => {
+
+    return 1;
+  }
+};
 const SumAccumulator = {
   accumulator: ACCUMULATORS.SUM,
-  displayName: 'sum',
+  displayName: 'Sum',
   buildAccumulatorWithMeasure: (measure: string) => {
     if (!measure || measure.length === 0) {
       // Just count the group by docs when there's no measure.
@@ -164,6 +173,8 @@ export const getAccumulator = (accumulator: ACCUMULATORS): AggAccumulator => {
       return StdDevSampAccumulator;
     case ACCUMULATORS.SUM:
       return SumAccumulator;
+    case ACCUMULATORS.COUNT:
+      return CountAccumulator;
     default:
       throw new Error(`Accumulator not found '${accumulator}'`);
   }
@@ -183,7 +194,8 @@ export const aggAccumulators: AggAccumulator[] = [
   PushAccumulator,
   StdDevPopAccumulator,
   StdDevSampAccumulator,
-  SumAccumulator
+  SumAccumulator,
+  CountAccumulator
 ];
 
 // export const aggAcumulators = Object.keys(ACCUMULATORS).map(
