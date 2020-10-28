@@ -11,13 +11,15 @@
 
 .stage-editor-out-of-date-documents {
   width: 100%;
-  background-color: #fbb129;
-  border-bottom: 1px solid black;
+  background-color:#FBEAC7;
+  border-bottom: 1px solid #7C6A51;
   padding: 10px;
+  font-size:11pt;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 .stage-editor-schema {
-  padding: 16px;
+  padding: 0px;
   overflow: auto;
   flex-grow: 1;
 }

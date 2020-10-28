@@ -208,14 +208,14 @@ class StagesBar extends React.Component<StateProps & DispatchProps> {
     } = this.props;
 
     return (
-      <div
+      <div 
         className={classnames({
           'stages-bar-data-source': true,
           'stages-bar-data-source-is-selected': activeStage === DATA_SERVICE_STAGE_INDEX
         })}
         onClick={() => this.onDataSourceClicked()}
       >
-        Datasource: {dataSourceStage.database}.{dataSourceStage.collection}
+        {dataSourceStage.database}.{dataSourceStage.collection}
       </div>
     );
   }
@@ -315,12 +315,12 @@ class StagesBar extends React.Component<StateProps & DispatchProps> {
             />
           </button>
         </div>
-        <button
+        <button className="stages-run-export-buttons"
           onClick={this.onRunClicked}
         >
           Run
         </button>
-        <button
+        <button className="stages-run-export-buttons"
           onClick={this.onExportClicked}
         >
           Export

@@ -64,7 +64,7 @@ class SampleDocuments extends React.Component<StateProps & DispatchProps> {
 
     return (
       <div className="sample-documents-container">
-        <div>Showing {sampledCount > MAX_DOCS_CAN_SHOW ? `first ${MAX_DOCS_CAN_SHOW} of ${sampledCount}` : sampledCount} sample documents</div>
+        <div className="sample-documents-text">Showing {sampledCount > MAX_DOCS_CAN_SHOW ? `first ${MAX_DOCS_CAN_SHOW} of ${sampledCount}` : sampledCount} sample documents</div>
         {errorLoadingSampleDocuments && <div>
           Error loading sample documents: {errorLoadingSampleDocuments}
         </div>}
