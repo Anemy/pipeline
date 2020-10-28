@@ -8,8 +8,6 @@ type props = {
 }
 
 class DocumentMinichart extends Component<props> {
-  static displayName = 'DocumentMiniChartComponent';
-
   render() {
     let docFieldsMessage = '';
     if (this.props.nestedDocType) {

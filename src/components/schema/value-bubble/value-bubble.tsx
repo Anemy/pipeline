@@ -11,6 +11,7 @@ import {
 import { Types } from '../../../models/field-type';
 import Stage, {
   ensureWeAreOnValidStageForAction,
+  FilterStage,
   STAGES
 } from '../../../models/stage';
 
@@ -42,9 +43,9 @@ class ValueBubble extends Component<props & StateProps & DispatchProps> {
     const {
       newActiveStage,
       newStages
-    } = ensureWeAreOnValidStageForAction(STAGES.MATCH, stages, activeStage);
+    } = ensureWeAreOnValidStageForAction(STAGES.FILTER, stages, activeStage);
 
-    const currentStage = newStages[newActiveStage];
+    const currentStage = newStages[newActiveStage] as FilterStage;
 
     // TODO: Get rid of this query value and just use the stage with path / current stage content.
 

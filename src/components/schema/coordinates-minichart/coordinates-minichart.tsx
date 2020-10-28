@@ -22,7 +22,7 @@ import {
   AppState
 } from '../../../store/store';
 import Stage, {
-  ensureWeAreOnValidStageForAction, STAGES
+  ensureWeAreOnValidStageForAction, FilterStage, STAGES
 } from '../../../models/stage';
 import { getHereAttributionMessage } from './utils';
 import { addLayer, isLayerWeCanAdd, generateGeoQuery } from '../../../modules/geo';
@@ -255,9 +255,9 @@ class CoordinatesMinichart extends Component<props & StateProps & DispatchProps>
     const {
       newActiveStage,
       newStages
-    } = ensureWeAreOnValidStageForAction(STAGES.MATCH, stages, activeStage);
+    } = ensureWeAreOnValidStageForAction(STAGES.FILTER, stages, activeStage);
 
-    const currentStage = newStages[newActiveStage];
+    const currentStage = newStages[newActiveStage] as FilterStage;
 
     // TODO: Currently we don't allow 2 layers.
     // In Compass-schema other fields on the query bar are wiped when
@@ -305,9 +305,9 @@ class CoordinatesMinichart extends Component<props & StateProps & DispatchProps>
     const {
       newActiveStage,
       newStages
-    } = ensureWeAreOnValidStageForAction(STAGES.MATCH, stages, activeStage);
+    } = ensureWeAreOnValidStageForAction(STAGES.FILTER, stages, activeStage);
 
-    const currentStage = newStages[newActiveStage];
+    const currentStage = newStages[newActiveStage] as FilterStage;
 
     evt.layers.eachLayer((layer: any) => {
       // this.geoLayerAdded(field, layer);
@@ -341,9 +341,9 @@ class CoordinatesMinichart extends Component<props & StateProps & DispatchProps>
     const {
       newActiveStage,
       newStages
-    } = ensureWeAreOnValidStageForAction(STAGES.MATCH, stages, activeStage);
+    } = ensureWeAreOnValidStageForAction(STAGES.FILTER, stages, activeStage);
 
-    const currentStage = newStages[newActiveStage];
+    const currentStage = newStages[newActiveStage] as FilterStage;
 
     evt.layers.eachLayer((layer: any) => {
       delete currentStage.geoLayers[layer._leaflet_id];

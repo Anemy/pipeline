@@ -17,19 +17,21 @@ import {
 import {
   AppState
 } from '../../store/store';
-import DataSource from '../../models/data-source';
 import Stage, {
   buildAggregationPipelineFromStages,
+  getNewStageForStageType,
+  getNiceStageNameForStageType,
   DATA_SERVICE_STAGE_INDEX,
   NO_ACTIVE_STAGE,
-  STAGES
+  STAGES,
+  DataSourceStage
 } from '../../models/stage';
 
 import './stage-bar.css';
 
 type StateProps = {
   activeStage: number,
-  dataSource: DataSource,
+  dataSourceStage: DataSourceStage,
   sampleCount: number,
   stages: Stage[];
 };
@@ -77,11 +79,16 @@ class StagesBar extends React.Component<StateProps & DispatchProps> {
       isChoosingNewStage: false
     });
 
+    if (newStageType === STAGES.DATA_SOURCE) {
+      alert('Coming soon.');
+      return;
+    }
+
     this.props.updateStore({
       activeStage: this.props.stages.length,
       stages: [
         ...this.props.stages,
-        new Stage(newStageType)
+        getNewStageForStageType(newStageType)
       ]
     });
   };
@@ -185,7 +192,7 @@ class StagesBar extends React.Component<StateProps & DispatchProps> {
   renderDataSource = (): React.ReactNode => {
     const {
       activeStage,
-      dataSource
+      dataSourceStage
     } = this.props;
 
     return (
@@ -196,7 +203,7 @@ class StagesBar extends React.Component<StateProps & DispatchProps> {
         })}
         onClick={() => this.onDataSourceClicked()}
       >
-        Datasource: {dataSource.database}.{dataSource.collection}
+        Datasource: {dataSourceStage.database}.{dataSourceStage.collection}
       </div>
     );
   }
@@ -226,7 +233,7 @@ class StagesBar extends React.Component<StateProps & DispatchProps> {
               onClick={() => this.onStageClicked(stageIndex)}
             >
               <div>
-                {Stage.getNiceStageNameForStageType(stage.type)}
+                {getNiceStageNameForStageType(stage.type)}
               </div>
               <FontAwesomeIcon
                 onClick={() => this.onDeleteStageClicked(stageIndex)}
@@ -251,7 +258,7 @@ class StagesBar extends React.Component<StateProps & DispatchProps> {
             key={`${stage}`}
             onClick={() => this.onClickAddStageOption(stage as STAGES)}
           >
-            {Stage.getNiceStageNameForStageType(stage as STAGES)}
+            {getNiceStageNameForStageType(stage as STAGES)}
           </a>
         ))}
       </div>
@@ -307,7 +314,7 @@ class StagesBar extends React.Component<StateProps & DispatchProps> {
 const mapStateToProps = (state: AppState): StateProps => {
   return {
     activeStage: state.activeStage,
-    dataSource: state.stages[0] as DataSource,
+    dataSourceStage: state.stages[0] as DataSourceStage,
     sampleCount: state.sampleCount,
     stages: state.stages
   };

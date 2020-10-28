@@ -1,0 +1,72 @@
+.aggregate-editor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: row;
+  padding: 14px 7px;
+  font-size: 14px;
+}
+
+.aggregate-editor-area-title {
+  flex-grow: 1;
+  font-weight: bold;
+}
+
+.aggregate-editor-metrics-top-bar {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 24px;
+}
+
+/* .aggregate-editor-metrics-title {
+  
+} */
+
+.aggregate-editor-metrics-container {
+  position: relative;
+}
+
+.aggregate-editor-add-metric-button:hover {
+  cursor: pointer;
+}
+
+.aggregate-editor-metrics-list {
+  min-height: 200px;
+  width: 100%;
+  border: 1px solid black;
+  margin-top: 8px;
+}
+
+.aggregate-editor-metrics-list-item {
+  padding: 8px;
+}
+
+.aggregate-editor-group-by-list {
+  min-height: 200px;
+  width: 100%;
+  border: 1px solid black;
+  margin-top: 8px;
+}
+
+.aggregate-editor-metric-config-item-title {
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.aggregate-editor-metric-config-item {
+  margin-bottom: 24px;
+}
+
+.aggregate-editor-metric-config-add-button {
+  float: right;
+  margin-right: 10px;
+}
+
+.aggregate-editor-metric-config-add-button:hover {
+  cursor: pointer;
+}

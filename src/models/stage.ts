@@ -3,21 +3,50 @@ import { v4 as uuidv4 } from 'uuid';
 import Schema, { placeHolderSchema } from './schema';
 
 export enum STAGES {
-  MATCH = 'MATCH',
-  LIMIT = 'LIMIT',
-  PROJECT = 'PROJECT',
-  UNSET = 'UNSET'
+  FILTER = 'FILTER',
+  TRANSFORM = 'TRANSFORM',
+  AGGREGATE = 'AGGREGATE',
+  DATA_SOURCE = 'DATA_SOURCE'
+  // MATCH = 'MATCH',
+  // LIMIT = 'LIMIT',
+  // PROJECT = 'PROJECT',
+  // UNSET = 'UNSET'
 };
 
 export const DATA_SERVICE_STAGE_INDEX = 0;
 export const NO_ACTIVE_STAGE = -1;
 
-export class Stage {
+export interface Stage {
   type: STAGES;
+  typeName: string;
+
   // TODO: We can create different classes that extend this interface
   // with their own content definitions (certain stages have more defined syntax).
-  content: any = {};
-  geoLayers: any = {};
+  // content: any;
+  // geoLayers: any;
+  id: string;
+
+
+  errorLoadingSampleDocuments: string;
+  hasLoadedSampleDocuments: boolean;
+  isLoadingSampleDocuments: boolean;
+
+  sampleDocuments: any[];
+
+  errorAnalyzingDocumentsSchema: string;
+  hasAnalyzedSchema: boolean;
+  isAnalyszingSchema: boolean;
+
+  sampleDocumentsSchema: Schema;
+
+  getPipelineFromStage: () => any[];
+  copyStageItems: (stageToCopyFrom: Stage) => void
+}
+
+class BasicStage implements Stage {
+  type: STAGES;
+  typeName = ''; // Each stage should implement.
+
   id: string;
 
   errorLoadingSampleDocuments = '';
@@ -35,30 +64,14 @@ export class Stage {
   constructor(stageType: STAGES) {
     this.type = stageType;
     this.id = uuidv4();
-
-    // Set some defaults... TODO: Class for each stage.
-    if (stageType === STAGES.LIMIT) {
-      this.content = 5;
-    }
   }
 
-  static getNiceStageNameForStageType(stageType: STAGES) {
-    switch (stageType) {
-      case STAGES.MATCH:
-        return 'Match';
-      case STAGES.LIMIT:
-        return 'Limit';
-      case STAGES.PROJECT:
-        return 'Project';
-      case STAGES.UNSET:
-        return 'Unset';
-      default:
-        return stageType;
-    }
+  getPipelineFromStage = (): any[] => {
+    return [];
   }
 
   // Copies details/sample docs from another stage.
-  copyStageItems(stageToCopyThingsFrom: Stage) {
+  copyStageItems = (stageToCopyThingsFrom: Stage) => {
     this.errorLoadingSampleDocuments = stageToCopyThingsFrom.errorLoadingSampleDocuments;
     this.hasLoadedSampleDocuments = stageToCopyThingsFrom.hasLoadedSampleDocuments;
     this.isLoadingSampleDocuments = stageToCopyThingsFrom.isLoadingSampleDocuments;
@@ -71,6 +84,87 @@ export class Stage {
   }
 }
 
+export class FilterStage extends BasicStage implements Stage {
+  geoLayers: any = {};
+  content: any = {}; // The filter. TODO: Better naming.
+
+  constructor() {
+    super(STAGES.FILTER);
+  }
+
+  getPipelineFromStage = () => {
+    return [{
+      $match: this.content
+    }];
+  };
+}
+
+export class TransformStage extends BasicStage implements Stage {
+  hiddenFields: { [fieldPath: string]: boolean } = {};
+  renamedFields: { [fieldPath: string]: string } = {};
+  addedFields: { [fieldPath: string]: any } = {};
+
+  constructor() {
+    super(STAGES.TRANSFORM);
+  }
+
+  getPipelineFromStage = () => {
+    const pipeline: any[] = [];
+
+    const fieldsForProject: { [fieldPath: string]: string | number } = {};
+    for (const renamedFieldPath of Object.keys(this.renamedFields)) {
+      fieldsForProject[this.renamedFields[renamedFieldPath]] = `$${renamedFieldPath}`;
+    }
+
+    if (Object.keys(fieldsForProject).length > 0) {
+      for (const field of this.sampleDocumentsSchema.fields) {
+        if (!fieldsForProject[field.path]) {
+          fieldsForProject[field.path] = 1;
+        }
+      }
+
+      // Now we add all of the keys...
+      pipeline.push({
+        $project: fieldsForProject
+      });
+    }
+
+    const fieldsForUnset: { [fieldPath: string]: boolean } = {};
+    for (const renamedFieldPath of Object.keys(this.renamedFields)) {
+      fieldsForUnset[renamedFieldPath] = true;
+    }
+    for (const hiddenFieldPath of Object.keys(this.hiddenFields)) {
+      fieldsForUnset[hiddenFieldPath] = true;
+    }
+
+    if (Object.keys(fieldsForUnset).length > 0) {
+      pipeline.push({
+        $unset: Object.keys(fieldsForUnset)
+      });
+    }
+
+    return pipeline;
+  };
+}
+
+export class AggregateStage extends BasicStage implements Stage {
+  constructor() {
+    super(STAGES.AGGREGATE);
+  }
+}
+
+export class DataSourceStage extends BasicStage {
+  database: string;
+  collection: string;
+
+  constructor(databaseName: string, collectionName: string) {
+    super(STAGES.DATA_SOURCE);
+
+    this.database = databaseName;
+    this.collection = collectionName;
+  }
+}
+
 export const buildAggregationPipelineFromStages = (stages: Stage[], sampleCount: number) => {
   // TODO: Get some typing for this.
   const pipeline: any = [{
@@ -80,50 +174,27 @@ export const buildAggregationPipelineFromStages = (stages: Stage[], sampleCount:
   }];
 
   for (const stage of stages) {
-    // TODO: Move this into the stages class and have the stage class be
-    // an interface for all kind of stages.
-    switch (stage.type) {
-      case STAGES.MATCH:
-        pipeline.push({
-          $match: stage.content
-        });
-        break;
-      case STAGES.LIMIT:
-        pipeline.push({
-          $limit: stage.content
-        });
-        break;
-      case STAGES.PROJECT:
-        const projectContent = {
-          ...stage.content
-        };
-
-        // For now to make all the fields appear so we can control more
-        // of the projection details.
-        // This won't work if we don't find fields in the sample
-        // but we can handle that later.
-
-        // for (const field of stage.sampleDocumentsSchema.fields) {
-        //   if (!projectContent[]) {
-
-        //   }
-        // }
-
-        pipeline.push({
-          $project: projectContent
-        });
-        break;
-      case STAGES.UNSET:
-        pipeline.push({
-          $unset: Object.keys(stage.content)
-        });
-        break;
-      default:
-        break;
+    const newStages = stage.getPipelineFromStage();
+    if (newStages && newStages.length > 0) {
+      pipeline.push(...newStages);
     }
   }
 
   return pipeline;
+};
+
+export const getNewStageForStageType = (stageType: STAGES) => {
+  switch (stageType) {
+    case STAGES.TRANSFORM:
+      return new TransformStage();
+    case STAGES.AGGREGATE:
+      return new AggregateStage();
+    case STAGES.FILTER:
+      return new FilterStage();
+    default:
+      // TODO: Error.
+      return new BasicStage(stageType);
+  }
 };
 
 // Adds a new stage of the type if we aren't already on that stage.
@@ -146,7 +217,7 @@ export const ensureWeAreOnValidStageForAction = (
       newActiveStage = activeStage + 1;
     } else {
       // Create a new stage and set it as our active stage.
-      const newStage = new Stage(stageType);
+      const newStage = getNewStageForStageType(stageType);
 
       // Copy details/sample docs from current stage.
       // TODO: I think we actually want to make this re-render the docs
@@ -162,6 +233,21 @@ export const ensureWeAreOnValidStageForAction = (
     newActiveStage,
     newStages
   };
+};
+
+export const getNiceStageNameForStageType = (stageType: STAGES) => {
+  switch (stageType) {
+    case STAGES.TRANSFORM:
+      return 'Transform';
+    case STAGES.AGGREGATE:
+      return 'Aggregate';
+    case STAGES.FILTER:
+      return 'Filter';
+    case STAGES.DATA_SOURCE:
+      return 'Data Source'
+    default:
+      return stageType;
+  }
 };
 
 export default Stage;

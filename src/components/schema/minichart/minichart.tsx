@@ -13,7 +13,7 @@ import {
   UpdateStoreAction
 } from '../../../store/actions';
 import vizFns from '../../../modules';
-import { STAGES } from '../../../models/stage';
+import { FilterStage, STAGES } from '../../../models/stage';
 import { AppState } from '../../../store/store';
 
 type props = {
@@ -182,7 +182,7 @@ const mapStateToProps = (state: AppState): StateProps => {
   const currentStage = state.stages[state.activeStage];
 
   return {
-    filter: currentStage.type === STAGES.MATCH ? { ...currentStage.content } : {},
+    filter: currentStage.type === STAGES.FILTER ? { ...(currentStage as FilterStage).content } : {},
   };
 };
 

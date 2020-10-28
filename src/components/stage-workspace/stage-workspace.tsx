@@ -2,7 +2,6 @@ import { MongoClient } from 'mongodb';
 import React from 'react';
 import { connect } from 'react-redux';
 import SplitterLayout from 'react-splitter-layout';
-import parseSchema from 'mongodb-schema';
 
 import 'react-splitter-layout/lib/index.css';
 
@@ -15,10 +14,9 @@ import {
 } from '../../store/store';
 import Stage, {
   NO_ACTIVE_STAGE,
-  buildAggregationPipelineFromStages
+  buildAggregationPipelineFromStages,
+  DataSourceStage
 } from '../../models/stage';
-import DataSource from '../../models/data-source';
-import Schema, { placeHolderSchema } from '../../models/schema';
 
 import './stage-workspace.css';
 
@@ -29,8 +27,7 @@ const DEFAULT_MAX_TIME_MS = 10000;
 
 type StateProps = {
   activeStage: number;
-  dataSource: DataSource;
-  documents: any[];
+  dataSource: DataSourceStage;
   mongoClient: MongoClient;
   sampleCount: number;
   stages: Stage[];
@@ -55,68 +52,6 @@ class StageWorkspace extends React.Component<StateProps & DispatchProps> {
         !this.props.stages[activeStage].isLoadingSampleDocuments
       ) {
         this.loadSampleDocuments();
-      } else if (
-        this.props.stages[activeStage].hasLoadedSampleDocuments &&
-        !this.props.stages[activeStage].hasAnalyzedSchema &&
-        !this.props.stages[activeStage].isAnalyszingSchema
-      ) {
-        this.analyzeSchemaOfSampleDocuments();
-      }
-    }
-  }
-
-  analyzeSchemaOfSampleDocuments = () => {
-    const {
-      documents
-    } = this.props;
-
-    const currentStageId = this.props.stages[this.props.activeStage].id;
-
-    const updatedStages = [...this.props.stages];
-    updatedStages[this.props.activeStage].isAnalyszingSchema = true;
-    updatedStages[this.props.activeStage].hasAnalyzedSchema = false;
-
-    this.props.updateStore({
-      stages: updatedStages
-    });
-
-    const updateWithError = (err: Error) => {
-      const newStages = [...this.props.stages];
-      newStages[this.props.activeStage].isAnalyszingSchema = false;
-      newStages[this.props.activeStage].hasAnalyzedSchema = true;
-      newStages[this.props.activeStage].sampleDocumentsSchema = placeHolderSchema;
-      newStages[this.props.activeStage].errorAnalyzingDocumentsSchema = err.message;
-
-      this.props.updateStore({
-        stages: newStages
-      });
-    };
-
-    // TODO: We need to cover cases here where we just infinite load.
-    try {
-      parseSchema(documents, (err: Error, schema: Schema) => {
-        if (err) {
-          updateWithError(err);
-          return;
-        }
-
-        // Ensure we're still looking at the same stage.
-        if (this.props.stages[this.props.activeStage].id === currentStageId) {
-          const newStages = [...this.props.stages];
-          newStages[this.props.activeStage].isAnalyszingSchema = false;
-          newStages[this.props.activeStage].hasAnalyzedSchema = true;
-          newStages[this.props.activeStage].sampleDocumentsSchema = schema;
-          newStages[this.props.activeStage].errorAnalyzingDocumentsSchema = '';
-
-          this.props.updateStore({
-            stages: newStages
-          });
-        }
-      });
-    } catch (err) {
-      // Ensure we're still looking at the same stage.
-      if (this.props.stages[this.props.activeStage].id === currentStageId) {
-        updateWithError(err);
       }
     }
   }
@@ -233,12 +168,9 @@ class StageWorkspace extends React.Component<StateProps & DispatchProps> {
 }
 
 const mapStateToProps = (state: AppState): StateProps => {
-  const hasValidStageSelected = state.activeStage !== NO_ACTIVE_STAGE && !!state.stages[state.activeStage];
-
   return {
     activeStage: state.activeStage,
-    dataSource: state.stages[0] as DataSource,
-    documents: hasValidStageSelected ? state.stages[state.activeStage].sampleDocuments : [],
+    dataSource: state.stages[0] as DataSourceStage,
     mongoClient: state.mongoClient,
     sampleCount: state.sampleCount,
     stages: state.stages

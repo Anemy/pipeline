@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import { isArray, isPlainObject } from 'lodash';
 import { bsonEqual, hasDistinctValue } from 'mongodb-query-util';
 
-import Stage, { ensureWeAreOnValidStageForAction, STAGES } from '../../../models/stage';
+import Stage, { ensureWeAreOnValidStageForAction, FilterStage, STAGES } from '../../../models/stage';
 import { InnerFieldType } from '../../../models/field-type';
 import { AppState } from '../../../store/store';
 import {
@@ -100,9 +100,9 @@ class D3Component extends Component<props & StateProps & DispatchProps> {
     const {
       newActiveStage,
       newStages
-    } = ensureWeAreOnValidStageForAction(STAGES.MATCH, stages, activeStage);
+    } = ensureWeAreOnValidStageForAction(STAGES.FILTER, stages, activeStage);
 
-    const currentStage = newStages[newActiveStage];
+    const currentStage = newStages[newActiveStage] as FilterStage;
 
     // Now we update....
     // TODO: Maybe we want more deconstructing to make sure we're not

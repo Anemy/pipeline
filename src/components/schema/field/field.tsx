@@ -20,7 +20,11 @@ import {
   ObjectFieldType,
   Types
 } from '../../../models/field-type';
-import Stage, { ensureWeAreOnValidStageForAction, STAGES } from '../../../models/stage';
+import Stage, {
+  ensureWeAreOnValidStageForAction,
+  TransformStage,
+  STAGES
+} from '../../../models/stage';
 import { AppState } from '../../../store/store';
 import {
   ActionTypes,
@@ -57,19 +61,6 @@ type StateProps = {
 type DispatchProps = {
   updateStore: (update: any) => void;
 };
-
-// https://docs.mongodb.com/manual/reference/aggregation-variables/#variable.REMOVE
-// Note - don't change this value, it's used in the pipeline ^
-// const HIDDEN_FIELD = '$$REMOVE';
-// {
-//   $cond: {
-//     if: { $eq: ["", "123"] },
-//     then: "$$REMOVE",
-//     else: "0"
-//   }
-// }; // '$$REMOVE';
-
-const HIDDEN_FIELD = 'HIDDEN_FIELD';
 
 class Field extends Component<props & StateProps & DispatchProps> {
   state: StateType = {
@@ -151,24 +142,23 @@ class Field extends Component<props & StateProps & DispatchProps> {
     const {
       newActiveStage,
       newStages
-    } = ensureWeAreOnValidStageForAction(STAGES.PROJECT, stages, activeStage);
+    } = ensureWeAreOnValidStageForAction(STAGES.TRANSFORM, stages, activeStage);
 
     // https://docs.mongodb.com/manual/reference/operator/aggregation/project/#pipe._S_project
 
-    const currentStage = newStages[newActiveStage];
+    const currentStage = newStages[newActiveStage] as TransformStage;
 
     // If already renamed, remove old renaming.
     if (isRenamedField) {
       // TODO: Do we want to remove all the rename occurences?
       // This might conflict in the future.
       // We probably want a more manual control of field renames.
-      delete currentStage.content[renamedFieldName];
+      delete currentStage.renamedFields[path];
     }
 
     // Only rename then if the new name isn't equal to the current name.
     if (newFieldName !== path.split('.').slice(-1)[0]) {
-      const renameExpr = `$${path}`;
-      currentStage.content[newFieldName] = renameExpr;
+      currentStage.renamedFields[path] = newFieldName;
     }
 
     this.props.updateStore({
@@ -188,18 +178,18 @@ class Field extends Component<props & StateProps & DispatchProps> {
     const {
       newActiveStage,
       newStages
-    } = ensureWeAreOnValidStageForAction(STAGES.UNSET, stages, activeStage);
+    } = ensureWeAreOnValidStageForAction(STAGES.TRANSFORM, stages, activeStage);
 
     // Update the stage's unset to include or remove the field.
-    const currentStage = newStages[newActiveStage];
+    const currentStage = newStages[newActiveStage] as TransformStage;
 
     // TODO: Maybe we can use:
     // https://docs.mongodb.com/manual/reference/aggregation-variables/#variable.REMOVE
     // And put it all in one project?
     if (isHiddenField) {
-      delete currentStage.content[path];
+      delete currentStage.hiddenFields[path];
     } else {
-      currentStage.content[path] = HIDDEN_FIELD;
+      currentStage.hiddenFields[path] = true;
     }
 
     this.props.updateStore({
@@ -445,23 +435,27 @@ class Field extends Component<props & StateProps & DispatchProps> {
 
 const mapStateToProps = (state: AppState, ownProps: props): StateProps => {
   const currentStage = state.stages[state.activeStage];
-  let isHiddenField = currentStage.type === STAGES.UNSET
-    && currentStage.content[ownProps.path]
-    && currentStage.content[ownProps.path] === HIDDEN_FIELD;
 
   // TODO: This only pulls in the first renaming.
   // We should ensure we show all of the names this field has been renamed to.
   let isRenamedField = false;
   let renamedFieldName = '';
-  const renameExpr = `$${ownProps.path}`;
-  const alreadyRenamed = Object.keys(currentStage.content).filter(
-    (renamedPath: string) => currentStage.content[renamedPath] === renameExpr
-  );
+  // const renameExpr = `$${ownProps.path}`;
+  let isHiddenField = false;
+  if (currentStage.type === STAGES.TRANSFORM) {
+    isHiddenField = (currentStage as TransformStage).hiddenFields[ownProps.path];
 
-  if (alreadyRenamed && alreadyRenamed.length > 0) {
-    isRenamedField = true;
-    renamedFieldName = alreadyRenamed[0];
+    isRenamedField = !!(currentStage as TransformStage).renamedFields[ownProps.path];
+    renamedFieldName = (currentStage as TransformStage).renamedFields[ownProps.path];
+    // Object.keys(currentStage.content).filter(
+    //   (renamedPath: string) => currentStage.content[renamedPath] === renameExpr
+    // );
   }
+
+  // if (alreadyRenamed && alreadyRenamed.length > 0) {
+  //   isRenamedField = true;
+  //   renamedFieldName = alreadyRenamed[0];
+  // }
 
   return {
     activeStage: state.activeStage,

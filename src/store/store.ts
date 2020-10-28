@@ -1,7 +1,6 @@
 import { MongoClient } from 'mongodb';
 
-import DataSource from '../models/data-source';
-import Stage, { NO_ACTIVE_STAGE } from '../models/stage';
+import Stage, { NO_ACTIVE_STAGE, DataSourceStage } from '../models/stage';
 import { Actions, ActionTypes } from './actions';
 
 export const SCHEMA_CONSTANTS = {
@@ -24,7 +23,7 @@ export const getInitialState = (mongoClient: MongoClient) => ({
   sampleCount: DEFAULT_SAMPLE_COUNT,
   showGraph: false,
   // The datasource here tells us which 'database', 'collection' to use.
-  stages: [new DataSource('ships', 'shipwrecks')]
+  stages: [new DataSourceStage('ships', 'shipwrecks')]
   // stages: [new DataSource('dxl', 'versions')]
   // stages: [new DataSource('test', 'sales')]
   // stages: [new DataSource('encryption', 'dataKeys')]
