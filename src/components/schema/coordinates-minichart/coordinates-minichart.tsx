@@ -226,6 +226,8 @@ class CoordinatesMinichart extends Component<props & StateProps & DispatchProps>
 
     const values = this.props.type.values.filter(isValidLatLng);
 
+    // TODO: We could highlight the points.
+
     const geopoints = values
       .map(value => {
         const v = valueToGeoPoint(value);
@@ -260,7 +262,20 @@ class CoordinatesMinichart extends Component<props & StateProps & DispatchProps>
     // TODO: Currently we don't allow 2 layers.
     // In Compass-schema other fields on the query bar are wiped when
     // more than 1 layer is added, since we don't want that we just only allow one.
+
+    // Right now this don't quite work though and shows all layers but only uses last for query.
     if (isLayerWeCanAdd(evt.layer)) {
+      // const newLayer = evt.layer;
+      // console.log('evt.target:', evt.target);
+      // for (const layer in evt.layers) {
+      //   if (layer !== newLayer) {
+      //     evt.target.removeLayer(layer);
+      //   }
+      // }
+      // if (currentStage.geoLayers) {
+      //   evt.target.removeLayer(currentStage.geoLayers);
+      // }
+
       currentStage.geoLayers = addLayer(fieldName, evt.layer, {});
     }
 
@@ -355,7 +370,8 @@ class CoordinatesMinichart extends Component<props & StateProps & DispatchProps>
         viewport={{ center: [0, 0], zoom: 1 }}
         whenReady={this.whenMapReady}
         ref={ref => { this.mapRef = ref; }}
-        onMoveend={this.onMoveEnd}>
+        onMoveend={this.onMoveEnd}
+      >
         {this.renderMapItems()}
         <TileLayer url={DEFAULT_TILE_URL} attribution={attributionMessage} />
         <FeatureGroup>
@@ -369,7 +385,7 @@ class CoordinatesMinichart extends Component<props & StateProps & DispatchProps>
             // onEditStop={this.onEditStop}
             // onDeleteStop={this.onDeleteStop}
             draw={{
-              rectangle: false,
+              rectangle: true,
               polyline: false,
               marker: false,
               circlemarker: false
