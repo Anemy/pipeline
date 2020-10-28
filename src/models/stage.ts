@@ -214,9 +214,52 @@ export class TransformStage extends BasicStage implements Stage {
   };
 }
 
+export type MetricType = {
+  groupBy: string[],
+  accumulator: string, // TODO: accumulator types
+  measure: string
+};
+
 export class AggregateStage extends BasicStage implements Stage {
+  metrics: { [metricName: string]: MetricType } = {};
+
   constructor() {
     super(STAGES.AGGREGATE);
+  }
+
+  getPipelineFromStage = () => {
+    const pipeline: any[] = [];
+
+    console.log('build aggregate stage', this.metrics);
+
+    // TODO: The group by has to be set for each stage.
+    // Group by always needs to be the same.
+
+    // How do we do multiple group by at once?
+    // Can we?
+
+    for (const metricName of Object.keys(this.metrics)) {
+      let groupBy: string | { [fieldName: string]: string } = {};
+      for (const fieldName of this.metrics[metricName].groupBy) {
+        groupBy[fieldName] = `$${fieldName}`;
+      }
+
+      if (Object.keys(groupBy).length === 1) {
+        groupBy = groupBy[Object.keys(groupBy)[0]];
+      }
+
+      pipeline.push({
+        $group: {
+          _id: groupBy,
+          [metricName]: {
+            // TODO: More kinds of accumulators.
+            [this.metrics[metricName].accumulator]: 1
+          }
+        }
+      });
+    }
+
+    return pipeline;
   }
 }
 

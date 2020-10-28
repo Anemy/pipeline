@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 import Select from 'react-select';
 
@@ -11,27 +11,41 @@ import {
 import {
   AppState
 } from '../../store/store';
-import Stage, { STAGES } from '../../models/stage';
-// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-// import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import Stage, { AggregateStage, MetricType, STAGES } from '../../models/stage';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import Schema from '../../models/schema';
 
-const options = [
-  { value: 'x', label: 'Coming soon' },
-  { value: 'y', label: 'Not yet implemented' }
+// TODO: Pull from https://github.com/mongodb-js/vscode-mongodb-language/blob/master/syntaxes/mongodb-symbols.json
+const aggAccumulators = [
+  '$addToSet',
+  '$avg',
+  '$first',
+  '$last',
+  '$max',
+  '$min',
+  '$push',
+  '$stdDevPop',
+  '$stdDevSamp',
+  '$sum'
 ];
 
+const accumulatorOptions = aggAccumulators.map(accumulator => ({
+  value: accumulator,
+  label: accumulator.substr(1) // remove $
+}));
+
 type StateType = {
-  metrics: any[], // TODO: Better type.
   metricName: string,
   metricConfigMeasure: any,
-  metricConfigOperator: any,
+  metricConfigAccumulator: any,
   selectedGroupBy: { [fieldPath: string]: boolean }
 }
 
 type StateProps = {
   activeStage: number;
   activeStageType: STAGES;
+  metrics: { [metricName: string]: MetricType };
   sampleDocumentsSchema: Schema;
   stages: Stage[];
 };
@@ -43,21 +57,22 @@ type DispatchProps = {
 class AggregateEditor extends React.Component<StateProps & DispatchProps> {
   state: StateType = {
     // addingMetric: false,
-    metrics: [],
     metricName: '',
     metricConfigMeasure: null,
-    metricConfigOperator: null,
+    metricConfigAccumulator: null,
     selectedGroupBy: {}
   };
 
   resetMetricConfigFields = () => {
-    this.setState({
-      // addingMetric: false,
-      metricName: '',
-      metricConfigMeasure: null,
-      metricConfigOperator: null,
-      selectedGroupBy: {}
-    });
+    // Don't reset for now - users might use same fields in multiple metrics.
+
+    // this.setState({
+    //   // addingMetric: false,
+    //   metricName: '',
+    //   metricConfigMeasure: null,
+    //   metricConfigAccumulator: null,
+    //   selectedGroupBy: {}
+    // });
   }
 
   // onClickAddMetric = () => {
@@ -67,17 +82,78 @@ class AggregateEditor extends React.Component<StateProps & DispatchProps> {
   // }
 
   onClickSaveMetric = () => {
-    this.setState({
-      metrics: [...this.state.metrics, 'Example metric']
-    })
+    if (!this.state.selectedGroupBy || Object.keys(this.state.selectedGroupBy).length === 0) {
+      alert('Please select a group by option before adding a metric.');
+      return;
+    }
+
+    if (Object.keys(this.props.metrics).length > 0) {
+      // TODO: Allow multiple with same group by or multiple with different group by?
+      alert('We currently only allow 1 metric at a time.');
+      return;
+    }
+
+    const {
+      metricName,
+      metricConfigMeasure,
+      metricConfigAccumulator,
+      selectedGroupBy
+    } = this.state;
+
+    const {
+      activeStage,
+      stages
+    } = this.props;
+
+    const newStages = [...stages];
+
+    const currentStage = newStages[activeStage] as AggregateStage;
+
+    let newMetricName;
+    if (metricName && metricName.length > 0) {
+      newMetricName = metricName;
+    } else {
+      newMetricName = `Group by '${Object.keys(selectedGroupBy).join(', ')}' and ${metricConfigAccumulator.label}`;
+    }
+
+    // TODO: Name conflicts.
+    currentStage.metrics[newMetricName] = {
+      groupBy: Object.keys(selectedGroupBy),
+      accumulator: metricConfigAccumulator.value,
+      measure: metricConfigMeasure.value
+    };
+    // TODO: Add the group by.
+
+    this.props.updateStore({
+      stages: newStages
+    });
 
     this.resetMetricConfigFields();
+  }
+
+  onClickRemoveMetric = (metricName: string) => {
+    const {
+      activeStage,
+      stages
+    } = this.props;
+
+    const newStages = [...stages];
+
+    const currentStage = newStages[activeStage] as AggregateStage;
+
+    if (currentStage.metrics[metricName]) {
+      delete currentStage.metrics[metricName];
+    }
+
+    this.props.updateStore({
+      stages: newStages
+    });
   }
 
   renderMetrics() {
     const {
       metrics
-    } = this.state;
+    } = this.props;
 
     return (
       <div className="aggregate-editor-metrics-container col-sm-4">
@@ -96,12 +172,23 @@ class AggregateEditor extends React.Component<StateProps & DispatchProps> {
           </button> */}
         </div>
         <div className="aggregate-editor-metrics-list">
-          {metrics.map((metric, i) => (
+          {Object.keys(metrics).map((metricName, i) => (
             <div
               className="aggregate-editor-metrics-list-item"
-              key={`${i}`}
+              key={`${metricName}-${i}`}
             >
-              {metric}
+              <div className="aggregate-editor-metrics-list-item-name">
+                {metricName}
+              </div>
+              <button
+                className="aggregate-editor-remove-metric-button"
+                onClick={() => this.onClickRemoveMetric(metricName)}
+              >
+                <FontAwesomeIcon
+                  className="aggregate-editor-remove-metric-button-icon"
+                  icon={faTrashAlt}
+                />
+              </button>
             </div>
           ))}
         </div>
@@ -168,8 +255,17 @@ class AggregateEditor extends React.Component<StateProps & DispatchProps> {
     const {
       metricName,
       metricConfigMeasure,
-      metricConfigOperator
+      metricConfigAccumulator
     } = this.state;
+
+    const {
+      sampleDocumentsSchema
+    } = this.props;
+
+    const measureOptions = sampleDocumentsSchema.fields.map(field => ({
+      value: field.path,
+      label: field.path
+    }));
 
     return (
       <div className="aggregate-editor-metric-group-by-container col-sm-4">
@@ -195,7 +291,7 @@ class AggregateEditor extends React.Component<StateProps & DispatchProps> {
             onChange={selectedOption => this.setState({
               metricConfigMeasure: selectedOption
             })}
-            options={options}
+            options={measureOptions}
           />
         </div>
 
@@ -204,11 +300,11 @@ class AggregateEditor extends React.Component<StateProps & DispatchProps> {
             Aggregation Operator
           </div>
           <Select
-            value={metricConfigOperator}
+            value={metricConfigAccumulator}
             onChange={selectedOption => this.setState({
-              metricConfigOperator: selectedOption
+              metricConfigAccumulator: selectedOption
             })}
-            options={options}
+            options={accumulatorOptions}
           />
         </div>
 
@@ -234,11 +330,12 @@ class AggregateEditor extends React.Component<StateProps & DispatchProps> {
 }
 
 const mapStateToProps = (state: AppState): StateProps => {
-  const currentStage = state.stages[state.activeStage];
+  const currentStage = state.stages[state.activeStage] as AggregateStage;
 
   return {
     activeStage: state.activeStage,
     activeStageType: currentStage.type,
+    metrics: currentStage.metrics,
     sampleDocumentsSchema: currentStage.sampleDocumentsSchema,
     stages: state.stages
   };

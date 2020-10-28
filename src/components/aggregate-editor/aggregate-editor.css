@@ -41,6 +41,24 @@
 
 .aggregate-editor-metrics-list-item {
   padding: 8px;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+}
+
+.aggregate-editor-metrics-list-item-name {
+  flex-grow: 1;
+}
+
+.aggregate-editor-remove-metric-button {
+  margin-left: 10px;
+  border: none;
+  background: none;
+}
+
+.aggregate-editor-remove-metric-button:hover {
+  cursor: pointer;
+  color: red;
 }
 
 .aggregate-editor-group-by-list {
