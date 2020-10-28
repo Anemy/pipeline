@@ -128,7 +128,7 @@ class AggregateEditor extends React.Component<StateProps & DispatchProps> {
           || accumulator === ACCUMULATORS.STD_DEV_SAMP
           || accumulator === ACCUMULATORS.SUM
         ) {
-          measureMessage = ` with ${metricConfigMeasure.value}`;
+          measureMessage = ` with '${metricConfigMeasure.value}'`;
         } else if (
           accumulator === ACCUMULATORS.AVG
           || accumulator === ACCUMULATORS.FIRST
@@ -136,7 +136,7 @@ class AggregateEditor extends React.Component<StateProps & DispatchProps> {
           || accumulator === ACCUMULATORS.MAX
           || accumulator === ACCUMULATORS.MIN
         ) {
-          measureMessage = ` of ${metricConfigMeasure.value}`;
+          measureMessage = ` of '${metricConfigMeasure.value}'`;
         }
       }
 
