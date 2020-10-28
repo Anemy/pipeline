@@ -258,4 +258,19 @@ export const getNiceStageNameForStageType = (stageType: STAGES) => {
   }
 };
 
+export const getDescriptionForStageType = (stageType: STAGES) => {
+  switch (stageType) {
+    case STAGES.TRANSFORM:
+      return 'Shape documents in your pipeline into a form you can work with: rename fields, hide fields, etc.';
+    case STAGES.AGGREGATE:
+      return 'Group your documents together, build averages, count fields, and more.';
+    case STAGES.FILTER:
+      return 'Match certain documents in the pipeline, leaving only the documents you want to see.'
+    case STAGES.DATA_SOURCE:
+      return 'Pull more data into your pipeline.'
+    default:
+      return stageType;
+  }
+};
+
 export default Stage;

@@ -19,6 +19,7 @@ import {
 } from '../../store/store';
 import Stage, {
   buildAggregationPipelineFromStages,
+  getDescriptionForStageType,
   getNewStageForStageType,
   getNiceStageNameForStageType,
   DATA_SERVICE_STAGE_INDEX,
@@ -255,10 +256,17 @@ class StagesBar extends React.Component<StateProps & DispatchProps> {
         {Object.keys(STAGES).map((stage: string, i: number) => (
           <a
             className="stages-bar-add-new-stage-option"
-            key={`${stage}`}
             onClick={() => this.onClickAddStageOption(stage as STAGES)}
+            key={`${stage}`}
           >
-            {getNiceStageNameForStageType(stage as STAGES)}
+            <div
+              className="stages-bar-add-new-stage-option-text"
+            >
+              {getNiceStageNameForStageType(stage as STAGES)}
+            </div>
+            <div className="stages-bar-add-new-stage-info-hover">
+              {getDescriptionForStageType(stage as STAGES)}
+            </div>
           </a>
         ))}
       </div>

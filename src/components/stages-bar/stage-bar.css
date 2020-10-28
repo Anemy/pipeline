@@ -139,13 +139,59 @@
 
 .stages-bar-add-new-stage-option {
   font-size: 14px;
-  padding: 4px 8px;
   background: white;
+  color: #232323;
+  position: relative;
+  padding: 4px 8px;
+  text-decoration: none;
+}
+
+.stages-bar-add-new-stage-option:hover {
+  background: #f5f5f5;
+  cursor: pointer;
+}
+
+.stages-bar-add-new-stage-option-text {
+  /* background: white; */
   text-decoration: none;
   color: #232323;
 }
 
-.stages-bar-add-new-stage-option:hover {
+/* .stages-bar-add-new-stage-option-button:hover {
   cursor: pointer;
-  background: #f5f5f5;
+  /* background: #f5f5f5; */
+/*} */
+
+.stages-bar-add-new-stage-info-hover {
+  visibility: hidden;
+  position: absolute;
+  left: 100%;
+  top: 2px;
+  margin-left: 6px;
+  border: 1px solid #343434;
+  padding: 8px;
+  background: white;
+  min-width: 200px;
+}
+
+.stages-bar-add-new-stage-info-hover::before {
+  content: '';
+  position: absolute;
+  top: 12px;
+  left: -6px;
+  /* left: -10px; */
+  z-index: 1;
+  /* opacity: 0; */
+  /* transition: all .2s ease-out; */
+  transform: translateY(-50%);
+  /* Was border left */
+  /* border-left: 10px solid #1b76c4; */
+  /* border-right: 6px solid #1b76c4; */
+  border-right: 6px solid #232323;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+}
+
+.stages-bar-add-new-stage-option:hover .stages-bar-add-new-stage-info-hover {
+  visibility: visible;
 }
