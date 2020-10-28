@@ -128,10 +128,6 @@ class StageWorkspace extends React.Component<StateProps & DispatchProps> {
     }
   };
 
-  // onWorkspacePanelSizeChange = (newWidth: number) => {
-  //   console.log('New panel size:', newWidth);
-  // }
-
   renderNoActiveStage() {
     return (
       <div className="stage-workspace-empty-state">

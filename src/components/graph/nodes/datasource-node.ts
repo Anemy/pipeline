@@ -29,7 +29,7 @@ export default class DataSourceNode extends LGraphNode {
     this.boxcolor = 'black';
   }
 
-  setSampleSize = (sampleSize: number) => {
+  setSampleSize = (sampleSize: number, onUpdateSampleSize: (newSample: number) => void) => {
     this.properties.sampleSize = sampleSize;
 
     this.addWidget(
@@ -38,7 +38,8 @@ export default class DataSourceNode extends LGraphNode {
       this.properties.sampleSize,
       (v) => {
         // console.log('widget value change', v);
-        this.properties.sampleSize = v;
+        this.properties.sampleSize = Math.round(v);
+        onUpdateSampleSize(Math.round(v));
       }, {
       min: 1,
       max: 1000,

@@ -172,7 +172,9 @@ class Graph extends React.Component<props & StateProps & DispatchProps> {
 
     const dataSource: DataSourceNode = LiteGraph.createNode(dataSourceNodeType);
     dataSource.pos = [150,200];
-    dataSource.setSampleSize(sampleCount);
+    dataSource.setSampleSize(sampleCount, (newSampleCount) => this.props.updateStore({
+      sampleCount: newSampleCount
+    }));
     graph.add(dataSource);
 
     const startX = 450;
