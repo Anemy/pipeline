@@ -36,64 +36,109 @@ const AvgAccumulator = {
   accumulator: ACCUMULATORS.AVG,
   displayName: 'average',
   buildAccumulatorWithMeasure: (measure: string) => {
-    return 1;
+    if (!measure || measure.length === 0) {
+      // This should probably error...
+      return 1;
+    }
+
+    return `$${measure}`;
   }
 };
 const FirstAccumulator = {
   accumulator: ACCUMULATORS.FIRST,
   displayName: 'first',
   buildAccumulatorWithMeasure: (measure: string) => {
-    return 1;
+    if (!measure || measure.length === 0) {
+      // This should probably error...
+      return 1;
+    }
+
+    return `$${measure}`;
   }
 };
 const LastAccumulator = {
   accumulator: ACCUMULATORS.LAST,
   displayName: 'last',
   buildAccumulatorWithMeasure: (measure: string) => {
-    return 1;
+    if (!measure || measure.length === 0) {
+      // This should probably error...
+      return 1;
+    }
+
+    return `$${measure}`;
   }
 };
 const MaxAccumulator = {
   accumulator: ACCUMULATORS.MAX,
   displayName: 'max',
   buildAccumulatorWithMeasure: (measure: string) => {
-    return 1;
+    if (!measure || measure.length === 0) {
+      // This should probably error...
+      return 1;
+    }
+
+    return `$${measure}`;
   }
 };
 const MinAccumulator = {
   accumulator: ACCUMULATORS.MIN,
   displayName: 'min',
   buildAccumulatorWithMeasure: (measure: string) => {
-    return 1;
+    if (!measure || measure.length === 0) {
+      // This should probably error...
+      return 1;
+    }
+
+    return `$${measure}`;
   }
 };
 const PushAccumulator = {
   accumulator: ACCUMULATORS.PUSH,
-  displayName: 'add to set',
+  displayName: 'add to array',
   buildAccumulatorWithMeasure: (measure: string) => {
-    return 1;
+    if (!measure || measure.length === 0) {
+      // This should probably error...
+      return 1;
+    }
+
+    return `$${measure}`;
   }
 };
 const StdDevPopAccumulator = {
   accumulator: ACCUMULATORS.STD_DEV_POP,
   displayName: 'standard deviation population',
   buildAccumulatorWithMeasure: (measure: string) => {
-    return 1;
+    if (!measure || measure.length === 0) {
+      // This should probably error...
+      return 1;
+    }
+
+    return `$${measure}`;
   }
 };
 const StdDevSampAccumulator = {
   accumulator: ACCUMULATORS.STD_DEV_SAMP,
   displayName: 'standard deviation sample',
   buildAccumulatorWithMeasure: (measure: string) => {
-    return 1;
+    if (!measure || measure.length === 0) {
+      // This should probably error...
+      return 1;
+    }
+
+    return `$${measure}`;
   }
 };
 const SumAccumulator = {
   accumulator: ACCUMULATORS.SUM,
   displayName: 'sum',
   buildAccumulatorWithMeasure: (measure: string) => {
-    // We don't use the metric with sum since we're just summing the group by.
-    return 1;
+    if (!measure || measure.length === 0) {
+      // Just count the group by docs when there's no measure.
+      return 1;
+    }
+
+    // TODO: We could allow more measures here, like multiplying or adding inside...
+    return `$${measure}`;
   }
 };
 

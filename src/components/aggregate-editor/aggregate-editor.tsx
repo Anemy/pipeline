@@ -15,7 +15,7 @@ import Stage, { AggregateStage, MetricType, STAGES } from '../../models/stage';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import Schema from '../../models/schema';
-import { aggAccumulators } from '../../models/accumulators';
+import { ACCUMULATORS, aggAccumulators } from '../../models/accumulators';
 
 const accumulatorOptions = aggAccumulators.map(accumulator => ({
   value: accumulator.accumulator,
@@ -107,6 +107,8 @@ class AggregateEditor extends React.Component<StateProps & DispatchProps> {
 
     const currentStage = newStages[activeStage] as AggregateStage;
 
+    const accumulator = metricConfigAccumulator.value;
+
     let newMetricName;
     if (metricName && metricName.length > 0) {
       newMetricName = metricName;
@@ -114,10 +116,31 @@ class AggregateEditor extends React.Component<StateProps & DispatchProps> {
       if (currentStage.metrics[newMetricName]) {
         // Already exists.
         alert('Metric with that name already exists, please specify a unique name');
+        return;
       }
     } else {
-      // let measureMessage = metricConfigMeasure ? ` with ${metricConfigMeasure.value}` : '';
-      newMetricName = `Group by '${Object.keys(selectedGroupBy).join(', ')}' and ${metricConfigAccumulator.label}`;
+      let measureMessage = '';
+      if (metricConfigMeasure && metricConfigMeasure.value && metricConfigMeasure.value.length > 0) {
+        if (
+          accumulator === ACCUMULATORS.ADD_TO_SET
+          || accumulator === ACCUMULATORS.PUSH
+          || accumulator === ACCUMULATORS.STD_DEV_POP
+          || accumulator === ACCUMULATORS.STD_DEV_SAMP
+          || accumulator === ACCUMULATORS.SUM
+        ) {
+          measureMessage = ` with ${metricConfigMeasure.value}`;
+        } else if (
+          accumulator === ACCUMULATORS.AVG
+          || accumulator === ACCUMULATORS.FIRST
+          || accumulator === ACCUMULATORS.LAST
+          || accumulator === ACCUMULATORS.MAX
+          || accumulator === ACCUMULATORS.MIN
+        ) {
+          measureMessage = ` of ${metricConfigMeasure.value}`;
+        }
+      }
+
+      newMetricName = `Group by '${Object.keys(selectedGroupBy).join(', ')}' and ${metricConfigAccumulator.label}${measureMessage}`;
     }
 
     if (currentStage.metrics[newMetricName]) {
@@ -130,7 +153,7 @@ class AggregateEditor extends React.Component<StateProps & DispatchProps> {
     // TODO: Name conflicts.
     currentStage.metrics[newMetricName] = {
       groupBy: Object.keys(selectedGroupBy),
-      accumulator: metricConfigAccumulator.value,
+      accumulator,
       // TODO: We can be more selective about which accumulators we allow
       // null as a measure for (like $sum).
       measure: metricConfigMeasure ? metricConfigMeasure.value : ''
