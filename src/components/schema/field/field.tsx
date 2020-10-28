@@ -482,7 +482,7 @@ class Field extends Component<props & StateProps & DispatchProps> {
         className="schema-field-changes-area"
       >
         <FontAwesomeIcon
-          className="schema-field-changes-icon"
+          className="changesicon"
           icon={faHistory}
         />
         <div className="schema-field-changes-list">
@@ -541,7 +541,8 @@ class Field extends Component<props & StateProps & DispatchProps> {
       <div className={cls}>
         <div className="row">
           {isHiddenField && <div className="schema-field-is-hidden" />}
-          <div className="col-sm-4">
+
+          <div className="col-sm-10 offset-sm-1">
             <div className="schema-field-name">
               {nestedDocType && (
                 <button
@@ -569,8 +570,7 @@ class Field extends Component<props & StateProps & DispatchProps> {
             <div className="schema-field-type-list">
               {typeList}
             </div>
-          </div>
-          <div className="col-sm-7 offset-sm-1">
+       
             <Minichart
               fieldName={this.props.path}
               type={activeType as InnerFieldType}
@@ -581,7 +581,7 @@ class Field extends Component<props & StateProps & DispatchProps> {
             className="schema-field-options-button"
             onClick={this.onClickShowFieldOptions}
           >
-            <FontAwesomeIcon
+            <FontAwesomeIcon className="ellipsisbutton"
               icon={faEllipsisH}
             />
           </button>

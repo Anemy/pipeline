@@ -142,6 +142,14 @@
 }
 
 :global {
+  .ellipsisbutton {
+  margin-right: 20px;
+  }
+  .changesicon {
+    top: -14px;
+    left: -30px;
+    position: absolute
+    }
   .sampling-message {
     border-bottom: 1px solid @gray7;
     font-size: 13px;
@@ -185,7 +193,7 @@
     // .list-group;
     .schema-field {
       // .list-group-item;
-      padding: 24px 0 0 0;
+      padding: 20px 0 0 0;
       border-bottom: 3px solid @gray8;
       background: @pw;
       transition: all 250ms ease-out;
@@ -193,14 +201,15 @@
 
       .row {
         margin-bottom: 24px;
+        margin-left:-50px;
       }
 
       .schema-field-type-list {
-        padding-left: 24px;
+        padding-left: 0px;
       }
 
       .schema-field-name {
-        padding-left: 24px;
+        padding-left: 0px;
       }
 
       .array-subtypes {
