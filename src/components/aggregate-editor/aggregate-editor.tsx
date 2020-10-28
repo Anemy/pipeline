@@ -15,24 +15,11 @@ import Stage, { AggregateStage, MetricType, STAGES } from '../../models/stage';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import Schema from '../../models/schema';
-
-// TODO: Pull from https://github.com/mongodb-js/vscode-mongodb-language/blob/master/syntaxes/mongodb-symbols.json
-const aggAccumulators = [
-  '$addToSet',
-  '$avg',
-  '$first',
-  '$last',
-  '$max',
-  '$min',
-  '$push',
-  '$stdDevPop',
-  '$stdDevSamp',
-  '$sum'
-];
+import { aggAccumulators } from '../../models/accumulators';
 
 const accumulatorOptions = aggAccumulators.map(accumulator => ({
-  value: accumulator,
-  label: accumulator.substr(1) // remove $
+  value: accumulator.accumulator,
+  label: accumulator.displayName
 }));
 
 type StateType = {
@@ -82,17 +69,6 @@ class AggregateEditor extends React.Component<StateProps & DispatchProps> {
   // }
 
   onClickSaveMetric = () => {
-    if (!this.state.selectedGroupBy || Object.keys(this.state.selectedGroupBy).length === 0) {
-      alert('Please select a group by option before adding a metric.');
-      return;
-    }
-
-    if (Object.keys(this.props.metrics).length > 0) {
-      // TODO: Allow multiple with same group by or multiple with different group by?
-      alert('We currently only allow 1 metric at a time.');
-      return;
-    }
-
     const {
       metricName,
       metricConfigMeasure,
@@ -102,8 +78,30 @@ class AggregateEditor extends React.Component<StateProps & DispatchProps> {
 
     const {
       activeStage,
+      metrics,
       stages
     } = this.props;
+
+    if (!selectedGroupBy || Object.keys(selectedGroupBy).length === 0) {
+      alert('Please select a group by option before adding a metric.');
+      return;
+    }
+
+    if (!metricConfigAccumulator || Object.keys(metricConfigAccumulator).length === 0) {
+      alert('Please select an accumulator before adding a metric.');
+      return;
+    }
+
+    if (
+      Object.keys(metrics).length > 0
+      && !!metrics[Object.keys(metrics)[0]].groupBy.find(currentGroupBy => (
+        !Object.keys(selectedGroupBy).includes(currentGroupBy)
+      ))
+    ) {
+      // TODO: Allow multiple with same group by or multiple with different group by?
+      alert('We currently only allow 1 set of group by options at a time.');
+      return;
+    }
 
     const newStages = [...stages];
 
@@ -112,15 +110,29 @@ class AggregateEditor extends React.Component<StateProps & DispatchProps> {
     let newMetricName;
     if (metricName && metricName.length > 0) {
       newMetricName = metricName;
+
+      if (currentStage.metrics[newMetricName]) {
+        // Already exists.
+        alert('Metric with that name already exists, please specify a unique name');
+      }
     } else {
       newMetricName = `Group by '${Object.keys(selectedGroupBy).join(', ')}' and ${metricConfigAccumulator.label}`;
+    }
+
+    if (currentStage.metrics[newMetricName]) {
+      // Metric with the same auto generated name already exists.
+      // TODO: Just add a number index or something.
+      alert('Metric with that name already exists, please specify a unique name');
+      return;
     }
 
     // TODO: Name conflicts.
     currentStage.metrics[newMetricName] = {
       groupBy: Object.keys(selectedGroupBy),
       accumulator: metricConfigAccumulator.value,
-      measure: metricConfigMeasure.value
+      // TODO: We can be more selective about which accumulators we allow
+      // null as a measure for (like $sum).
+      measure: metricConfigMeasure ? metricConfigMeasure.value : ''
     };
     // TODO: Add the group by.
 

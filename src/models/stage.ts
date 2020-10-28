@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 
 import Schema, { placeHolderSchema } from './schema';
+import { ACCUMULATORS, getAccumulator } from './accumulators';
 
 export enum STAGES {
   FILTER = 'FILTER',
@@ -25,7 +26,6 @@ export interface Stage {
   // content: any;
   // geoLayers: any;
   id: string;
-
 
   errorLoadingSampleDocuments: string;
   hasLoadedSampleDocuments: boolean;
@@ -230,34 +230,39 @@ export class AggregateStage extends BasicStage implements Stage {
   getPipelineFromStage = () => {
     const pipeline: any[] = [];
 
+    if (!this.metrics || Object.keys(this.metrics).length === 0) {
+      return pipeline;
+    }
+
     console.log('build aggregate stage', this.metrics);
 
-    // TODO: The group by has to be set for each stage.
-    // Group by always needs to be the same.
+    let groupBy: string | { [fieldName: string]: string } = {};
 
-    // How do we do multiple group by at once?
-    // Can we?
+    // Currently we assume every metric has same group by.
+    // TODO: Allow multiple group bys somehow.
+    for (const fieldName of this.metrics[Object.keys(this.metrics)[0]].groupBy) {
+      groupBy[fieldName] = `$${fieldName}`;
+    }
+
+    if (Object.keys(groupBy).length === 1) {
+      groupBy = groupBy[Object.keys(groupBy)[0]];
+    }
+
+    const groupStage: any = {
+      _id: groupBy
+    };
 
     for (const metricName of Object.keys(this.metrics)) {
-      let groupBy: string | { [fieldName: string]: string } = {};
-      for (const fieldName of this.metrics[metricName].groupBy) {
-        groupBy[fieldName] = `$${fieldName}`;
-      }
-
-      if (Object.keys(groupBy).length === 1) {
-        groupBy = groupBy[Object.keys(groupBy)[0]];
-      }
-
-      pipeline.push({
-        $group: {
-          _id: groupBy,
-          [metricName]: {
-            // TODO: More kinds of accumulators.
-            [this.metrics[metricName].accumulator]: 1
-          }
-        }
-      });
+      groupStage[metricName] = {
+        [this.metrics[metricName].accumulator]: getAccumulator(
+          this.metrics[metricName].accumulator as ACCUMULATORS
+        ).buildAccumulatorWithMeasure(this.metrics[metricName].measure)
+      };
     }
+
+    pipeline.push({
+      $group: groupStage
+    })
 
     return pipeline;
   }
