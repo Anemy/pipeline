@@ -111,16 +111,24 @@ class StagesBar extends React.Component<StateProps & DispatchProps> {
 
     let newActiveStage = activeStage;
 
+    let reloadDocs = true;
     if (activeStage === stageIndexToDelete) {
       if (stages.length - 1 === activeStage) {
         newActiveStage = activeStage - 1;
       }
     } else if (stageIndexToDelete < activeStage) {
       newActiveStage--;
+    } else {
+      reloadDocs = false;
     }
 
     const newStages = [...stages];
     newStages.splice(stageIndexToDelete, 1);
+
+    if (reloadDocs) {
+      newStages[newActiveStage].hasLoadedSampleDocuments = false;
+      newStages[newActiveStage].hasAnalyzedSchema = false;
+    }
 
     this.props.updateStore({
       activeStage: newActiveStage,

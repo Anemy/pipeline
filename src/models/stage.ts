@@ -125,17 +125,16 @@ export class TransformStage extends BasicStage implements Stage {
   getPipelineFromStage = () => {
     const pipeline: any[] = [];
 
-
     // let findValNiceLooking:: any;
     const fieldsForFindAndReplaceProject: { [fieldPath: string]: any } = {};
     for (const fieldPath of Object.keys(this.findAndReplaceFields)) {
-      let findValNiceLooking = this.findAndReplaceFields[fieldPath].findValue;
+      const findVal = this.findAndReplaceFields[fieldPath].findValue;
       // if (isNaN(Number(findValNiceLooking))) {
       //   findValNiceLooking = `"${findValNiceLooking}"`;
       //   // When it's a string, wrap it in quotes.
       // }
 
-      let replaceValNicelooking = this.findAndReplaceFields[fieldPath].replaceWithValue;
+      const replaceVal = this.findAndReplaceFields[fieldPath].replaceWithValue;
       // if (isNaN(Number(replaceValNicelooking))) {
       //   replaceValNicelooking = `"${replaceValNicelooking}"`;
       //   // When it's a string, wrap it in quotes.
@@ -153,20 +152,17 @@ export class TransformStage extends BasicStage implements Stage {
       // };
       fieldsForFindAndReplaceProject[fieldPath] = {
         $reduce: {
-          input: { $split: [ `$${fieldPath}`, findValNiceLooking] },
+          input: { $split: [`$${fieldPath}`, findVal] },
           initialValue: '',
           in: {
-              $concat: [
-                  '$$value',
-                  {$cond: [{$eq: ['$$value', '']}, '', replaceValNicelooking]}, 
-                  '$$this']
+            $concat: [
+              '$$value',
+              { $cond: [{ $eq: ['$$value', ''] }, '', replaceVal] },
+              '$$this'
+            ]
           }
-      }
+        }
       };
-
-
-
-    
     }
 
     if (Object.keys(fieldsForFindAndReplaceProject).length > 0) {
