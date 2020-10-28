@@ -100,7 +100,10 @@ class StagesBar extends React.Component<StateProps & DispatchProps> {
     });
   };
 
-  onDeleteStageClicked = (stageIndexToDelete: number): void => {
+  onDeleteStageClicked = (e: React.MouseEvent, stageIndexToDelete: number): void => {
+    e.preventDefault();
+    e.stopPropagation();
+
     const {
       activeStage,
       stages
@@ -109,11 +112,11 @@ class StagesBar extends React.Component<StateProps & DispatchProps> {
     let newActiveStage = activeStage;
 
     if (activeStage === stageIndexToDelete) {
-      if (stages.length === 1) {
-        newActiveStage = NO_ACTIVE_STAGE;
-      } else if (stages.length - 1 === activeStage) {
-        newActiveStage = stages.length - 2;
+      if (stages.length - 1 === activeStage) {
+        newActiveStage = activeStage - 1;
       }
+    } else if (stageIndexToDelete < activeStage) {
+      newActiveStage--;
     }
 
     const newStages = [...stages];
@@ -237,7 +240,7 @@ class StagesBar extends React.Component<StateProps & DispatchProps> {
                 {getNiceStageNameForStageType(stage.type)}
               </div>
               <FontAwesomeIcon
-                onClick={() => this.onDeleteStageClicked(stageIndex)}
+                onClick={(e) => this.onDeleteStageClicked(e, stageIndex)}
                 className="stages-bar-stage-delete-button"
                 icon={faTimes}
               />

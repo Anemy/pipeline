@@ -108,8 +108,6 @@ class D3Component extends Component<props & StateProps & DispatchProps> {
     // TODO: Maybe we want more deconstructing to make sure we're not
     // editing refs of current stages.
 
-    // console.log('update type:', updateFilterType);
-    // console.log('options', options);
     switch (updateFilterType) {
       case UPDATE_FILTER_TYPE.SET_GEO_WITHIN_VALUE:
         const newValue: any = {};
@@ -252,7 +250,7 @@ class D3Component extends Component<props & StateProps & DispatchProps> {
         }
         break;
       default:
-        console.log('UKNOWN FILTER UPDATE TYPE:', updateFilterType);
+        new Error(`Unknown filter type: ${updateFilterType}`);
         break;
     }
 

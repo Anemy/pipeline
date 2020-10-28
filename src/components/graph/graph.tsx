@@ -76,7 +76,6 @@ class Graph extends React.Component<props & StateProps & DispatchProps> {
         height
       } = this.props;
 
-      // console.log('draw bg');
       ctx.fillStyle = '#f5f5f5';
       ctx.fillRect(visible_area[0], visible_area[1], visible_area[2], visible_area[3]);
 
@@ -131,11 +130,7 @@ class Graph extends React.Component<props & StateProps & DispatchProps> {
         }
         textHeight += textMeasurements.actualBoundingBoxDescent + textMeasurements.actualBoundingBoxAscent + 2;
       }
-      // const textMeasurements = ctx.measureText(text);
-      // const textHeightMaybe = textMeasurements.actualBoundingBoxDescent + textMeasurements.actualBoundingBoxAscent;
-
-      // console.log('textHeightMaybe', textHeightMaybe);
-      // console.log('textMeasurements', textMeasurements);
+      
       const padding = 30;
       const halfPadding = padding / 2;
       ctx.strokeRect(pos[0], pos[1], textWidth + padding, textHeight + padding);
