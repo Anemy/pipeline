@@ -372,7 +372,7 @@ export const getDescriptionForStageType = (stageType: STAGES) => {
     case STAGES.AGGREGATE:
       return 'Group your documents together, build averages, count fields, and more.';
     case STAGES.FILTER:
-      return 'Match certain documents in the pipeline, leaving only the documents you want to see.'
+      return 'Match certain documents in the pipeline, filtering for the documents you want to see.'
     case STAGES.DATA_SOURCE:
       return 'Pull more data into your pipeline.'
     default:
