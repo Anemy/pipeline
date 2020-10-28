@@ -152,14 +152,21 @@ export class TransformStage extends BasicStage implements Stage {
       //   }
       // };
       fieldsForFindAndReplaceProject[fieldPath] = {
-        $cond: {
-          if: {
-            $eq: [`$${fieldPath}`, findValNiceLooking]
-          },
-          then: replaceValNicelooking,
-          else: `$${fieldPath}`
-        }
+        $reduce: {
+          input: { $split: [ `$${fieldPath}`, findValNiceLooking] },
+          initialValue: '',
+          in: {
+              $concat: [
+                  '$$value',
+                  {$cond: [{$eq: ['$$value', '']}, '', replaceValNicelooking]}, 
+                  '$$this']
+          }
+      }
       };
+
+
+
+    
     }
 
     if (Object.keys(fieldsForFindAndReplaceProject).length > 0) {
