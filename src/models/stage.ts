@@ -292,7 +292,7 @@ export const ensureWeAreOnValidStageForAction = (
 
       // Copy details/sample docs from current stage.
       newStage.copyStageItems(newStages[activeStage]);
-      if (activeStage !== 0) {
+      if (activeStage !== 0 && !(newStages[activeStage].type === STAGES.FILTER && Object.keys((newStages[activeStage] as FilterStage).content).length === 0)) {
         newStage.documentsAreUpToDate = false;
       }
 

@@ -25,6 +25,9 @@ code {
 
 .smalltalk .content-area {
   white-space: pre;
+  overflow: auto !important;
+  max-width: 400px;
+  max-height: 400px;
 }
 
 .smalltalk input {

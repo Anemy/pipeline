@@ -490,7 +490,7 @@ class Field extends Component<props & StateProps & DispatchProps> {
             Renamed '{this.props.name}' to '{renamedFieldName}'
           </div>}
           {isFindAndReplaceField && <div className="schema-field-change-item">
-            Replacing '{(stages[activeStage] as TransformStage).findAndReplaceFields[path].findValue}' with '{(stages[activeStage] as TransformStage).findAndReplaceFields[path].replaceWithValue}'
+            Replace '{(stages[activeStage] as TransformStage).findAndReplaceFields[path].findValue}' with '{(stages[activeStage] as TransformStage).findAndReplaceFields[path].replaceWithValue}'
           </div>}
         </div>
       </div>
