@@ -3,6 +3,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import SplitterLayout from 'react-splitter-layout';
 import Button from '@leafygreen-ui/button';
+import fs from 'fs';
 
 import 'react-splitter-layout/lib/index.css';
 
@@ -202,6 +203,77 @@ class StageWorkspace extends React.Component<StateProps & DispatchProps> {
     }
   };
 
+  saveImageCallback = async (canvas: HTMLCanvasElement, filePath: string) => {
+    const blob: Blob | null = await new Promise(
+      (resolve) => canvas.toBlob(blob => resolve(blob), 'image/png')// with jpg maybe: , 0.8)
+    );
+    if (blob === null) {
+      console.log('null blob');
+      return;
+    }
+    const buffer = new Buffer(await blob.arrayBuffer());
+
+    await new Promise(
+      (resolve, reject) => fs.writeFile(
+        filePath,
+        buffer,
+        'binary',
+        (err: Error | null) => {
+          if (err === null) {
+            resolve();
+          } else {
+            reject(err);
+          }
+        }
+      )
+    );
+  }
+
+  shownSaved = false;
+
+  saveIceberg = () => {
+    //   function saveCallback(filePath) {
+    //     // Get the DataUrl from the Canvas
+    //     const url = canvas.toDataURL('image/jpg', 0.8);
+
+    //     // remove Base64 stuff from the Image
+    //     const base64Data = url.replace(/^data:image\/png;base64,/, "");
+    //     fs.writeFile(filePath, base64Data, 'base64', function (err) {
+    //         console.log(err);
+    //     });
+    // }
+    const canvas = document.getElementById('defaultCanvas0');
+    const imageName = `Iceberg series - ${Date.now()}.png`;
+
+    if (!this.shownSaved) {
+      this.shownSaved = true;
+      alert('Image saved to current directory. We wont show alerts in future when images save.')
+    }
+
+    if (canvas === null) {
+      console.log('no canvas, can\'t save image');
+      return;
+    }
+
+    this.saveImageCallback(canvas as HTMLCanvasElement, imageName);
+
+
+    // const imageData = (canvas as any).toDataURL('image/png');
+    // // document.write(`<img src="${imageData}"/>`);
+
+    // const button: any = document.getElementById('iceberg-btn-download');
+    // // button.href = dataURL;
+    // button.href = imageData;
+
+    //     var button = document.getElementById('btn-download');
+    // button.addEventListener('click', function (e) {
+    //     var dataURL = canvas.toDataURL('image/png');
+    //     button.href = dataURL;
+    // });
+
+
+  };
+
   renderNoActiveStage() {
     const {
       canvasMeasurements
@@ -227,6 +299,16 @@ class StageWorkspace extends React.Component<StateProps & DispatchProps> {
             onClick={() => this.props.updateStore({ activeStage: 0 })}
           >
             View data source
+          </Button>
+
+          <Button
+            variant="primary"
+            id="iceberg-btn-download"
+            className="stage-workspace-empty-state-button"
+            title="View data source"
+            onClick={this.saveIceberg}
+          >
+            Download pic
           </Button>
         </div>
       </div>

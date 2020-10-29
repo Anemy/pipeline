@@ -5,7 +5,7 @@ export default function getSetup(canvasWidth: number, canvasHeight: number, p5: 
     sky: '#f5f5f5',
     under: '#116149', // 'rgba(11, 59, 53, 150)', // under: '#116149',
     above: '#13AA52', // rgba(11, 59, 53, 0.5) // 13AA52
-    drawUnder: Math.random() > 0.5
+    drawUnder: Math.random() > 0.35
   }];
 
   let MIN_SOOT_COUNT = 50;
@@ -53,7 +53,7 @@ export default function getSetup(canvasWidth: number, canvasHeight: number, p5: 
 
     sola(canvasWidth, canvasHeight);
 
-    p5.fill(255, 255, 255, 255 * Math.random() * Math.random());
+    p5.fill(255, 255, 255, 255 * Math.random() * Math.random() * Math.random());
     p5.rect(0, 0, canvasWidth, canvasHeight);
 
     let maxSootTimes = 6 + Math.floor(Math.random() * 10);
