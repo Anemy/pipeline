@@ -95,7 +95,7 @@ const MinAccumulator = {
 };
 const PushAccumulator = {
   accumulator: ACCUMULATORS.PUSH,
-  displayName: 'Add to Array',
+  displayName: 'All Values',
   buildAccumulatorWithMeasure: (measure: string) => {
     if (!measure || measure.length === 0) {
       // This should probably error...
@@ -107,7 +107,7 @@ const PushAccumulator = {
 };
 const StdDevPopAccumulator = {
   accumulator: ACCUMULATORS.STD_DEV_POP,
-  displayName: 'Standard Deviation (population)',
+  displayName: 'Standard Deviation (Population)',
   buildAccumulatorWithMeasure: (measure: string) => {
     if (!measure || measure.length === 0) {
       // This should probably error...
@@ -119,7 +119,7 @@ const StdDevPopAccumulator = {
 };
 const StdDevSampAccumulator = {
   accumulator: ACCUMULATORS.STD_DEV_SAMP,
-  displayName: 'Standard Deviation Sample',
+  displayName: 'Standard Deviation (Sample)',
   buildAccumulatorWithMeasure: (measure: string) => {
     if (!measure || measure.length === 0) {
       // This should probably error...
@@ -185,17 +185,17 @@ export const getAccumulator = (accumulator: ACCUMULATORS): AggAccumulator => {
 //   accumulatorList.push(getAccumulator(accumulator));
 // }
 export const aggAccumulators: AggAccumulator[] = [
-  AddToSetAccumulator,
   AvgAccumulator,
+  SumAccumulator,
+  MinAccumulator,
+  MaxAccumulator,
+  CountAccumulator,
+  AddToSetAccumulator,
+  PushAccumulator,
   FirstAccumulator,
   LastAccumulator,
-  MaxAccumulator,
-  MinAccumulator,
-  PushAccumulator,
   StdDevPopAccumulator,
-  StdDevSampAccumulator,
-  SumAccumulator,
-  CountAccumulator
+  StdDevSampAccumulator
 ];
 
 // export const aggAcumulators = Object.keys(ACCUMULATORS).map(

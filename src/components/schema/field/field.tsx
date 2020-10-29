@@ -205,6 +205,7 @@ class Field extends Component<props & StateProps & DispatchProps> {
       currentStage.hiddenFields[path] = true;
     }
 
+
     currentStage.sampleDocumentsAreUpToDate = false;
 
     this.props.updateStore({

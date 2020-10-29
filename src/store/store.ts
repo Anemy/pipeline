@@ -7,7 +7,7 @@ export const SCHEMA_CONSTANTS = {
   'SCHEMA_PROBABILITY_PERCENT': 'schema-probability-percent'
 };
 
-export const DEFAULT_SAMPLE_COUNT = 50;
+export const DEFAULT_SAMPLE_COUNT = 500;
 
 export const DEFAULT_MAX_TIME_MS = 10000;
 

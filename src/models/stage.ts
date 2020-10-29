@@ -247,13 +247,19 @@ export class AggregateStage extends BasicStage implements Stage {
     if (Object.keys(groupBy).length === 1) {
       groupBy = groupBy[Object.keys(groupBy)[0]];
     }
-
+    const fieldsForReproject: { [fieldPath: string]: string | number } = {};
+    if (Object.keys(groupBy).length > 1) {
+      for (const renamedFieldPath of Object.keys(groupBy)) {
+        fieldsForReproject[renamedFieldPath] = `$_id.${renamedFieldPath}`;
+    }
+  }
     const groupStage: any = {
       _id: groupBy
     };
-
+    fieldsForReproject['_id'] = 0;
     for (const metricName of Object.keys(this.metrics)) {
       const metric = this.metrics[metricName];
+      fieldsForReproject[metricName] = 1;
 
       if (metric.accumulator == ACCUMULATORS.COUNT) {
         groupStage[metricName] = {
@@ -272,7 +278,9 @@ export class AggregateStage extends BasicStage implements Stage {
     pipeline.push({
       $group: groupStage
     })
-
+    pipeline.push({
+      $project: fieldsForReproject
+    })
     return pipeline;
   }
 }

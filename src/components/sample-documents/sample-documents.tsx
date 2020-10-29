@@ -28,7 +28,7 @@ type DispatchProps = {
   updateStore: (update: any) => void;
 };
 
-const MAX_DOCS_CAN_SHOW = 10;
+const MAX_DOCS_CAN_SHOW = 20;
 
 class SampleDocuments extends React.Component<StateProps & DispatchProps> {
   renderSampleDocuments() {

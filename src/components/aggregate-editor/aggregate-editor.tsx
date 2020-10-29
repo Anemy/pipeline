@@ -82,11 +82,6 @@ class AggregateEditor extends React.Component<StateProps & DispatchProps> {
       stages
     } = this.props;
 
-    if (!selectedGroupBy || Object.keys(selectedGroupBy).length === 0) {
-      alert('Please select a group by option before adding a metric.');
-      return;
-    }
-
     if (!metricConfigAccumulator || Object.keys(metricConfigAccumulator).length === 0) {
       alert('Please select an accumulator before adding a metric.');
       return;
@@ -121,26 +116,14 @@ class AggregateEditor extends React.Component<StateProps & DispatchProps> {
     } else {
       let measureMessage = '';
       if (metricConfigMeasure && metricConfigMeasure.value && metricConfigMeasure.value.length > 0) {
-        if (
-          accumulator === ACCUMULATORS.ADD_TO_SET
-          || accumulator === ACCUMULATORS.PUSH
-          || accumulator === ACCUMULATORS.STD_DEV_POP
-          || accumulator === ACCUMULATORS.STD_DEV_SAMP
-          || accumulator === ACCUMULATORS.SUM
-        ) {
-          measureMessage = ` with '${metricConfigMeasure.value}'`;
-        } else if (
-          accumulator === ACCUMULATORS.AVG
-          || accumulator === ACCUMULATORS.FIRST
-          || accumulator === ACCUMULATORS.LAST
-          || accumulator === ACCUMULATORS.MAX
-          || accumulator === ACCUMULATORS.MIN
-        ) {
           measureMessage = ` of '${metricConfigMeasure.value}'`;
-        }
       }
-
-      newMetricName = `Group by '${Object.keys(selectedGroupBy).join(', ')}' and ${metricConfigAccumulator.label}${measureMessage}`;
+      if (!selectedGroupBy || Object.keys(selectedGroupBy).length === 0) {
+        newMetricName = `${metricConfigAccumulator.label}${measureMessage}`;
+      } else {
+      // newMetricName = `${metricConfigAccumulator.label}${measureMessage} by '${Object.keys(selectedGroupBy).join(', ')}'`;
+      newMetricName = `${metricConfigAccumulator.label}${measureMessage}`;
+      }
     }
 
     if (currentStage.metrics[newMetricName]) {
