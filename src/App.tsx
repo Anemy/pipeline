@@ -2,7 +2,6 @@ import { MongoClient } from 'mongodb';
 import React from 'react';
 import { Provider } from 'react-redux';
 import { createStore } from 'redux';
-import LeafyGreenProvider from '@leafygreen-ui/leafygreen-provider';
 
 import { getInitialState, rootReducer } from './store/store';
 import Pipeline from './components/pipeline/pipeline';
@@ -67,9 +66,7 @@ class App extends React.Component {
         </div>}
         {!connectingToDataService && !errorConnectingToDataService && (
           <Provider store={this.store}>
-            <LeafyGreenProvider>
-              <Pipeline />
-            </LeafyGreenProvider>
+            <Pipeline />
           </Provider>
         )}
       </React.Fragment>

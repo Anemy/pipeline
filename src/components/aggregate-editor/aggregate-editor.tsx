@@ -253,21 +253,12 @@ class AggregateEditor extends React.Component<StateProps & DispatchProps> {
                 className="aggregate-editor-group-by-checkbox"
                 id={`checkbox-${field.path}-${index}`}
                 checked={!!selectedGroupBy[field.path]}
-                onChange={() => {
-                  const newGroupBy = {
-                    ...selectedGroupBy
-                  };
-
-                  if (newGroupBy[field.path]) {
-                    delete newGroupBy[field.path];
-                  } else {
-                    newGroupBy[field.path] = true;
+                onChange={() => this.setState({
+                  selectedGroupBy: {
+                    ...selectedGroupBy,
+                    [field.path]: !selectedGroupBy[field.path]
                   }
-
-                  this.setState({
-                    selectedGroupBy: newGroupBy
-                  });
-                }}
+                })}
               />
               <label
                 htmlFor={`checkbox-${field.path}-${index}`}
