@@ -31,15 +31,14 @@ class IcebergSeries extends React.Component<props> {
   }
 
   render() {
+    const { width, height } = this.props;
     const { version } = this.state;
 
     return (
       <Sketch
         className="iceberg-series"
         setup={this.setupIcebergSeries}
-        // mouseClicked={(e) => this.onClickSketch(e)}
-        key={`${version}`}
-      // draw={this.draw}
+        key={`${width}-${height}-${version}`}
       />
     );
   };

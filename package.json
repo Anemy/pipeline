@@ -19,6 +19,8 @@
     "@fortawesome/fontawesome-svg-core": "^1.2.32",
     "@fortawesome/free-solid-svg-icons": "^5.15.1",
     "@fortawesome/react-fontawesome": "^0.1.11",
+    "@leafygreen-ui/button": "^8.0.1",
+    "@leafygreen-ui/leafygreen-provider": "^2.0.1",
     "bson": "^4.2.0",
     "classnames": "^2.2.6",
     "concurrently": "^5.3.0",

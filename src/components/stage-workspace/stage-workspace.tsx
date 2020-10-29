@@ -2,6 +2,7 @@ import { MongoClient } from 'mongodb';
 import React from 'react';
 import { connect } from 'react-redux';
 import SplitterLayout from 'react-splitter-layout';
+import Button from '@leafygreen-ui/button';
 
 import 'react-splitter-layout/lib/index.css';
 
@@ -42,8 +43,28 @@ type StateType = {
   canvasMeasurements: any;
 };
 
+// Returns a function, that, as long as it continues to be invoked, will not
+// be triggered. The function will be called after it stops being called for
+// `wait` milliseconds.
+const debounce = (func: () => void, wait: number /* ms */) => {
+  let timeout: ReturnType<typeof setTimeout>;
+
+  return function executedFunction() { // was ...args here and func
+    const later = () => {
+      clearTimeout(timeout);
+      func();
+    };
+
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+};
+
+const RESIZE_DEBOUNCE_MS = 100;
+
 class StageWorkspace extends React.Component<StateProps & DispatchProps> {
   inactiveStateRef: any;
+  debouncedUpdateIcebergDimensions?: () => void;
 
   state: StateType = {
     canvasMeasurements: undefined
@@ -57,6 +78,15 @@ class StageWorkspace extends React.Component<StateProps & DispatchProps> {
         canvasMeasurements: rect
       });
     }
+
+    this.debouncedUpdateIcebergDimensions = debounce(this.updateIcebergDimensions, RESIZE_DEBOUNCE_MS);
+    // debouncedUpdateIcebergDimensions: () => void = debounce(function() , 250);
+
+    window.addEventListener('resize', this.debouncedUpdateIcebergDimensions);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.debouncedUpdateIcebergDimensions as () => void);
   }
 
   componentDidUpdate() {
@@ -75,6 +105,17 @@ class StageWorkspace extends React.Component<StateProps & DispatchProps> {
         this.loadSampleDocuments();
       }
     } else if (!this.state.canvasMeasurements && this.inactiveStateRef) {
+      const rect = this.inactiveStateRef.getBoundingClientRect();;
+
+      this.setState({
+        canvasMeasurements: rect
+      });
+    }
+  }
+
+  // Don't call this directly, use the debounce so we don't render a lot.
+  updateIcebergDimensions = () => {
+    if (this.inactiveStateRef && this.inactiveStateRef.getBoundingClientRect) {
       const rect = this.inactiveStateRef.getBoundingClientRect();;
 
       this.setState({
@@ -176,7 +217,17 @@ class StageWorkspace extends React.Component<StateProps & DispatchProps> {
           height={canvasMeasurements.height}
         />}
         <div className="stage-workspace-empty-state">
-          No active stage, please create a new one or choose one from above.
+          <div>
+            No active stage, create a new one above or
+          </div>
+          <Button
+            variant="primary"
+            className="stage-workspace-empty-state-button"
+            title="View data source"
+            onClick={() => this.props.updateStore({ activeStage: 0 })}
+          >
+            View data source
+          </Button>
         </div>
       </div>
     );

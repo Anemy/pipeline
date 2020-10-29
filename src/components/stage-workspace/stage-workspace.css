@@ -16,6 +16,15 @@
   right: 0;
   z-index: 5;
   position: absolute;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.stage-workspace-empty-state-button {
+  margin: 20px auto;
+  margin-bottom: 0px;
+  /* margin-top: 20px; */
 }
 
 .stage-workspace-container {
