@@ -23,6 +23,7 @@ import './stage-workspace.css';
 
 import SampleDocuments from '../sample-documents/sample-documents';
 import StageEditor from '../stage-editor/stage-editor';
+import IcebergSeries from '../iceberg/iceberg';
 // import { placeHolderSchema } from '../../models/schema';
 
 type StateProps = {
@@ -37,7 +38,27 @@ type DispatchProps = {
   updateStore: (update: any) => void;
 };
 
+type StateType = {
+  canvasMeasurements: any;
+};
+
 class StageWorkspace extends React.Component<StateProps & DispatchProps> {
+  inactiveStateRef: any;
+
+  state: StateType = {
+    canvasMeasurements: undefined
+  };
+
+  componentDidMount() {
+    if (!this.state.canvasMeasurements && this.inactiveStateRef) {
+      const rect = this.inactiveStateRef.getBoundingClientRect();;
+
+      this.setState({
+        canvasMeasurements: rect
+      });
+    }
+  }
+
   componentDidUpdate() {
     const {
       activeStage,
@@ -53,6 +74,12 @@ class StageWorkspace extends React.Component<StateProps & DispatchProps> {
       )) {
         this.loadSampleDocuments();
       }
+    } else if (!this.state.canvasMeasurements && this.inactiveStateRef) {
+      const rect = this.inactiveStateRef.getBoundingClientRect();;
+
+      this.setState({
+        canvasMeasurements: rect
+      });
     }
   }
 
@@ -135,9 +162,22 @@ class StageWorkspace extends React.Component<StateProps & DispatchProps> {
   };
 
   renderNoActiveStage() {
+    const {
+      canvasMeasurements
+    } = this.state;
+
     return (
-      <div className="stage-workspace-empty-state">
-        No active stage, please create a new one or choose one from above.
+      <div
+        className="stage-workspace-empty-state-container"
+        ref={ref => this.inactiveStateRef = ref}
+      >
+        {canvasMeasurements && <IcebergSeries
+          width={canvasMeasurements.width}
+          height={canvasMeasurements.height}
+        />}
+        <div className="stage-workspace-empty-state">
+          No active stage, please create a new one or choose one from above.
+        </div>
       </div>
     );
   }
